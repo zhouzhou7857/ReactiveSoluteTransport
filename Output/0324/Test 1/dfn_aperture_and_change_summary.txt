@@ -1,0 +1,20 @@
+Init file: DFN_init.txt
+Delta file: DFN_aperture_delta.txt
+Corrected delta file: DFN_aperture_delta_corrected.txt
+Aperture change is recomputed by coordinate matching against DFN_init.txt.
+
+Initial aperture:
+  count = 4481
+  min = 7.125e-05
+  max = 0.000235588
+  mean = 0.000129482549587
+  median = 0.000127059
+  std = 2.64385811457e-05
+
+Aperture change:
+  count = 4481
+  min = 0
+  max = 1.086e-06
+  mean = 4.59423789333e-08
+  median = 2.3e-08
+  std = 6.94468674324e-08

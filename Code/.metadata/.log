@@ -1,0 +1,127 @@
+!SESSION 2019-12-09 11:33:41.345 -----------------------------------------------
+eclipse.buildId=4.10.0.I20181206-0815
+java.version=1.8.0_161
+java.vendor=Oracle Corporation
+BootLoader constants: OS=linux, ARCH=x86_64, WS=gtk, NL=fr_FR
+Framework arguments:  -product org.eclipse.epp.package.cpp.product -desktop
+Command-line arguments:  -os linux -ws gtk -arch x86_64 -product org.eclipse.epp.package.cpp.product -desktop
+
+!ENTRY org.eclipse.launchbar.core 2 0 2019-12-09 11:34:12.069
+!MESSAGE Enablement expression is missing for config provider for org.eclipse.cdt.arduino.core.descriptorType
+
+!ENTRY org.eclipse.launchbar.core 2 0 2019-12-09 11:34:12.070
+!MESSAGE Enablement expression is missing for descriptor type org.eclipse.cdt.debug.core.coreBuildDescriptorType
+
+!ENTRY org.eclipse.launchbar.core 2 0 2019-12-09 11:34:12.070
+!MESSAGE Enablement expression is missing for config provider for org.eclipse.cdt.debug.core.coreBuildDescriptorType
+
+!ENTRY org.eclipse.launchbar.core 2 0 2019-12-09 11:34:12.070
+!MESSAGE Enablement expression is missing for config provider for org.eclipse.cdt.debug.core.coreBuildDescriptorType
+
+!ENTRY org.eclipse.launchbar.core 2 0 2019-12-09 11:34:12.070
+!MESSAGE Enablement expression is missing for config provider for org.eclipse.cdt.debug.core.coreBuildDescriptorType
+
+!ENTRY org.eclipse.launchbar.core 2 0 2019-12-09 11:34:12.070
+!MESSAGE Enablement expression is missing for config provider for org.eclipse.cdt.debug.core.coreBuildDescriptorType
+
+!ENTRY org.eclipse.equinox.p2.touchpoint.natives 4 0 2019-12-09 11:35:13.755
+!MESSAGE Manual restore of backup needed for: /tmp/_home_ajay_eclipse_cpp-latest-released_eclipse_2ddd4746b8a0_7f0001018031/_/home/ajay/eclipse/cpp-latest-released/eclipse/.eclipseproduct
+
+!ENTRY org.eclipse.equinox.p2.touchpoint.natives 4 0 2019-12-09 11:35:13.756
+!MESSAGE 0 items out of 1 items restored.
+
+!ENTRY org.eclipse.equinox.p2.engine 4 4 2019-12-09 11:35:13.756
+!MESSAGE An error occurred while committing the engine session for profile: _home_ajay_eclipse_cpp-latest-released_eclipse.
+!SUBENTRY 1 org.eclipse.equinox.p2.touchpoint.natives 4 0 2019-12-09 11:35:13.756
+!MESSAGE Restore of backup failed - see log for details. Backup directory name: _home_ajay_eclipse_cpp-latest-released_eclipse_2ddd4746b8a0_7f0001018031.
+!STACK 0
+java.io.IOException: Errors while restoring - see earlier logged errors
+	at org.eclipse.equinox.internal.p2.touchpoint.natives.BackupStore.close(BackupStore.java:546)
+	at org.eclipse.equinox.internal.p2.touchpoint.natives.BackupStore.restore(BackupStore.java:508)
+	at org.eclipse.equinox.internal.p2.touchpoint.natives.LazyBackupStore.restore(LazyBackupStore.java:58)
+	at org.eclipse.equinox.internal.p2.touchpoint.natives.NativeTouchpoint.rollback(NativeTouchpoint.java:205)
+	at org.eclipse.equinox.internal.p2.engine.EngineSession.rollback(EngineSession.java:199)
+	at org.eclipse.equinox.internal.p2.engine.Engine.perform(Engine.java:89)
+	at org.eclipse.equinox.internal.p2.engine.Engine.perform(Engine.java:48)
+	at org.eclipse.equinox.internal.provisional.p2.director.PlanExecutionHelper.executePlan(PlanExecutionHelper.java:45)
+	at org.eclipse.oomph.p2.internal.core.ProfileTransactionImpl$3.commit(ProfileTransactionImpl.java:543)
+	at org.eclipse.oomph.p2.internal.core.ProfileTransactionImpl.commit(ProfileTransactionImpl.java:340)
+	at org.eclipse.oomph.setup.p2.impl.P2TaskImpl.perform(P2TaskImpl.java:733)
+	at org.eclipse.oomph.setup.internal.core.SetupTaskPerformer.doPerformNeededSetupTasks(SetupTaskPerformer.java:3335)
+	at org.eclipse.oomph.setup.internal.core.SetupTaskPerformer.access$1(SetupTaskPerformer.java:3278)
+	at org.eclipse.oomph.setup.internal.core.SetupTaskPerformer$WorkspaceUtil$1.run(SetupTaskPerformer.java:4514)
+	at org.eclipse.core.internal.resources.Workspace.run(Workspace.java:2295)
+	at org.eclipse.core.internal.resources.Workspace.run(Workspace.java:2322)
+	at org.eclipse.oomph.setup.internal.core.SetupTaskPerformer$WorkspaceUtil.performNeededSetupTasks(SetupTaskPerformer.java:4508)
+	at org.eclipse.oomph.setup.internal.core.SetupTaskPerformer$WorkspaceUtil.access$0(SetupTaskPerformer.java:4506)
+	at org.eclipse.oomph.setup.internal.core.SetupTaskPerformer.performNeededSetupTasks(SetupTaskPerformer.java:3269)
+	at org.eclipse.oomph.setup.internal.core.SetupTaskPerformer.performTriggeredSetupTasks(SetupTaskPerformer.java:3244)
+	at org.eclipse.oomph.setup.internal.core.SetupTaskPerformer.perform(SetupTaskPerformer.java:3144)
+	at org.eclipse.oomph.setup.ui.wizards.ProgressPage$9.run(ProgressPage.java:575)
+	at org.eclipse.oomph.setup.ui.wizards.ProgressPage$11$1.run(ProgressPage.java:701)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:63)
+
+!ENTRY org.eclipse.equinox.p2.engine 2 4 2019-12-09 11:35:13.769
+!MESSAGE An error occurred while uninstalling
+!SUBENTRY 1 org.eclipse.equinox.p2.engine 4 0 2019-12-09 11:35:13.769
+!MESSAGE session context was:(profile=_home_ajay_eclipse_cpp-latest-released_eclipse, phase=org.eclipse.equinox.internal.p2.engine.phases.Uninstall, operand=[R]org.eclipse.platform_root 4.10.0.v20181206-0815 --> null, action=org.eclipse.equinox.internal.p2.touchpoint.natives.actions.CleanupzipAction).
+!SUBENTRY 1 org.eclipse.equinox.p2.touchpoint.natives 4 0 2019-12-09 11:35:13.769
+!MESSAGE Backup of file /home/ajay/eclipse/cpp-latest-released/eclipse/.eclipseproduct failed.
+!STACK 0
+java.io.IOException: File that was copied to backup could not be deleted: /home/ajay/eclipse/cpp-latest-released/eclipse/.eclipseproduct
+	at org.eclipse.equinox.internal.p2.touchpoint.natives.BackupStore.moveToBackup(BackupStore.java:290)
+	at org.eclipse.equinox.internal.p2.touchpoint.natives.BackupStore.backup(BackupStore.java:254)
+	at org.eclipse.equinox.internal.p2.touchpoint.natives.LazyBackupStore.backup(LazyBackupStore.java:38)
+	at org.eclipse.equinox.internal.p2.touchpoint.natives.actions.CleanupzipAction.cleanupzip(CleanupzipAction.java:90)
+	at org.eclipse.equinox.internal.p2.touchpoint.natives.actions.CleanupzipAction.execute(CleanupzipAction.java:34)
+	at org.eclipse.equinox.internal.p2.engine.ParameterizedProvisioningAction.execute(ParameterizedProvisioningAction.java:42)
+	at org.eclipse.equinox.internal.p2.engine.Phase.mainPerform(Phase.java:187)
+	at org.eclipse.equinox.internal.p2.engine.Phase.perform(Phase.java:99)
+	at org.eclipse.equinox.internal.p2.engine.PhaseSet.perform(PhaseSet.java:50)
+	at org.eclipse.equinox.internal.p2.engine.Engine.perform(Engine.java:80)
+	at org.eclipse.equinox.internal.p2.engine.Engine.perform(Engine.java:48)
+	at org.eclipse.equinox.internal.provisional.p2.director.PlanExecutionHelper.executePlan(PlanExecutionHelper.java:45)
+	at org.eclipse.oomph.p2.internal.core.ProfileTransactionImpl$3.commit(ProfileTransactionImpl.java:543)
+	at org.eclipse.oomph.p2.internal.core.ProfileTransactionImpl.commit(ProfileTransactionImpl.java:340)
+	at org.eclipse.oomph.setup.p2.impl.P2TaskImpl.perform(P2TaskImpl.java:733)
+	at org.eclipse.oomph.setup.internal.core.SetupTaskPerformer.doPerformNeededSetupTasks(SetupTaskPerformer.java:3335)
+	at org.eclipse.oomph.setup.internal.core.SetupTaskPerformer.access$1(SetupTaskPerformer.java:3278)
+	at org.eclipse.oomph.setup.internal.core.SetupTaskPerformer$WorkspaceUtil$1.run(SetupTaskPerformer.java:4514)
+	at org.eclipse.core.internal.resources.Workspace.run(Workspace.java:2295)
+	at org.eclipse.core.internal.resources.Workspace.run(Workspace.java:2322)
+	at org.eclipse.oomph.setup.internal.core.SetupTaskPerformer$WorkspaceUtil.performNeededSetupTasks(SetupTaskPerformer.java:4508)
+	at org.eclipse.oomph.setup.internal.core.SetupTaskPerformer$WorkspaceUtil.access$0(SetupTaskPerformer.java:4506)
+	at org.eclipse.oomph.setup.internal.core.SetupTaskPerformer.performNeededSetupTasks(SetupTaskPerformer.java:3269)
+	at org.eclipse.oomph.setup.internal.core.SetupTaskPerformer.performTriggeredSetupTasks(SetupTaskPerformer.java:3244)
+	at org.eclipse.oomph.setup.internal.core.SetupTaskPerformer.perform(SetupTaskPerformer.java:3144)
+	at org.eclipse.oomph.setup.ui.wizards.ProgressPage$9.run(ProgressPage.java:575)
+	at org.eclipse.oomph.setup.ui.wizards.ProgressPage$11$1.run(ProgressPage.java:701)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:63)
+
+!ENTRY org.eclipse.oomph.setup.ui 1 0 2019-12-09 11:35:13.770
+!MESSAGE Setup tasks were performed during startup. See '/home/roubinet/.eclipse/org.eclipse.platform_4.10.0_1179090564_linux_gtk_x86_64/configuration/org.eclipse.oomph.setup/setup.log' for details
+!SESSION 2019-12-16 10:36:28.772 -----------------------------------------------
+eclipse.buildId=4.10.0.I20181206-0815
+java.version=1.8.0_161
+java.vendor=Oracle Corporation
+BootLoader constants: OS=linux, ARCH=x86_64, WS=gtk, NL=fr_FR
+Framework arguments:  -product org.eclipse.epp.package.cpp.product -desktop
+Command-line arguments:  -os linux -ws gtk -arch x86_64 -product org.eclipse.epp.package.cpp.product -desktop
+
+!ENTRY org.eclipse.launchbar.core 2 0 2019-12-16 10:38:15.247
+!MESSAGE Enablement expression is missing for config provider for org.eclipse.cdt.arduino.core.descriptorType
+
+!ENTRY org.eclipse.launchbar.core 2 0 2019-12-16 10:38:15.311
+!MESSAGE Enablement expression is missing for descriptor type org.eclipse.cdt.debug.core.coreBuildDescriptorType
+
+!ENTRY org.eclipse.launchbar.core 2 0 2019-12-16 10:38:15.311
+!MESSAGE Enablement expression is missing for config provider for org.eclipse.cdt.debug.core.coreBuildDescriptorType
+
+!ENTRY org.eclipse.launchbar.core 2 0 2019-12-16 10:38:15.311
+!MESSAGE Enablement expression is missing for config provider for org.eclipse.cdt.debug.core.coreBuildDescriptorType
+
+!ENTRY org.eclipse.launchbar.core 2 0 2019-12-16 10:38:15.311
+!MESSAGE Enablement expression is missing for config provider for org.eclipse.cdt.debug.core.coreBuildDescriptorType
+
+!ENTRY org.eclipse.launchbar.core 2 0 2019-12-16 10:38:15.312
+!MESSAGE Enablement expression is missing for config provider for org.eclipse.cdt.debug.core.coreBuildDescriptorType

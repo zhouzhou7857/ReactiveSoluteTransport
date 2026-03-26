@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?fileVersion 4.0.0?><cproject storage_type_id="org.eclipse.cdt.core.XmlProjectDescriptionStorage">
+	<storageModule moduleId="org.eclipse.cdt.core.settings">
+		<cconfiguration id="cdt.managedbuild.config.gnu.macosx.exe.debug.2131360999">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.config.gnu.macosx.exe.debug.2131360999" moduleId="org.eclipse.cdt.core.settings" name="Debug">
+				<externalSettings/>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.GNU_ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+				</extensions>
+			</storageModule>
+			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+				<configuration artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug" cleanCommand="rm -rf" description="" id="cdt.managedbuild.config.gnu.macosx.exe.debug.2131360999" name="Debug" parent="cdt.managedbuild.config.gnu.macosx.exe.debug">
+					<folderInfo id="cdt.managedbuild.config.gnu.macosx.exe.debug.2131360999." name="/" resourcePath="">
+						<toolChain id="cdt.managedbuild.toolchain.gnu.base.756773153" name="Linux GCC" superClass="cdt.managedbuild.toolchain.gnu.base">
+							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.GNU_ELF" id="cdt.managedbuild.target.gnu.platform.base.116057436" name="Debug Platform" osList="linux,hpux,aix,qnx" superClass="cdt.managedbuild.target.gnu.platform.base"/>
+							<builder buildPath="${workspace_loc:/HeatTransport1D}/Debug" id="cdt.managedbuild.target.gnu.builder.base.1650863732" keepEnvironmentInBuildfile="false" name="Gnu Make Builder" superClass="cdt.managedbuild.target.gnu.builder.base"/>
+							<tool id="cdt.managedbuild.tool.gnu.archiver.base.1505588668" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.base"/>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.base.1001778471" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.base">
+								<option id="gnu.cpp.compiler.option.include.paths.259829633" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+									<listOptionValue builtIn="false" value="/usr/include"/>
+									<listOptionValue builtIn="false" value="/usr/include/c++/5/bits"/>
+									<listOptionValue builtIn="false" value="/home/marwa/libraries/boost_1_61_0"/>
+									<listOptionValue builtIn="false" value="/home/marwa/libraries/boost-numeric-bindings"/>
+									<listOptionValue builtIn="false" value="/home/marwa/libraries/SuiteSparse/UMFPACK/Include"/>
+									<listOptionValue builtIn="false" value="/home/marwa/libraries/SuiteSparse/AMD/Include"/>
+									<listOptionValue builtIn="false" value="/home/marwa/libraries/CGAL-4.12-beta1/include"/>
+									<listOptionValue builtIn="false" value="/home/marwa/libraries/SuiteSparse/include"/>
+									<listOptionValue builtIn="false" value="/Developer/Library/Platform/CGAL-3.2.1/include"/>
+									<listOptionValue builtIn="false" value="/Developer/Library/Platform/CGAL-3.2.1/include/CGAL/config/msvc7"/>
+									<listOptionValue builtIn="false" value="/Developer/Library/Platform/boost_1_49_0"/>
+									<listOptionValue builtIn="false" value="/Developer/Library/Platform/boost-numeric-bindings"/>
+									<listOptionValue builtIn="false" value="/System/Library/Frameworks/OpenGL.framework/Versions/A/Headers"/>
+									<listOptionValue builtIn="false" value="/System/Library/Frameworks/GLUT.framework/Versions/A/Headers"/>
+									<listOptionValue builtIn="false" value="/Developer/Library/Platform/UMFPACK/Include"/>
+								</option>
+								<option id="gnu.cpp.compiler.option.optimization.level.387107607" name="Optimization Level" superClass="gnu.cpp.compiler.option.optimization.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.optimization.level.none" valueType="enumerated"/>
+								<option defaultValue="gnu.cpp.compiler.debugging.level.max" id="gnu.cpp.compiler.option.debugging.level.527741166" name="Debug Level" superClass="gnu.cpp.compiler.option.debugging.level" useByScannerDiscovery="false" valueType="enumerated"/>
+								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.544103686" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.c.compiler.base.689173721" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.base">
+								<option id="gnu.c.compiler.option.include.paths.997438962" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+									<listOptionValue builtIn="false" value="/home/ajay/libraries/boost_1_61_0"/>
+									<listOptionValue builtIn="false" value="/Developer/Library/Platform/CGAL-3.2.1/include/CGAL/config/msvc7"/>
+									<listOptionValue builtIn="false" value="/Developer/Library/Platform/boost_1_49_0"/>
+									<listOptionValue builtIn="false" value="/Developer/Library/Platform/boost-numeric-bindings"/>
+									<listOptionValue builtIn="false" value="/System/Library/Frameworks/OpenGL.framework/Versions/A/Headers"/>
+									<listOptionValue builtIn="false" value="/System/Library/Frameworks/GLUT.framework/Versions/A/Headers"/>
+									<listOptionValue builtIn="false" value="/Developer/Library/Platform/UMFPACK/Include"/>
+								</option>
+								<option defaultValue="gnu.c.optimization.level.none" id="gnu.c.compiler.option.optimization.level.1285159294" name="Optimization Level" superClass="gnu.c.compiler.option.optimization.level" useByScannerDiscovery="false" valueType="enumerated"/>
+								<option defaultValue="gnu.c.debugging.level.max" id="gnu.c.compiler.option.debugging.level.1835191701" name="Debug Level" superClass="gnu.c.compiler.option.debugging.level" useByScannerDiscovery="false" valueType="enumerated"/>
+								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1554518189" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.c.linker.base.1805982135" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.base"/>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.base.413517964" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.base">
+								<option id="gnu.cpp.link.option.libs.1961525087" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="CGAL"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="umfpack"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="amd"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="cholmod"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="colamd"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="ccolamd"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="suitesparseconfig"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="blas"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="camd"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="GL"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="glut"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="boost_thread"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="metis"/>
+								</option>
+								<option id="gnu.cpp.link.option.paths.135114533" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
+									<listOptionValue builtIn="false" value="/usr/lib/x86_64-linux-gnu"/>
+									<listOptionValue builtIn="false" value="/home/marwa/libraries/SuiteSparse/UMFPACK/Lib"/>
+									<listOptionValue builtIn="false" value="/home/marwa/libraries/libblas"/>
+									<listOptionValue builtIn="false" value="/home/marwa/libraries/SuiteSparse/AMD/Lib"/>
+									<listOptionValue builtIn="false" value="/home/marwa/libraries/SuiteSparse/CHOLMOD/Lib"/>
+									<listOptionValue builtIn="false" value="/home/marwa/libraries/SuiteSparse/COLAMD/Lib"/>
+									<listOptionValue builtIn="false" value="/home/marwa/libraries/SuiteSparse/CAMD/Lib"/>
+									<listOptionValue builtIn="false" value="/home/marwa/libraries/SuiteSparse/SuiteSparse_config"/>
+									<listOptionValue builtIn="false" value="/home/marwa/libraries/SuiteSparse/CCOLAMD/Lib"/>
+									<listOptionValue builtIn="false" value="/home/marwa/libraries/CGAL-4.12-beta1/lib"/>
+									<listOptionValue builtIn="false" value="/home/marwa/libraries/SuiteSparse/metis-5.1.0/build/Linux-x86_64/libmetis"/>
+								</option>
+								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.1449736466" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
+									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
+									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
+								</inputType>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.assembler.base.517171941" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.base">
+								<option id="gnu.both.asm.option.include.paths.1492221077" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="/home/ajay/libraries/boost_1_61_0"/>
+									<listOptionValue builtIn="false" value="/Developer/Library/Platform/CGAL-3.2.1/include/CGAL/config/msvc7"/>
+									<listOptionValue builtIn="false" value="/Developer/Library/Platform/boost_1_49_0"/>
+									<listOptionValue builtIn="false" value="/Developer/Library/Platform/boost-numeric-bindings"/>
+									<listOptionValue builtIn="false" value="/System/Library/Frameworks/OpenGL.framework/Versions/A/Headers"/>
+									<listOptionValue builtIn="false" value="/System/Library/Frameworks/GLUT.framework/Versions/A/Headers"/>
+									<listOptionValue builtIn="false" value="/Developer/Library/Platform/UMFPACK/Include"/>
+								</option>
+								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.1911815318" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
+							</tool>
+						</toolChain>
+					</folderInfo>
+					<sourceEntries>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
+					</sourceEntries>
+				</configuration>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+		</cconfiguration>
+		<cconfiguration id="cdt.managedbuild.config.macosx.exe.release.1380995650">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.config.macosx.exe.release.1380995650" moduleId="org.eclipse.cdt.core.settings" name="Release">
+				<externalSettings/>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.MachO64" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+				</extensions>
+			</storageModule>
+			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+				<configuration artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.release" cleanCommand="rm -rf" description="" id="cdt.managedbuild.config.macosx.exe.release.1380995650" name="Release" parent="cdt.managedbuild.config.macosx.exe.release">
+					<folderInfo id="cdt.managedbuild.config.macosx.exe.release.1380995650." name="/" resourcePath="">
+						<toolChain id="cdt.managedbuild.toolchain.gnu.macosx.base.1745775575" name="MacOSX GCC" superClass="cdt.managedbuild.toolchain.gnu.macosx.base">
+							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.MachO64" id="cdt.managedbuild.target.gnu.platform.macosx.base.193830379" name="Debug Platform" osList="macosx" superClass="cdt.managedbuild.target.gnu.platform.macosx.base"/>
+							<builder buildPath="${workspace_loc:/HeatTransport1D}/Release" id="cdt.managedbuild.target.gnu.builder.macosx.base.807174823" name="Gnu Make Builder.Release" superClass="cdt.managedbuild.target.gnu.builder.macosx.base"/>
+							<tool id="cdt.managedbuild.tool.macosx.c.linker.macosx.base.1639238120" name="MacOS X C Linker" superClass="cdt.managedbuild.tool.macosx.c.linker.macosx.base"/>
+							<tool id="cdt.managedbuild.tool.macosx.cpp.linker.macosx.base.1196165356" name="MacOS X C++ Linker" superClass="cdt.managedbuild.tool.macosx.cpp.linker.macosx.base">
+								<option id="macosx.cpp.link.option.libs.641334611" superClass="macosx.cpp.link.option.libs" useByScannerDiscovery="false" valueType="libs">
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="CGAL"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="umfpack"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="amd"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="cholmod"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="colamd"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="cblas"/>
+								</option>
+								<option id="macosx.cpp.link.option.paths.622637697" superClass="macosx.cpp.link.option.paths" useByScannerDiscovery="false" valueType="libPaths">
+									<listOptionValue builtIn="false" value="/Developer/Library/Platform/CGAL-3.2.1/lib/i386_Darwin-10.8_g++-4.2.1"/>
+									<listOptionValue builtIn="false" value="/Developer/Library/Platform/UMFPACK/Lib"/>
+									<listOptionValue builtIn="false" value="/Developer/Library/Platform/AMD/Lib"/>
+									<listOptionValue builtIn="false" value="/Developer/Library/Platform/CHOLMOD/Lib"/>
+									<listOptionValue builtIn="false" value="/Developer/Library/Platform/COLAMD/Lib"/>
+									<listOptionValue builtIn="false" value="/developer/Library/Platform/Atlas/lib/windows"/>
+								</option>
+								<option id="macosx.cpp.link.option.flags.1025628664" superClass="macosx.cpp.link.option.flags" useByScannerDiscovery="false" value=" -framework GLUT -framework openGL -framework Cocoa" valueType="string"/>
+								<inputType id="cdt.managedbuild.tool.macosx.cpp.linker.input.2030257352" superClass="cdt.managedbuild.tool.macosx.cpp.linker.input">
+									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
+									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
+								</inputType>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.assembler.macosx.base.177138287" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.macosx.base">
+								<option id="gnu.both.asm.option.include.paths.2135403388" superClass="gnu.both.asm.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+									<listOptionValue builtIn="false" value="/Developer/Library/Platform/CGAL-3.2.1/include"/>
+									<listOptionValue builtIn="false" value="/Developer/Library/Platform/CGAL-3.2.1/include/CGAL/config/msvc7"/>
+									<listOptionValue builtIn="false" value="/Developer/Library/Platform/boost_1_49_0"/>
+									<listOptionValue builtIn="false" value="/Developer/Library/Platform/boost-numeric-bindings"/>
+									<listOptionValue builtIn="false" value="/System/Library/Frameworks/OpenGL.framework/Versions/A/Headers"/>
+									<listOptionValue builtIn="false" value="/System/Library/Frameworks/GLUT.framework/Versions/A/Headers"/>
+									<listOptionValue builtIn="false" value="/Developer/Library/Platform/UMFPACK/Include"/>
+									<listOptionValue builtIn="false" value="/home/ajay/libraries/SuiteSparse/SuiteSparse_config"/>
+									<listOptionValue builtIn="false" value="/home/ajay/libraries/boost_1_61_0"/>
+								</option>
+								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.1699958065" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.archiver.macosx.base.1607512149" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.macosx.base"/>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.macosx.base.1899582530" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.macosx.base">
+								<option id="gnu.cpp.compiler.option.include.paths.22773900" superClass="gnu.cpp.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+									<listOptionValue builtIn="false" value="/usr/include"/>
+									<listOptionValue builtIn="false" value="/usr/include/c++/5/bits"/>
+									<listOptionValue builtIn="false" value="/Developer/Library/Platform/CGAL-3.2.1/include"/>
+									<listOptionValue builtIn="false" value="/Developer/Library/Platform/CGAL-3.2.1/include/CGAL/config/msvc7"/>
+									<listOptionValue builtIn="false" value="/Developer/Library/Platform/boost_1_49_0"/>
+									<listOptionValue builtIn="false" value="/Developer/Library/Platform/boost-numeric-bindings"/>
+									<listOptionValue builtIn="false" value="/System/Library/Frameworks/OpenGL.framework/Versions/A/Headers"/>
+									<listOptionValue builtIn="false" value="/System/Library/Frameworks/GLUT.framework/Versions/A/Headers"/>
+									<listOptionValue builtIn="false" value="/Developer/Library/Platform/UMFPACK/Include"/>
+								</option>
+								<option id="gnu.cpp.compiler.option.optimization.level.1119159848" superClass="gnu.cpp.compiler.option.optimization.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.optimization.level.most" valueType="enumerated"/>
+								<option id="gnu.cpp.compiler.option.debugging.level.523940869" superClass="gnu.cpp.compiler.option.debugging.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.debugging.level.none" valueType="enumerated"/>
+								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.646130904" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.c.compiler.macosx.base.1168084149" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.macosx.base">
+								<option id="gnu.c.compiler.option.include.paths.625444092" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+									<listOptionValue builtIn="false" value="/Developer/Library/Platform/CGAL-3.2.1/include"/>
+									<listOptionValue builtIn="false" value="/Developer/Library/Platform/CGAL-3.2.1/include/CGAL/config/msvc7"/>
+									<listOptionValue builtIn="false" value="/Developer/Library/Platform/boost_1_49_0"/>
+									<listOptionValue builtIn="false" value="/Developer/Library/Platform/boost-numeric-bindings"/>
+									<listOptionValue builtIn="false" value="/System/Library/Frameworks/OpenGL.framework/Versions/A/Headers"/>
+									<listOptionValue builtIn="false" value="/System/Library/Frameworks/GLUT.framework/Versions/A/Headers"/>
+									<listOptionValue builtIn="false" value="/Developer/Library/Platform/UMFPACK/Include"/>
+									<listOptionValue builtIn="false" value="/home/ajay/libraries/SuiteSparse/SuiteSparse_config"/>
+									<listOptionValue builtIn="false" value="/home/ajay/libraries/boost_1_61_0"/>
+								</option>
+								<option defaultValue="gnu.c.optimization.level.most" id="gnu.c.compiler.option.optimization.level.550608484" superClass="gnu.c.compiler.option.optimization.level" useByScannerDiscovery="false" valueType="enumerated"/>
+								<option id="gnu.c.compiler.option.debugging.level.1534264398" superClass="gnu.c.compiler.option.debugging.level" useByScannerDiscovery="false" value="gnu.c.debugging.level.none" valueType="enumerated"/>
+								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.2065859953" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
+							</tool>
+						</toolChain>
+					</folderInfo>
+					<sourceEntries>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
+					</sourceEntries>
+				</configuration>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+		</cconfiguration>
+	</storageModule>
+	<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+		<project id="HeatTransport1D.cdt.managedbuild.target.macosx.exe.1641160032" name="Executable" projectType="cdt.managedbuild.target.macosx.exe"/>
+	</storageModule>
+	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
+	<storageModule moduleId="refreshScope" versionNumber="2">
+		<configuration configurationName="Debug">
+			<resource resourceType="PROJECT" workspacePath="/HeatTransport1D"/>
+		</configuration>
+		<configuration configurationName="Release">
+			<resource resourceType="PROJECT" workspacePath="/HeatTransport1D"/>
+		</configuration>
+	</storageModule>
+	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets"/>
+	<storageModule moduleId="scannerConfiguration">
+		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.macosx.exe.release.1380995650;cdt.managedbuild.config.macosx.exe.release.1380995650.;cdt.managedbuild.tool.gnu.cpp.compiler.base.2128528573;cdt.managedbuild.tool.gnu.cpp.compiler.input.1268348238">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.macosx.exe.release.1380995650;cdt.managedbuild.config.macosx.exe.release.1380995650.;cdt.managedbuild.tool.gnu.c.compiler.base.44097200;cdt.managedbuild.tool.gnu.c.compiler.input.639844236">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.macosx.exe.debug.2131360999;cdt.managedbuild.config.gnu.macosx.exe.debug.2131360999.;cdt.managedbuild.tool.gnu.c.compiler.macosx.exe.debug.1635703528;cdt.managedbuild.tool.gnu.c.compiler.input.1828154472">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.macosx.exe.release.1380995650;cdt.managedbuild.config.macosx.exe.release.1380995650.;cdt.managedbuild.tool.gnu.cpp.compiler.macosx.exe.release.1758021208;cdt.managedbuild.tool.gnu.cpp.compiler.input.1928131485">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.macosx.exe.release.1380995650;cdt.managedbuild.config.macosx.exe.release.1380995650.;cdt.managedbuild.tool.gnu.c.compiler.macosx.exe.release.2062477786;cdt.managedbuild.tool.gnu.c.compiler.input.1599654076">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.macosx.exe.debug.2131360999;cdt.managedbuild.config.gnu.macosx.exe.debug.2131360999.;cdt.managedbuild.tool.gnu.c.compiler.base.689173721;cdt.managedbuild.tool.gnu.c.compiler.input.1554518189">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.macosx.exe.debug.2131360999;cdt.managedbuild.config.gnu.macosx.exe.debug.2131360999.;cdt.managedbuild.tool.gnu.cpp.compiler.base.1001778471;cdt.managedbuild.tool.gnu.cpp.compiler.input.544103686">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.macosx.exe.debug.2131360999;cdt.managedbuild.config.gnu.macosx.exe.debug.2131360999.;cdt.managedbuild.tool.gnu.cpp.compiler.macosx.exe.debug.1788058864;cdt.managedbuild.tool.gnu.cpp.compiler.input.1547391147">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+	</storageModule>
+	<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
+</cproject>

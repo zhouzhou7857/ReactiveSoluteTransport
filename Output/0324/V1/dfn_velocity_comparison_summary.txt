@@ -1,0 +1,18 @@
+Initial file: DFN_init.txt
+Updated file: DFN_aperture_delta_corrected.txt
+
+Initial velocity:
+  count = 4481
+  min = -0.451216
+  max = 0.757995
+  mean = 0.00596682088719
+  median = 0.000389573
+  std = 0.0656818976502
+
+Updated velocity:
+  count = 4480
+  min = 2.63537e-08
+  max = 0.883506
+  mean = 0.0642535081685
+  median = 0.04466575
+  std = 0.0766824947985
