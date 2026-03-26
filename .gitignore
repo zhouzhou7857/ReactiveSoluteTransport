@@ -1,0 +1,29 @@
+# OS files
+.DS_Store
+._*
+
+# Temporary editor files
+*~
+.~*
+*.swp
+*.swo
+
+# IDE metadata
+.metadata/
+.settings/
+.vscode/
+RemoteSystemsTempFiles/
+.cproject
+.project
+
+# Build outputs
+Debug/
+Release/
+build/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Project outputs
+Output/
