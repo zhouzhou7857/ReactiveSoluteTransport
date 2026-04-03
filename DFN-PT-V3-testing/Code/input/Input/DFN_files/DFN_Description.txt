@@ -1,0 +1,6 @@
+% DFN generation option, description below for generation option = file
+% number of fractures
+% coordinates of the extremities of the first fracture [m]
+% aperture of the first fracture [m]
+% coordinates of the extremities of the second fracture [m]
+% aperture of the second fracture [m]

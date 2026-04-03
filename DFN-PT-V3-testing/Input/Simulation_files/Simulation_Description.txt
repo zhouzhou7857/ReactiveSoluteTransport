@@ -1,0 +1,10 @@
+% number of particles
+% probability of transfering from one fracture to another through the matrix - used if simu option = 1
+% simu option for matrix diffusion: simu_option=0/1 = INFINITE/FINITE MATRIX
+% t_min: minimum time in the BTC description
+% t_max: maximum time in the BTC description
+% Nt: number of time interval in the BTC description
+% number of the random seed (not used for DFN generation option = file)
+% time injection [s] - particles injection time
+% output_interval [s] - Particles position output as you wish (Not equal to time interval)
+% reaction time step [s] - time step to recalculate the flow field and update the aperture (Attention: should not above number of particles; adjust by the efficiency and accuracy)
