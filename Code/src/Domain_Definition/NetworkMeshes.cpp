@@ -168,10 +168,8 @@ NetworkMeshes::NetworkMeshes(Domain domain_,double C_density,double D_dim,double
         *this=net_mesh;
 }
 
-// modified by DR on 2025/12/11: change the mesh aperture based on a reaction update step
-// modified by Wenyu on 2025/12/30: use ComputeAperture to update mesh aperture from
-// the effective particle count in the current reaction time step and a fixed
-// reference injected count for that reaction step
+// Legacy empirical aperture update interface based on particle-count coupling.
+// 在 DFN-PT-V3 当前主路径中并未使用，仅保留给旧版本/兼容性代码。
 #include <iostream>
 #include <iomanip>
 #include <algorithm>
@@ -215,7 +213,8 @@ void NetworkMeshes::ChangeAperture(int mesh_index, double dt_in_fract, double Nb
 		}
 	}
 }
-// modified by Wenyu on 2026/1/8: change the mesh aperture by a given ratio
+// Legacy empirical ratio-based aperture update interface.
+// 在 DFN-PT-V3 当前主路径中并未使用，仅保留给旧版本/兼容性代码。
 void NetworkMeshes::ChangeApertureByRatio(int mesh_index, double travel_ratio)
 {
 	if (mesh_index < 0 || mesh_index >= (int)meshes.size()) return;
@@ -594,8 +593,9 @@ NetworkMeshes::NetworkMeshes(double density_param, double exponent_param, Parame
                         // definition of a segment
                         seg=Segment2D(fract_center,fract_length,angle);
                         domain.SegmentIntersectDomain(seg,seg);
-			rnd_value=1-rnd_value;
-			fract_aperture=exp(sqrt(2)*param.RSD_lnb*boost::math::erf_inv(rnd_value*(erf((log(param.b_max)-param.mean_lnb)/(sqrt(2)*param.RSD_lnb))-erf((log(param.b_min)-param.mean_lnb)/(sqrt(2)*param.RSD_lnb)))+erf((log(param.b_min)-param.mean_lnb)/(sqrt(2)*param.RSD_lnb)))+param.mean_lnb);
+			fract_aperture=exp(sqrt(2)*param.RSD_lnb*boost::math::erf_inv(rnd_value*(erf((log(param.b_max)-param.mean_lnb)/
+			(sqrt(2)*param.RSD_lnb))-erf((log(param.b_min)-param.mean_lnb)/(sqrt(2)*param.RSD_lnb)))+erf((log(param.b_min)-
+			param.mean_lnb)/(sqrt(2)*param.RSD_lnb)))+param.mean_lnb);
                         frac_mesh=FractureMesh(seg,fract_aperture,cpt_fract-1);
                         AddFracture(frac_mesh,*this);
 			density+=seg.length*seg.length/(Lx*Ly);
@@ -1171,7 +1171,7 @@ NetworkMeshes Vertical_Translation(NetworkMeshes net_mesh,double H){
 	NetworkMeshes new_net_mesh;new_net_mesh.domain=net_mesh.domain;
 	new_net_mesh.max_fract_spacing=net_mesh.max_fract_spacing;
 	// 3. Loop on the initial fractures for translation and addition to the new network
-	for (int i=0;i<net_mesh.meshes.size();i++){
+	for (size_t i=0;i<net_mesh.meshes.size();i++){
 		// 3.1. Translation
 		// first extremity
 		x1=net_mesh.meshes[i].p_ori.p.x();
@@ -1222,7 +1222,7 @@ NetworkMeshes Vertical_Translation(NetworkMeshes net_mesh,double H){
 void FractureMeshNumbering(NetworkMeshes& net_mesh){
 	// 1. Define the number of each fracture mesh
 	int cpt_mesh=-1;
-	for (int i=0;i<net_mesh.meshes.size();i++){
+	for (size_t i=0;i<net_mesh.meshes.size();i++){
 		cpt_mesh++;
 		net_mesh.meshes[i].mesh_index=cpt_mesh;
 		if (net_mesh.meshes[i].original_mesh_index<0){
@@ -1232,7 +1232,7 @@ void FractureMeshNumbering(NetworkMeshes& net_mesh){
 	net_mesh.cpt_mesh=cpt_mesh;
 	// 2. Define the list of neighbors of each mesh
 	int index1,index2;
-	for (int i=0;i<net_mesh.meshes.size();i++){
+	for (size_t i=0;i<net_mesh.meshes.size();i++){
 		index1=net_mesh.meshes[i].p_ori.index;
 		index2=net_mesh.meshes[i].p_tar.index;
 		for (int j=0;j<net_mesh.meshes.size();j++){
@@ -1248,7 +1248,7 @@ void FractureMeshNumbering(NetworkMeshes& net_mesh){
 void UpdateCptFract(NetworkMeshes& net_mesh){
 	set<int> fracture_indices;
 	// 1. Redefine fracture_indices depending on the meshes that disappeared when computing the backbone
-	for (int i=0;i<net_mesh.meshes.size();i++){
+	for (size_t i=0;i<net_mesh.meshes.size();i++){
 		fracture_indices.insert(net_mesh.meshes[i].fracture_index);
 	}
 	// 2. Redefine fracture_indices depending on the fractures that disappeared when computing the backbone
@@ -1257,7 +1257,7 @@ void UpdateCptFract(NetworkMeshes& net_mesh){
 		vector<FractureMesh> new_meshes=net_mesh.meshes;
 		int cpt_fract=0;
 		for (set<int>::iterator it_fract=fracture_indices.begin();it_fract!=fracture_indices.end();it_fract++){
-			for (int i=0;i<net_mesh.meshes.size();i++){
+			for (size_t i=0;i<net_mesh.meshes.size();i++){
 				if (net_mesh.meshes[i].fracture_index==*it_fract){new_meshes[i].fracture_index=cpt_fract;}
 			}
 			cpt_fract++;
@@ -1287,7 +1287,7 @@ NetworkMeshes FlowComputation(NetworkMeshes net_mesh,BoundaryConditionsDef bc_ma
 	// 3. Flow computation
 	double velocity,max_velocity=0;FractureMesh fract_mesh;
 	vector<FractureMesh> new_meshes;
-	for (int i=0;i<net_mesh.meshes.size();i++){
+	for (size_t i=0;i<net_mesh.meshes.size();i++){
 		velocity=VelocityComputation(net_mesh.meshes[i].aperture,hydraulic_head(net_mesh.meshes[i].p_ori.index),hydraulic_head(net_mesh.meshes[i].p_tar.index),net_mesh.meshes[i].ReturnLength());
 		if (fabs(velocity)>EPSILON){
 			if (velocity>0){

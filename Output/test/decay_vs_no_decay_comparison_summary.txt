@@ -1,0 +1,41 @@
+Decay vs no-decay comparison summary
+Matched segments: 4463
+No-decay aperture sum: 0.0398779126315
+With-decay aperture sum: 0.00133707191918
+Net-sum ratio (with/no): 0.0335291350762
+Mean absolute difference per matched segment: 2.78460694065e-05
+Min difference (with-no): -0.000207375
+Max difference (with-no): 0.0001912421
+No-decay first crossing CDF>=0.5: 523110.0
+With-decay first crossing CDF>=0.5: 523110.0
+No-decay first crossing CDF>=0.9: 922198.0
+With-decay first crossing CDF>=0.9: 922198.0
+No-decay chemistry C0: 189.0
+No-decay chemistry k: 1e-05
+With-decay chemistry C0: 0.00353
+With-decay chemistry k: 0.5355
+No-decay mean x by snapshot:
+  t=100000.0: mean_x=0.0010148939623188405 count=138
+  t=200000.0: mean_x=0.0010719031071428572 count=140
+  t=300000.0: mean_x=0.0011381266251908396 count=131
+  t=400000.0: mean_x=0.0011915495845528457 count=123
+  t=500000.0: mean_x=0.001295455611904762 count=126
+  t=600000.0: mean_x=0.0013304095 count=117
+  t=700000.0: mean_x=0.001495690718699187 count=123
+  t=800000.0: mean_x=0.0013667471924528303 count=106
+  t=900000.0: mean_x=0.001489882974509804 count=102
+  t=1000000.0: mean_x=0.001223465336734694 count=98
+With-decay mean x by snapshot:
+  t=100000.0: mean_x=0.0010400681895522388 count=134
+  t=200000.0: mean_x=0.0009391585368421052 count=133
+  t=300000.0: mean_x=0.0010088439171824818 count=137
+  t=400000.0: mean_x=0.0011426150196899225 count=129
+  t=500000.0: mean_x=0.0008178763956834533 count=139
+  t=600000.0: mean_x=0.0011776465901515152 count=132
+  t=700000.0: mean_x=0.0010629023116788322 count=137
+  t=800000.0: mean_x=0.0009551319649264707 count=136
+  t=900000.0: mean_x=0.0010885270755395685 count=139
+  t=1000000.0: mean_x=0.0009413611677611941 count=134
+Concentration-decay interpretation:
+  The concentration curves are drawn from the active chemistry law C(t)=C0*exp(-k*t),
+  using the two chemistry input files rather than particle-by-particle exported concentrations.

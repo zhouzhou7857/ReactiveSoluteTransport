@@ -1,0 +1,86 @@
+Case 1/2/3 reactivity comparison summary
+
+Case 1-C0.01
+  Initial concentration proxy C0: 0.01
+  Segment count: 4457
+  Net aperture-change sum: 0.00208536444426
+  Positive aperture-change sum: 0.0655334401563
+  Negative aperture-change sum: -0.063448075712
+  Absolute aperture-change sum: 0.128981515868
+  Mean aperture change: 4.67885224201e-07
+  Median aperture change: 7.5e-08
+  Max aperture change: 0.000137379
+  Min aperture change: -0.000142412
+  First nonzero arrival: 124.588
+  t50: 523110.0
+  t90: 922198.0
+  Mean x by snapshots:
+    t=100000: mean_x=0.000843050035616, count=146
+    t=200000: mean_x=0.000993331955194, count=129
+    t=300000: mean_x=0.000955905699231, count=130
+    t=400000: mean_x=0.00112957296694, count=124
+    t=500000: mean_x=0.00118351953957, count=139
+    t=600000: mean_x=0.00104609556489, count=131
+    t=700000: mean_x=0.000976657984, count=125
+    t=800000: mean_x=0.00104036005366, count=123
+    t=900000: mean_x=0.00110507648, count=125
+    t=1e+06: mean_x=0.00134222666667, count=126
+
+Case 2-C0.03
+  Initial concentration proxy C0: 0.03
+  Segment count: 4461
+  Net aperture-change sum: 0.00470324554549
+  Positive aperture-change sum: 0.0669927743113
+  Negative aperture-change sum: -0.0622895287658
+  Absolute aperture-change sum: 0.129282303077
+  Mean aperture change: 1.05430296918e-06
+  Median aperture change: 4.86801e-09
+  Max aperture change: 0.000264746
+  Min aperture change: -0.000148832
+  First nonzero arrival: 124.588
+  t50: 523110.0
+  t90: 922198.0
+  Mean x by snapshots:
+    t=100000: mean_x=0.000933557773134, count=134
+    t=200000: mean_x=0.00112427486406, count=132
+    t=300000: mean_x=0.00112205055116, count=129
+    t=400000: mean_x=0.00107874487059, count=119
+    t=500000: mean_x=0.00136094150696, count=115
+    t=600000: mean_x=0.00106910790268, count=112
+    t=700000: mean_x=0.00126920113232, count=99
+    t=800000: mean_x=0.00131129358485, count=99
+    t=900000: mean_x=0.001141418445, count=100
+    t=1e+06: mean_x=0.00127494087283, count=92
+
+Case 3-C0.06
+  Initial concentration proxy C0: 0.06
+  Segment count: 4453
+  Net aperture-change sum: 0.0123035613016
+  Positive aperture-change sum: 0.0759514005442
+  Negative aperture-change sum: -0.0636478392426
+  Absolute aperture-change sum: 0.139599239787
+  Mean aperture change: 2.76298255144e-06
+  Median aperture change: 5.92e-07
+  Max aperture change: 0.00152051
+  Min aperture change: -0.000135588
+  First nonzero arrival: 124.588
+  t50: 523110.0
+  t90: 922198.0
+  Mean x by snapshots:
+    t=100000: mean_x=0.00131823437675, count=126
+    t=200000: mean_x=0.00132789994742, count=97
+    t=300000: mean_x=0.00121520160811, count=74
+    t=400000: mean_x=0.00136612802432, count=74
+    t=500000: mean_x=0.00148348718421, count=76
+    t=600000: mean_x=0.00151597876486, count=74
+    t=700000: mean_x=0.00110404427083, count=72
+    t=800000: mean_x=0.00129390108696, count=69
+    t=900000: mean_x=0.00122213156812, count=69
+    t=1e+06: mean_x=0.00124981426027, count=73
+
+Cross-case interpretation
+  Net-sum ratios: case2/case1=2.25535903733, case3/case1=5.89995736018
+  Abs-sum ratios: case2/case1=1.00233201794, case3/case1=1.08231973277
+  Note: the breakthrough curves remain effectively identical in the current outputs,
+  so the clearest effect of increasing initial concentration is currently on geometry-response magnitude,
+  not on the bulk CDF timing.

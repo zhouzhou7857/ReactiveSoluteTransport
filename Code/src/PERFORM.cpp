@@ -12,12 +12,14 @@
 #include "Domain_Definition/NetworkMeshes.h"
 #include "Transport/Transport.h"
 #include "Input_Output/Results.h"
+#include "Chemistry/Chemistry.h"
 #include "Utilitaries/Structures.h"
 #include "Visualisation/DFNVisu.h"
 #include "Visualisation/DisplayResults.h"
 #include "Flow/FlowComputation.h"
 #include <iostream>
 #include <chrono>
+#include <fstream>
 
 using namespace std;
 
@@ -32,6 +34,11 @@ int main(int argc, char **argv) {
 	// 1. Read parameters and define domain
 	// 1.1. Standard definition
 	Parameters param;
+	ConfigureChemistryParameters(param.chemistry_initial_reactive_concentration,
+			param.chemistry_reactive_concentration_decay,
+			param.chemistry_reactive_to_mineral_stoich,
+			param.chemistry_mineral_molar_volume,
+			param.chemistry_fracture_out_of_plane_thickness);
 	Domain domain(param.Lx,param.Ly);
 
 	// 1.2. Parameters related to the fracture network
@@ -41,6 +48,12 @@ int main(int argc, char **argv) {
 	cout << "p_lim = " << param.proba_transfer << endl;
 	cout << "option matrix = " << param.simu_option << endl;
 	cout << "DFN file = " << param.file_name_DFN << endl;
+	cout << "Chemistry file = " << (param.file_name_chemistry.empty() ? std::string("(default)") : param.file_name_chemistry) << endl;
+	cout << "Chemistry parameters: C0=" << INITIAL_REACTIVE_CONCENTRATION
+	     << " decay=" << REACTIVE_CONCENTRATION_DECAY
+	     << " stoich=" << REACTIVE_TO_MINERAL_STOICH
+	     << " molar_volume=" << MINERAL_MOLAR_VOLUME
+	     << " thickness=" << FRACTURE_OUT_OF_PLANE_THICKNESS << endl;
 	cout << "Domain bounds: min(" << domain.min_pt.i << "," << domain.min_pt.j
 	     << "), max(" << domain.max_pt.i << "," << domain.max_pt.j << ")" << endl;
 
@@ -48,7 +61,16 @@ int main(int argc, char **argv) {
 	// 2. Fracture network generation and backbone definition
 	cout << "1. Fracture network generation" << endl;
 	auto connectivity_start = std::chrono::steady_clock::now();
-	NetworkMeshes init_net_mesh(param.code_path,param.file_name_DFN,domain),net_mesh=init_net_mesh;
+	NetworkMeshes init_net_mesh;
+	if (param.generation_option_DFN=="generation_realistic3"
+	 || param.generation_option_DFN=="generation_realistic4"){
+		cout << "DFN generation path: constructor-based " << param.generation_option_DFN << endl;
+		init_net_mesh=NetworkMeshes(param.density_param,param.exponent_param,param,domain);
+	}
+	else{
+		init_net_mesh=NetworkMeshes(param.code_path,param.file_name_DFN,domain);
+	}
+	NetworkMeshes net_mesh=init_net_mesh;
 	int mesh_count_before_backbone = init_net_mesh.meshes.size();
 
 	auto count_border_meshes = [&](const NetworkMeshes& mesh_net){
@@ -105,6 +127,18 @@ int main(int argc, char **argv) {
 	     << ", right-border meshes: " << borders_before.second
 	     << ", meshes inside domain: " << count_in_domain_meshes(init_net_mesh) << endl;
 	report_dfn_extents(init_net_mesh);
+	// Preserve the generated network before backbone filtering for inspection.
+	{
+		ofstream raw_dfn_output((param.code_path+"/Output/DFN_raw.txt").c_str(),ofstream::out);
+		for (size_t i=0;i<init_net_mesh.meshes.size();i++){
+			raw_dfn_output << init_net_mesh.meshes[i].p_ori.p.x() << " "
+			               << init_net_mesh.meshes[i].p_ori.p.y() << " "
+			               << init_net_mesh.meshes[i].p_tar.p.x() << " "
+			               << init_net_mesh.meshes[i].p_tar.p.y() << " "
+			               << init_net_mesh.meshes[i].aperture << endl;
+		}
+		raw_dfn_output.close();
+	}
 	if (mesh_count_before_backbone==0){
 		cout << "WARNING in PERFORM.cpp: DFN mesh count is 0 after file read; check file format and coordinates" << endl;
 	}

@@ -17,8 +17,9 @@ from matplotlib.colors import Normalize, TwoSlopeNorm
 ROOT = Path(__file__).resolve().parent
 PARTICLE_PATTERN = re.compile(r"particle_positions_t(\d+)\.csv$")
 GROUPS: dict[str, list[str]] = {
-    "Np_group": ["Np1", "Np2", "V4"],
+    "Np_group": ["Np1", "Np4", "Np2", "V4"],
     "V_group": ["V1", "V2", "V3", "V4"],
+    "tg_group": ["tg1", "tg2", "V4", "tg4"],
 }
 CASE_LEGEND_LABELS: dict[str, str] = {
     "V1": "P=1e-1, Np=1e6",
@@ -26,8 +27,12 @@ CASE_LEGEND_LABELS: dict[str, str] = {
     "V3": "P=1e-3, Np=1e6",
     "V4": "P=1e-4, Np=1e6",
     "Np1": "P=1e-4, Np=1e4",
+    "Np4": "P=1e-4, Np=5e4",
     "Np2": "P=1e-4, Np=1e5",
     "Test 1": "P=1e-4, Np=1e6",
+    "tg1": "P=1e-4, tg=1 s",
+    "tg2": "P=1e-4, tg=10 s",
+    "tg4": "P=1e-4, tg=1000 s",
 }
 
 plt.style.use("seaborn-v0_8-whitegrid")
@@ -367,6 +372,8 @@ def generate_delta_aperture_histogram(group_name: str, case_names: list[str]) ->
 def get_group_case_label(group_name: str, case_name: str) -> str:
     if group_name == "Np_group" and case_name == "V4":
         return "P=1e-4, Np=1e6"
+    if group_name == "tg_group" and case_name == "V4":
+        return "P=1e-4, tg=100 s"
     return CASE_LEGEND_LABELS.get(case_name, case_name)
 
 
@@ -587,6 +594,233 @@ def generate_cumulative_contribution_plot(group_name: str, case_names: list[str]
     (ROOT / f"delta_aperture_cumulative_contribution_{group_name}.tsv").write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
+def generate_delta_aperture_difference_map(case_a: str, case_b: str) -> None:
+    file_a = ROOT / case_a / "DFN_aperture_delta_corrected.txt"
+    file_b = ROOT / case_b / "DFN_aperture_delta_corrected.txt"
+    if not file_a.exists() or not file_b.exists():
+        return
+
+    data_a = load_table(file_a, expected_cols=7)
+    data_b = load_table(file_b, expected_cols=7)
+
+    map_b: dict[tuple[float, float, float, float], np.ndarray] = {}
+    for row in data_b:
+        map_b[segment_key(row)] = row
+        map_b[reversed_segment_key(row)] = row
+
+    common_rows: list[np.ndarray] = []
+    diff_values: list[float] = []
+    missing_in_b = 0
+    for row_a in data_a:
+        row_b = map_b.get(segment_key(row_a))
+        if row_b is None:
+            missing_in_b += 1
+            continue
+        common_rows.append(row_a)
+        diff_values.append(float(row_a[6] - row_b[6]))
+
+    if not common_rows:
+        return
+
+    common_data = np.vstack(common_rows)
+    diff_array = np.asarray(diff_values, dtype=float)
+    segments = build_segments(common_data)
+    diff_abs_max = float(np.max(np.abs(diff_array)))
+
+    fig, ax = plt.subplots(figsize=(8.4, 6.4), constrained_layout=True)
+    add_segment_plot(
+        ax,
+        segments,
+        diff_array,
+        cmap="coolwarm",
+        norm=TwoSlopeNorm(vmin=-diff_abs_max, vcenter=0.0, vmax=diff_abs_max) if diff_abs_max > 0 else Normalize(vmin=0.0, vmax=1.0),
+        title=f"Delta aperture difference: {case_a} - {case_b}",
+        colorbar_label=f"delta_b({case_a}) - delta_b({case_b})",
+    )
+    fig.savefig(ROOT / f"delta_aperture_difference_{case_a}_minus_{case_b}.png", dpi=300, bbox_inches="tight")
+    plt.close(fig)
+
+    summary_lines = [
+        f"Case A: {case_a}",
+        f"Case B: {case_b}",
+        f"Common segments compared = {diff_array.size}",
+        f"Segments in {case_a} without match in {case_b} = {missing_in_b}",
+        "",
+        *describe(f"delta_b({case_a}) - delta_b({case_b})", diff_array),
+    ]
+    (ROOT / f"delta_aperture_difference_{case_a}_minus_{case_b}_summary.txt").write_text("\n".join(summary_lines) + "\n", encoding="utf-8")
+
+
+def matched_delta_difference(case_a: str, case_b: str) -> tuple[np.ndarray, np.ndarray, int]:
+    file_a = ROOT / case_a / "DFN_aperture_delta_corrected.txt"
+    file_b = ROOT / case_b / "DFN_aperture_delta_corrected.txt"
+    data_a = load_table(file_a, expected_cols=7)
+    data_b = load_table(file_b, expected_cols=7)
+
+    map_b: dict[tuple[float, float, float, float], np.ndarray] = {}
+    for row in data_b:
+        map_b[segment_key(row)] = row
+        map_b[reversed_segment_key(row)] = row
+
+    common_rows: list[np.ndarray] = []
+    diff_values: list[float] = []
+    missing_in_b = 0
+    for row_a in data_a:
+        row_b = map_b.get(segment_key(row_a))
+        if row_b is None:
+            missing_in_b += 1
+            continue
+        common_rows.append(row_a)
+        diff_values.append(float(row_a[6] - row_b[6]))
+
+    if not common_rows:
+        return np.empty((0, 7), dtype=float), np.empty(0, dtype=float), missing_in_b
+    return np.vstack(common_rows), np.asarray(diff_values, dtype=float), missing_in_b
+
+
+def generate_tg_convergence_analysis(reference_case: str = "tg1", compare_cases: list[str] | None = None) -> None:
+    if compare_cases is None:
+        compare_cases = ["tg2", "V4", "tg4"]
+    if not (ROOT / reference_case / "DFN_aperture_delta_corrected.txt").exists():
+        return
+
+    lines = ["plot_label\tcase_dir\tcommon_segments\tmean_abs_diff\tmax_abs_diff\trms_diff\tmissing_segments_vs_ref"]
+    x_vals: list[float] = [1.0]
+    mean_abs_vals: list[float] = [0.0]
+    rms_vals: list[float] = [0.0]
+    max_abs_vals: list[float] = [0.0]
+
+    tg_value_map = {"tg1": 1.0, "tg2": 10.0, "V4": 100.0, "tg4": 1000.0}
+    ref_label = get_group_case_label("tg_group", reference_case)
+    ref_count = load_table(ROOT / reference_case / "DFN_aperture_delta_corrected.txt", expected_cols=7).shape[0]
+    lines.append(f"{ref_label}\t{reference_case}\t{ref_count}\t0\t0\t0\t0")
+
+    for case_name in compare_cases:
+        case_file = ROOT / case_name / "DFN_aperture_delta_corrected.txt"
+        if not case_file.exists():
+            continue
+        _, diff, missing = matched_delta_difference(case_name, reference_case)
+        if diff.size == 0:
+            continue
+        abs_diff = np.abs(diff)
+        mean_abs = float(np.mean(abs_diff))
+        max_abs = float(np.max(abs_diff))
+        rms = float(np.sqrt(np.mean(diff * diff)))
+        label = get_group_case_label("tg_group", case_name)
+        lines.append(f"{label}\t{case_name}\t{diff.size}\t{mean_abs:.12g}\t{max_abs:.12g}\t{rms:.12g}\t{missing}")
+        x_vals.append(tg_value_map[case_name])
+        mean_abs_vals.append(mean_abs)
+        rms_vals.append(rms)
+        max_abs_vals.append(max_abs)
+
+    if not x_vals:
+        return
+
+    fig, ax = plt.subplots(figsize=(8.4, 5.2), constrained_layout=True)
+    ax.plot(x_vals, mean_abs_vals, marker="o", linewidth=2, label="mean |Δb - Δb_ref| (ref: tg=1 s)")
+    ax.plot(x_vals, rms_vals, marker="s", linewidth=2, label="RMS error (ref: tg=1 s)")
+    ax.plot(x_vals, max_abs_vals, marker="^", linewidth=2, label="max |Δb - Δb_ref| (ref: tg=1 s)")
+    ax.set_xscale("log")
+    ax.set_xlabel("Geometry update interval tg (s)")
+    ax.set_ylabel("Difference relative to tg = 1 s")
+    ax.set_title("Geometry update interval convergence")
+    ax.grid(True, which="both", linestyle="--", alpha=0.35)
+    ax.legend()
+    fig.savefig(ROOT / "tg_group_delta_aperture_convergence.png", dpi=300, bbox_inches="tight")
+    plt.close(fig)
+
+    (ROOT / "tg_group_delta_aperture_convergence.tsv").write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
+def generate_tg_cdf_error_plot(reference_case: str = "tg1", compare_cases: list[str] | None = None) -> None:
+    if compare_cases is None:
+        compare_cases = ["tg2", "V4", "tg4"]
+    ref_file = ROOT / reference_case / "cdf.txt"
+    if not ref_file.exists():
+        return
+
+    ref_x, ref_y = read_two_column_file(ref_file)
+    tg_value_map = {"tg1": 1.0, "tg2": 10.0, "V4": 100.0, "tg4": 1000.0}
+
+    x_vals = [tg_value_map[reference_case]]
+    max_abs_vals = [0.0]
+    mean_abs_vals = [0.0]
+    rms_vals = [0.0]
+    lines = ["plot_label\tcase_dir\tmax_abs_cdf_diff\tmean_abs_cdf_diff\trms_cdf_diff"]
+    lines.append(f"{get_group_case_label('tg_group', reference_case)}\t{reference_case}\t0\t0\t0")
+
+    for case_name in compare_cases:
+        case_file = ROOT / case_name / "cdf.txt"
+        if not case_file.exists():
+            continue
+        x, y = read_two_column_file(case_file)
+        interp = np.interp(ref_x, x, y)
+        diff = interp - ref_y
+        max_abs = float(np.max(np.abs(diff)))
+        mean_abs = float(np.mean(np.abs(diff)))
+        rms = float(np.sqrt(np.mean(diff * diff)))
+        x_vals.append(tg_value_map[case_name])
+        max_abs_vals.append(max_abs)
+        mean_abs_vals.append(mean_abs)
+        rms_vals.append(rms)
+        lines.append(f"{get_group_case_label('tg_group', case_name)}\t{case_name}\t{max_abs:.12g}\t{mean_abs:.12g}\t{rms:.12g}")
+
+    fig, ax = plt.subplots(figsize=(8.4, 5.2), constrained_layout=True)
+    ax.plot(x_vals, max_abs_vals, marker="o", linewidth=2, label="max |CDF - CDF_ref| (ref: tg=1 s)")
+    ax.plot(x_vals, mean_abs_vals, marker="s", linewidth=2, label="mean |CDF - CDF_ref| (ref: tg=1 s)")
+    ax.plot(x_vals, rms_vals, marker="^", linewidth=2, label="RMS CDF error (ref: tg=1 s)")
+    ax.set_xscale("log")
+    ax.set_xlabel("Geometry update interval tg (s)")
+    ax.set_ylabel("CDF error relative to tg = 1 s")
+    ax.set_title("CDF error vs geometry update interval")
+    ax.grid(True, which="both", linestyle="--", alpha=0.35)
+    ax.legend()
+    fig.savefig(ROOT / "tg_group_cdf_error_vs_tg.png", dpi=300, bbox_inches="tight")
+    plt.close(fig)
+
+    (ROOT / "tg_group_cdf_error_vs_tg.tsv").write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
+def generate_tg_difference_maps(reference_case: str = "tg1", compare_cases: list[str] | None = None) -> None:
+    if compare_cases is None:
+        compare_cases = ["tg2", "V4", "tg4"]
+    if not (ROOT / reference_case / "DFN_aperture_delta_corrected.txt").exists():
+        return
+
+    for case_name in compare_cases:
+        case_file = ROOT / case_name / "DFN_aperture_delta_corrected.txt"
+        if not case_file.exists():
+            continue
+        common_data, diff_array, missing = matched_delta_difference(case_name, reference_case)
+        if diff_array.size == 0:
+            continue
+        segments = build_segments(common_data)
+        diff_abs_max = float(np.max(np.abs(diff_array)))
+
+        fig, ax = plt.subplots(figsize=(8.4, 6.4), constrained_layout=True)
+        add_segment_plot(
+            ax,
+            segments,
+            diff_array,
+            cmap="coolwarm",
+            norm=TwoSlopeNorm(vmin=-diff_abs_max, vcenter=0.0, vmax=diff_abs_max) if diff_abs_max > 0 else Normalize(vmin=0.0, vmax=1.0),
+            title=f"Delta aperture difference: {case_name} - {reference_case}",
+            colorbar_label=f"delta_b({case_name}) - delta_b({reference_case})",
+        )
+        fig.savefig(ROOT / f"delta_aperture_difference_{case_name}_minus_{reference_case}.png", dpi=300, bbox_inches="tight")
+        plt.close(fig)
+
+        summary_lines = [
+            f"Case A: {case_name}",
+            f"Case B: {reference_case}",
+            f"Common segments compared = {diff_array.size}",
+            f"Segments in {case_name} without match in {reference_case} = {missing}",
+            "",
+            *describe(f"delta_b({case_name}) - delta_b({reference_case})", diff_array),
+        ]
+        (ROOT / f"delta_aperture_difference_{case_name}_minus_{reference_case}_summary.txt").write_text("\n".join(summary_lines) + "\n", encoding="utf-8")
+
+
 def main() -> None:
     for case_dir in sorted(path for path in ROOT.iterdir() if path.is_dir()):
         generate_case_outputs(case_dir)
@@ -597,6 +831,11 @@ def main() -> None:
         generate_delta_velocity_scatter(group_name, case_names)
         generate_delta_geometry_summary(group_name, case_names)
         generate_cumulative_contribution_plot(group_name, case_names)
+
+    generate_delta_aperture_difference_map("V1", "V4")
+    generate_tg_convergence_analysis(reference_case="tg1", compare_cases=["tg2", "V4", "tg4"])
+    generate_tg_cdf_error_plot(reference_case="tg1", compare_cases=["tg2", "V4", "tg4"])
+    generate_tg_difference_maps(reference_case="tg1", compare_cases=["tg2", "V4", "tg4"])
 
 
 if __name__ == "__main__":

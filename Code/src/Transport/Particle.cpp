@@ -19,5 +19,7 @@ Particle::Particle(){
 	L_in_fract=0;
 	t_in_fract=-1;
 	t_in_fract_prev = 0.0;// 2026/1/2 by Wenyu, time spent in the fracture at the previous step
+	reactive_concentration = 0.0;
+	representative_volume = 0.0;
 }
 Particle::~Particle(){}

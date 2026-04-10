@@ -34,9 +34,14 @@ public:
 	double t_injection;	// duration of particle injection; Modified by Wenyu on 2026/1/6
 	double output_interval;	// time interval for position outputs; Modified by Wenyu on 2026/1/8
 	double reaction_dt;	// fixed reaction update time step used for transport/aperture updates
+	double chemistry_initial_reactive_concentration;
+	double chemistry_reactive_concentration_decay;
+	double chemistry_reactive_to_mineral_stoich;
+	double chemistry_mineral_molar_volume;
+	double chemistry_fracture_out_of_plane_thickness;
 	//int num_simu_start;	// number of the starting simulation
 	std::string code_path;
-	std::string file_name_domain,file_name_DFN,file_name_simu;	// parameter files
+	std::string file_name_domain,file_name_DFN,file_name_simu,file_name_chemistry;	// parameter files
 	BoundaryConditionsDef bc_map_def;	// boundary conditions
 	//int seed;	// seed used for the generating the fracture networks (same seed for each pair of (C,D))
 	// DFN parameters

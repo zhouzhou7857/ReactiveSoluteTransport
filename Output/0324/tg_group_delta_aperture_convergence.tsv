@@ -1,0 +1,5 @@
+plot_label	case_dir	common_segments	mean_abs_diff	max_abs_diff	rms_diff	missing_segments_vs_ref
+P=1e-4, tg=1 s	tg1	4394	0	0	0	0
+P=1e-4, tg=10 s	tg2	4392	5.00585359745e-07	2.318e-05	1.44265040737e-06	15
+P=1e-4, tg=100 s	V4	4393	3.28553494195e-07	1.9772e-05	1.17239705042e-06	53
+P=1e-4, tg=1000 s	tg4	4393	3.27786569542e-07	1.9615e-05	1.16847107487e-06	71

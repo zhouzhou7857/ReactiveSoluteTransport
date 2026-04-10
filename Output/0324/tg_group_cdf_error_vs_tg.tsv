@@ -1,0 +1,5 @@
+plot_label	case_dir	max_abs_cdf_diff	mean_abs_cdf_diff	rms_cdf_diff
+P=1e-4, tg=1 s	tg1	0	0	0
+P=1e-4, tg=10 s	tg2	6.6e-05	5.0619099e-06	9.83066425228e-06
+P=1e-4, tg=100 s	V4	8.69999999999e-05	1.09108852e-05	2.01841403678e-05
+P=1e-4, tg=1000 s	tg4	0.000124	1.643847565e-05	2.86843925562e-05

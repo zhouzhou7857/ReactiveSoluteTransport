@@ -1,0 +1,149 @@
+% DFN generator description for generation_realistic3
+% This file documents the input format and parameter meaning for the
+% current generation_realistic3 path used in PERFORM.cpp.
+
+========================================================================
+1. General rule
+========================================================================
+
+Mode:
+generation_realistic3
+
+Current main path:
+  PERFORM.cpp + Parameters.cpp
+
+In the current codebase:
+  generation_realistic3 uses the constructor-based path in PERFORM.cpp.
+
+Important:
+  generation_realistic3 assumes a square domain in the current
+  implementation. If Lx != Ly, the code prints a warning and behavior is
+  not guaranteed.
+
+========================================================================
+2. generation_realistic3 input format
+========================================================================
+
+Format currently read by Parameters.cpp:
+generation_realistic3
+density_param exponent_param b_min b_max mean_lnb RSD_lnb r_min seed
+
+Meaning in the current main path:
+  density_param  : target accumulated density threshold, not an exact fracture count
+  exponent_param : exponent controlling fracture length distribution
+  b_min          : minimum fracture aperture [m]
+  b_max          : maximum fracture aperture [m]
+  mean_lnb       : mean of ln(b) for aperture sampling
+  RSD_lnb        : standard deviation of ln(b) for aperture sampling
+  r_min          : kept for compatibility; currently not used in the constructor path
+  seed           : random seed
+
+========================================================================
+3. Current generation principle
+========================================================================
+
+The current main path uses the constructor-based implementation.
+
+Loop until:
+  density >= density_param
+
+For each generated fracture:
+  1. fracture center is uniformly sampled in the domain
+  2. sample U ~ Uniform(0,1)
+  3. fracture length:
+       l = U^( 1 / (1 - exponent_param) )
+  4. angle:
+       theta ~ Uniform(0, pi)
+  5. segment is clipped by the domain
+  6. aperture uses the same random draw in correlated form:
+       use (1 - U) to sample a truncated lognormal aperture
+       with bounds [b_min, b_max] and log-space parameters
+       mean_lnb, RSD_lnb
+  7. density increment:
+       density += segment_length^2 / (Lx * Ly)
+
+Important notes:
+  This mode does NOT target an exact fracture number.
+  It stops when the accumulated density reaches density_param.
+  Length and aperture are correlated in this implementation because the
+  aperture draw reuses 1-U after the length draw.
+
+========================================================================
+4. Main parameter effects
+========================================================================
+
+density_param:
+  Larger density_param:
+    more total fractures on average
+    denser network
+  Smaller density_param:
+    fewer total fractures
+
+exponent_param:
+  directly changes segment-length distribution
+  in practice, smaller values usually lead to shorter segments and allow
+  more segments before reaching the same density threshold
+  values close to or above 1 can produce unstable or overly long segments
+  and should be used with caution
+
+b_min / b_max:
+  define the allowed aperture interval
+  larger bounds shift the possible aperture range upward
+
+mean_lnb:
+  increases or decreases the typical aperture in log-space
+  if you want a typical aperture near 100 microns:
+    mean_lnb near ln(1e-4) = -9.21034
+
+RSD_lnb:
+  controls aperture variability
+  larger RSD_lnb gives a wider aperture spread
+
+seed:
+  changes the random realization only
+
+========================================================================
+5. Practical tuning guidance
+========================================================================
+
+If you want more fractures:
+  increase density_param
+
+If you want shorter segments and therefore potentially more fractures:
+  decrease exponent_param
+
+If you want wider aperture spread:
+  increase RSD_lnb
+
+If you want a different random realization with similar statistics:
+  change seed
+
+========================================================================
+6. Current input examples
+========================================================================
+
+Example for generation_realistic3:
+generation_realistic3
+20.0 0.35 1e-6 1e-3 -9.21034037 0.9 0.001 1
+
+Example interpretation:
+  target accumulated density = 20.0
+  exponent controlling length distribution = 0.35
+  aperture range = 1e-6 m to 1e-3 m
+  typical aperture near 1e-4 m
+  random seed = 1
+
+========================================================================
+7. Output files related to generated DFN
+========================================================================
+
+After a run, you may see:
+  Output/DFN_raw.txt
+    raw generated DFN before backbone filtering
+  Output/DFN_init.txt
+    DFN after backbone filtering, before transport updates
+  Output/DFN.txt
+    DFN after later transport/reaction updates
+  Output/DFN_aperture_delta.txt
+    aperture change relative to the initial DFN
+

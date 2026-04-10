@@ -74,7 +74,11 @@ public:
 	bool define_fracture_map();
 	double ReturnVolumetricFractureDensity();
 	void print_DFN_in_file_aperture(std::string,int);
+	// Legacy empirical aperture update interface.
+	// 在 DFN-PT-V3 当前主路径中并未使用。
 	void ChangeAperture(int, double, double, double);
+	// Legacy empirical ratio-based aperture update interface.
+	// 在 DFN-PT-V3 当前主路径中并未使用。
 	void ChangeApertureByRatio(int, double);
 };
 

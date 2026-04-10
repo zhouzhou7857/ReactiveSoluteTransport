@@ -219,6 +219,8 @@ static void ResetParticleForInlet(Particle& pa,double t_reset){
 	pa.L_in_fract = 0.0;
 	pa.t_in_fract = 0.0;
 	pa.t_in_fract_prev = 0.0;
+	pa.reactive_concentration = INITIAL_REACTIVE_CONCENTRATION;
+	pa.representative_volume = 0.0;
 }
 static void WriteDFNSnapshot(const NetworkMeshes& net_mesh,const std::string& output_path,
                              int file_index,double time){
@@ -256,6 +258,70 @@ static void RemoveParticleFromSystem(Particle& pa,double t_stamp,const std::stri
 	pa.L_in_fract = 0.0;
 	pa.t_in_fract = 0.0;
 	pa.t_in_fract_prev = 0.0;
+	pa.representative_volume = 0.0;
+}
+static double ParticleInjectionTimeShare(const NumericalParam& num_param,int nb_part_tot){
+	if (nb_part_tot<=0){return 0.0;}
+	if (num_param.t_injection>0.0 && nb_part_tot>1){
+		return num_param.t_injection/(double)(nb_part_tot-1);
+	}
+	// For instantaneous injection under pressure-driven flow, there is no natural
+	// particle spacing in time. We distribute the first geometry-update interval
+	// equally across the injected particles as a pragmatic surrogate.
+	if (num_param.reaction_dt>0.0){
+		return num_param.reaction_dt/(double)nb_part_tot;
+	}
+	return 0.0;
+}
+static double ComputeParticleRepresentativeVolumeAtInjection(const NetworkMeshes& net_mesh,int mesh_index,double particle_time_share){
+	if (mesh_index<0 || particle_time_share<=0.0){return 0.0;}
+	FractureMesh mesh = net_mesh.return_mesh(mesh_index);
+	// In the current pressure-driven DFN model, the per-particle representative
+	// fluid volume is defined dynamically at injection as inlet volumetric flux
+	// times the time share carried by one particle:
+	// V_particle = |u_inlet| * aperture_inlet * thickness * dt_particle.
+	double inlet_flux = std::fabs(mesh.velocity)*mesh.aperture*FRACTURE_OUT_OF_PLANE_THICKNESS;
+	if (!std::isfinite(inlet_flux) || inlet_flux<0.0){return 0.0;}
+	return inlet_flux*particle_time_share;
+}
+// Update particle concentration in a dedicated chemistry module and accumulate
+// the segment-averaged aperture change that is equivalent to the local mineral
+// volume change over the actually traversed fraction of the segment.
+static void ApplyParticleChemistryToMesh(Particle& pa,const NetworkMeshes& net_mesh,
+                                         int mesh_index,double residence_time,
+                                         double traversed_length,
+                                         std::map<int,double>& aperture_changes)
+{
+	if (mesh_index<0){return;}
+	if (pa.reactive_concentration<=0.0){
+		pa.reactive_concentration = 0.0;
+		return;
+	}
+	FractureMesh mesh = net_mesh.return_mesh(mesh_index);
+	double segment_length = mesh.ReturnLength();
+	ChemistryStepResult chem_step = EvaluateReactiveStep(pa.reactive_concentration,residence_time,pa.representative_volume,segment_length,traversed_length);
+	pa.reactive_concentration = chem_step.concentration_out;
+	if (chem_step.segment_aperture_change!=0.0){
+		aperture_changes[mesh_index] += chem_step.segment_aperture_change;
+	}
+}
+static void ApplyParticleChemistryImmediate(Particle& pa,NetworkMeshes& net_mesh_modified,
+                                            const NetworkMeshes& net_mesh_reference,
+                                            int mesh_index,double residence_time,
+                                            double traversed_length)
+{
+	std::map<int,double> aperture_changes;
+	ApplyParticleChemistryToMesh(pa,net_mesh_reference,mesh_index,residence_time,traversed_length,aperture_changes);
+	for (std::map<int,double>::iterator it=aperture_changes.begin(); it!=aperture_changes.end(); it++){
+		for (size_t i=0;i<net_mesh_modified.meshes.size();i++){
+			if (net_mesh_modified.meshes[i].mesh_index==it->first){
+				double b_new = net_mesh_modified.meshes[i].aperture + it->second;
+				if (b_new<0.0){b_new = 0.0;}
+				net_mesh_modified.meshes[i].aperture = b_new;
+				break;
+			}
+		}
+	}
 }
 // Modified by Wenyu on 2026/1/15; reassign particle to the nearest connected mesh endpoint (USED)
 static bool ReassignToNearestConnectedEndpoint(Particle& pa,const NetworkMeshes& net_mesh,
@@ -431,7 +497,7 @@ Transport::Transport(RngStream_a rng_tracker_,NetworkMeshes net_mesh_,Domain dom
 	phys_param = PhysicsParam(param.Dm,param.porosity);
 	num_param = NumericalParam(param.nb_part,param.proba_transfer,param.simu_option,param.t_max,param.t_injection,param.output_interval,param.reaction_dt);
 	net_mesh_modified = net_mesh; // added by DR on 2025/12/11
-	net_mesh_modified.Nb_passed.assign(net_mesh_modified.meshes.size(), 0);// added by Wenyu on 2025/12/30
+	net_mesh_modified.Nb_passed.assign(net_mesh_modified.meshes.size(), 0);// legacy counters retained for compatibility with non-active paths
 	net_mesh_modified.last_t_update.assign(net_mesh_modified.meshes.size(), 0.0);// added by Wenyu on 2025/12/30
 
 };
@@ -462,6 +528,8 @@ vector<Particle> Transport::Particles_Injection(int option_injection){
 		part_vect[i].L_in_fract = 0.0;
 		part_vect[i].t_in_fract = 0.0;
 		part_vect[i].t_in_fract_prev = 0.0;
+		part_vect[i].reactive_concentration = INITIAL_REACTIVE_CONCENTRATION;
+		part_vect[i].representative_volume = 0.0;
 	}
 	return part_vect;
 }
@@ -556,7 +624,8 @@ bool Transport::finite_matrix_displacement(Particle & pa){
 	return true;
 }
 // Modified by Wenyu on 2026/1/8: Finite matrix displacement with distance tracking (to line 352)
-bool Transport::finite_matrix_displacement_step(Particle & pa, double t_target, std::map<int,double>& moved_distances){
+bool Transport::finite_matrix_displacement_step(Particle & pa, double t_target, std::map<int,double>& moved_distances,
+                                                std::map<int,double>& aperture_changes){
 	// 0. Variables
 	FractureMesh current_mesh = net_mesh.return_mesh(pa.mesh_index);
 	static std::set<int> warned_zero_velocity;
@@ -630,15 +699,19 @@ bool Transport::finite_matrix_displacement_step(Particle & pa, double t_target, 
 			double dt_remain = t_target - pa.t;
 			double adv_time_used = std::min(dt_remain, t_advec);
 			M_init = current_mesh.Mesh_Scale_Advection(M_init_in, adv_time_used);
+			double traversed_length = fabs(current_mesh.velocity)*adv_time_used;
+			ApplyParticleChemistryToMesh(pa,net_mesh,pa.mesh_index,dt_remain,traversed_length,aperture_changes);
 			pa.t = t_target;
 			pa.M = M_init;
 			pa.t_in_fract+=dt_remain;
 			pa.L_in_fract+=fabs(current_mesh.velocity)*adv_time_used;
-			moved_distances[pa.mesh_index]+=fabs(current_mesh.velocity)*adv_time_used;
+			moved_distances[pa.mesh_index]+=traversed_length;
 			return true;
 		}
 
-		moved_distances[pa.mesh_index]+=fabs(current_mesh.velocity)*t_advec;
+		double traversed_length = fabs(current_mesh.velocity)*t_advec;
+		ApplyParticleChemistryToMesh(pa,net_mesh,pa.mesh_index,particle_time,traversed_length,aperture_changes);
+		moved_distances[pa.mesh_index]+=traversed_length;
 		if (transferred && transfer_mesh!=-1){
 			current_mesh = net_mesh.return_mesh(transfer_mesh);
 			pa.mesh_index = transfer_mesh;
@@ -707,7 +780,8 @@ bool Transport::infinite_matrix_displacement(Particle & pa){
 	return true;
 }
 // Modified by Wenyu on 2026/1/8: Infinite matrix displacement with distance tracking
-bool Transport::infinite_matrix_displacement_step(Particle & pa, double t_target, std::map<int,double>& moved_distances){
+bool Transport::infinite_matrix_displacement_step(Particle & pa, double t_target, std::map<int,double>& moved_distances,
+                                                  std::map<int,double>& aperture_changes){
 	// 0. Variables
 	FractureMesh current_mesh = net_mesh.return_mesh(pa.mesh_index);
 	static std::set<int> warned_zero_velocity;
@@ -749,21 +823,25 @@ bool Transport::infinite_matrix_displacement_step(Particle & pa, double t_target
 		double dt_remain = t_target - pa.t;
 		double adv_time_used = std::min(dt_remain, advection_time);
 		pointcpp<double> M_new = current_mesh.Mesh_Scale_Advection(M_init, adv_time_used);
+		double traversed_length = fabs(current_mesh.velocity)*adv_time_used;
+		ApplyParticleChemistryToMesh(pa,net_mesh,pa.mesh_index,dt_remain,traversed_length,aperture_changes);
 		pa.M = M_new;
 		pa.t = t_target;
 		pa.t_in_fract+=dt_remain;
 		pa.L_in_fract+=fabs(current_mesh.velocity)*adv_time_used;
-		moved_distances[pa.mesh_index]+=fabs(current_mesh.velocity)*adv_time_used;
+		moved_distances[pa.mesh_index]+=traversed_length;
 		return true;
 	}
 
+	double traversed_length = fabs(current_mesh.velocity)*advection_time;
+	ApplyParticleChemistryToMesh(pa,net_mesh,pa.mesh_index,particle_time,traversed_length,aperture_changes);
 	pa.M = M_out;
 	if (particle_time==-1){pa.t=-1;}
 	else{
 		pa.t += particle_time;
 		pa.t_in_fract+=particle_time;
 		pa.L_in_fract+=fabs(current_mesh.velocity)*advection_time;
-		moved_distances[pa.mesh_index]+=fabs(current_mesh.velocity)*advection_time;
+		moved_distances[pa.mesh_index]+=traversed_length;
 	}
 	pair<pointcpp<double>,pointcpp<double> > seg_current=make_pair(M_init, M_out);
 	Segment_Particle_Time[seg_current].insert(pa.t); // when the particle reaches another position
@@ -944,18 +1022,9 @@ bool Transport::particle_displacement(Particle & pa){
 			// determination of the next fracture from proportional flow
 			FractureMesh mesh_current = net_mesh[pa.mesh_index];
 			
-			// modified by DR on 2025/12/11: before entering into a new fracture mesh, the aperture of the current fracture mesh is modified in relation with the time spent by the particle in this mesh
-			 /*net_mesh_modified.ChangeAperture(pa.mesh_index,pa.t_in_fract,num_param.nb_part);
-			 int Nt = num_param.nb_part;*/
-			
-			// modified by Wenyu on 2025/12/30: Count particles passed into fracture mesh and update the mesh grids
-			// update aperture using empirical law
-			net_mesh_modified.Nb_passed[pa.mesh_index]++;
-			double Nb = (double)net_mesh_modified.Nb_passed[pa.mesh_index];
-			double Nt = (double)num_param.nb_part;
-
-			// --- update aperture ---
-			net_mesh_modified.ChangeAperture(pa.mesh_index, pa.t_in_fract, Nb, Nt);
+			// Legacy non-step path: keep chemistry modular by using the same
+			// concentration-based segment update as the active stepwise solver.
+			ApplyParticleChemistryImmediate(pa,net_mesh_modified,net_mesh,pa.mesh_index,pa.t_in_fract,pa.L_in_fract);
 			
 			
 			bool no_downstream = false;
@@ -979,19 +1048,14 @@ bool Transport::particle_displacement(Particle & pa){
 		}
 	}
 
-	// modified by DR on 2025/12/11: before entering into a new fracture mesh, the aperture of the current fracture mesh is modified in relation with the time spent by the particle in this mesh
-	// modified by Wenyu on 2025/12/30.
-	net_mesh_modified.Nb_passed[pa.mesh_index]++;
-	double Nb = (double)net_mesh_modified.Nb_passed[pa.mesh_index];
-	double Nt = (double)num_param.nb_part;
-
-	net_mesh_modified.ChangeAperture(pa.mesh_index, pa.t_in_fract, Nb, Nt);
+	ApplyParticleChemistryImmediate(pa,net_mesh_modified,net_mesh,pa.mesh_index,pa.t_in_fract,pa.L_in_fract);
         if (nb_iter==nb_max_iter){cout << "Particle stopped because of nb_max_iter, simulation stopped"; pa.t=-1; return false;}
 
 	return cont_disp;
 }
 // Modified by Wenyu on 2026/1/8: Particle displacement with distance tracking
-bool Transport::particle_displacement_step(Particle & pa, double dt_step, std::map<int,double>& moved_distances){
+bool Transport::particle_displacement_step(Particle & pa, double dt_step, std::map<int,double>& moved_distances,
+                                           std::map<int,double>& aperture_changes){
 	double t_target = pa.t + dt_step;
 	int simu_option = this->num_param.simu_option;
 	int new_mesh_index = -1; bool cont_disp=true;
@@ -999,8 +1063,8 @@ bool Transport::particle_displacement_step(Particle & pa, double dt_step, std::m
 
 	while (!domain.on_output_limit(pa.M)&&cont_disp&&domain.IsInDomain(pa.M.CgalPoint())&&pa.t<t_target&&nb_iter<nb_max_iter){
 		nb_iter++;
-		if (simu_option==INFINITE_MATRIX){cont_disp=infinite_matrix_displacement_step(pa,t_target,moved_distances);}
-		else if (simu_option==FINITE_MATRIX){cont_disp=finite_matrix_displacement_step(pa,t_target,moved_distances);}
+		if (simu_option==INFINITE_MATRIX){cont_disp=infinite_matrix_displacement_step(pa,t_target,moved_distances,aperture_changes);}
+		else if (simu_option==FINITE_MATRIX){cont_disp=finite_matrix_displacement_step(pa,t_target,moved_distances,aperture_changes);}
 		else{cout << "WARNING in particle_displacement_step (Transport.cpp): simulation option not defined" << endl;}
 		if (pa.t>=t_target){break;}
 		if (!domain.on_output_limit(pa.M)&&cont_disp&&domain.IsInDomain(pa.M.CgalPoint())){
@@ -1030,6 +1094,7 @@ bool Transport::particle_displacement_step(Particle & pa, double dt_step, std::m
 bool Transport::Particles_Transport(map<int,double> & arrival_times,int option_injection){
 	// 0. Variables
 	int nb_part=num_param.nb_part;
+	double particle_time_share = ParticleInjectionTimeShare(num_param,nb_part);
 	// 1. Particles initialization and injection on the left border
 	vector<Particle> part_vect = Particles_Injection(option_injection);
 	// 2. Particle displacement
@@ -1041,23 +1106,6 @@ bool Transport::Particles_Transport(map<int,double> & arrival_times,int option_i
 	}
 	double output_interval = num_param.output_interval;
 	if (output_interval<=0.0){output_interval = dt_step;}
-	double reference_injected_count_dt = 0.0;
-	if (num_param.t_injection>0.0){
-		if (nb_part>1){
-			reference_injected_count_dt = dt_step * ((double)(nb_part-1) / num_param.t_injection);
-		}
-		else if (nb_part==1){
-			reference_injected_count_dt = dt_step / num_param.t_injection;
-		}
-	}
-	else{
-		// Instantaneous injection: use the total injected particles as the reference scale.
-		reference_injected_count_dt = (double)nb_part;
-	}
-	if (reference_injected_count_dt<=0.0){
-		cout << "WARNING in Particles_Transport (Transport.cpp): invalid reference injected count per reaction step" << endl;
-		return false;
-	}
 
 	double t_current = 0.0;
 	double next_output_time = 0.0;
@@ -1072,7 +1120,6 @@ bool Transport::Particles_Transport(map<int,double> & arrival_times,int option_i
 	int timing_prints = 0;
 	int timing_total = (total_steps_est>0)? std::min(10,total_steps_est) : 0;
 	double total_step_time = 0.0;
-	std::map<int,double> particle_pass_count;
 	std::set<int> zero_aperture_logged;
 	// Modified by Wenyu on 2026/1/13: loop over reaction time steps
 	{
@@ -1127,8 +1174,7 @@ bool Transport::Particles_Transport(map<int,double> & arrival_times,int option_i
 		auto step_start = std::chrono::steady_clock::now();
 		bool any_active = false;
 		bool rebuild_needed = false;
-		std::map<int,int> step_full_count;
-		std::map<int,double> step_partial_sum;
+		std::map<int,double> step_aperture_change;
 		std::vector<int> ready_indices;
 		for (int i=0;i<nb_part;i++){
 			if (part_vect[i].t==-1){continue;}
@@ -1211,6 +1257,8 @@ bool Transport::Particles_Transport(map<int,double> & arrival_times,int option_i
 							pa.L_in_fract = 0.0;
 							pa.t_in_fract = 0.0;
 							pa.t_in_fract_prev = 0.0;
+							pa.reactive_concentration = INITIAL_REACTIVE_CONCENTRATION;
+							pa.representative_volume = ComputeParticleRepresentativeVolumeAtInjection(net_mesh_modified,mesh_ids[i],particle_time_share);
 							Initial_Position_Particles[pa.no] = pa.M;
 							idx++;
 						}
@@ -1231,7 +1279,7 @@ bool Transport::Particles_Transport(map<int,double> & arrival_times,int option_i
 			if (pa.t>t_current+EPSILON){continue;}
 			any_active = true;
 			std::map<int,double> moved_distances;
-			if (!particle_displacement_step(pa,dt_step,moved_distances)){return false;}
+			if (!particle_displacement_step(pa,dt_step,moved_distances,step_aperture_change)){return false;}
 			if (pa.t!=-1 && domain.on_output_limit(pa.M)){
 				if (std::isfinite(pa.t)){
 					arrival_times[pa.no]=pa.t;
@@ -1243,49 +1291,28 @@ bool Transport::Particles_Transport(map<int,double> & arrival_times,int option_i
 					ResetParticleForInlet(pa,t_current);
 				}
 			}
-			for (std::map<int,double>::iterator it= moved_distances.begin(); it!=moved_distances.end(); it++){
-				int mesh_id = it->first;
-				double length = net_mesh_modified.return_mesh(mesh_id).ReturnLength();
-				double dist = it->second;
-				if (!std::isfinite(length) || length<=0.0){
-					cout << "WARNING in Particles_Transport (Transport.cpp): invalid mesh length="
-					     << length << " mesh_index=" << mesh_id << endl;
-					continue;
-				}
-				if (!std::isfinite(dist)){
-					cout << "WARNING in Particles_Transport (Transport.cpp): invalid moved distance="
-					     << dist << " mesh_index=" << mesh_id << endl;
-					continue;
-				}
-				double fraction = dist/length;
-				if (!std::isfinite(fraction)){
-					cout << "WARNING in Particles_Transport (Transport.cpp): invalid fraction="
-					     << fraction << " mesh_index=" << mesh_id << endl;
-					continue;
-				}
-				int full = (int)floor(fraction+EPSILON);
-				if (full>=1){
-					step_full_count[mesh_id] += full;
-				}
-				else{
-					step_full_count[mesh_id] += 0;
-					step_partial_sum[mesh_id] += fraction;
-				}
-			}
 		}
 
-		for (std::map<int,int>::iterator it= step_full_count.begin(); it!=step_full_count.end(); it++){
+		// Each segment chemistry event already converted residence-time-driven
+		// reactive mass loss into a segment-averaged aperture increment. We now
+		// apply the accumulated local changes for this geometry-update interval.
+		for (std::map<int,double>::iterator it= step_aperture_change.begin(); it!=step_aperture_change.end(); it++){
 			int mesh_id = it->first;
-			double Nb_eff = (double)step_full_count[mesh_id] + step_partial_sum[mesh_id];
-			if (!std::isfinite(Nb_eff)){
-				cout << "WARNING in Particles_Transport (Transport.cpp): Nb_eff is NaN/inf for mesh_index="
+			double aperture_delta = it->second;
+			if (!std::isfinite(aperture_delta)){
+				cout << "WARNING in Particles_Transport (Transport.cpp): aperture_delta is NaN/inf for mesh_index="
 				     << mesh_id << endl;
 				continue;
 			}
-			particle_pass_count[mesh_id] += Nb_eff;
 			double b_old = net_mesh_modified.return_mesh(mesh_id).aperture;
-			net_mesh_modified.ChangeAperture(mesh_id,dt_step,Nb_eff,reference_injected_count_dt);
-			double b_new = net_mesh_modified.return_mesh(mesh_id).aperture;
+			double b_new = b_old + aperture_delta;
+			if (b_new<0.0){b_new = 0.0;}
+			for (size_t i=0;i<net_mesh_modified.meshes.size();i++){
+				if (net_mesh_modified.meshes[i].mesh_index==mesh_id){
+					net_mesh_modified.meshes[i].aperture = b_new;
+					break;
+				}
+			}
 			if (b_old>0.0 && b_new==0.0){
 				rebuild_needed = true;
 			}
@@ -1294,7 +1321,7 @@ bool Transport::Particles_Transport(map<int,double> & arrival_times,int option_i
 				     << " t=" << (t_current+dt_step)
 				     << ", mesh_index=" << mesh_id
 				     << ", aperture_old=" << b_old
-				     << ", particles_passed=" << particle_pass_count[mesh_id] << endl;
+				     << ", aperture_delta=" << aperture_delta << endl;
 			}
 		}
 

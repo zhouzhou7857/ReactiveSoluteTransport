@@ -1,0 +1,4 @@
+Frames = 11
+Min particles/frame = 0
+Max particles/frame = 164
+Mean particles/frame = 115.363636364

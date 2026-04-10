@@ -1,0 +1,7 @@
+Combined particle/aperture plotting summary
+Number of segments: 10
+Snapshot count: 2
+Snapshot times: 300.0, 600.0
+Max aperture change: 1.021140e-05
+Min aperture change: 6.490730e-07
+x-range: -0.005 to 0.005

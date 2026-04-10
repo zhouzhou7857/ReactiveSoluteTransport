@@ -1704,7 +1704,8 @@ src/Input_Output/Parameters.o: ../src/Input_Output/Parameters.cpp \
  /home/zhouw/softs/boost/numeric/bindings/traits/vector_traits.hpp \
  /home/zhouw/softs/boost/numeric/bindings/traits/detail/generate_const.hpp \
  /home/zhouw/softs/boost/numeric/bindings/traits/matrix_traits.hpp \
- /home/zhouw/softs/boost/numeric/bindings/traits/detail/ublas_ordering.hpp
+ /home/zhouw/softs/boost/numeric/bindings/traits/detail/ublas_ordering.hpp \
+ ../src/Input_Output/../Chemistry/Chemistry.h
 
 ../src/Input_Output/Parameters.h:
 
@@ -5117,3 +5118,5 @@ src/Input_Output/Parameters.o: ../src/Input_Output/Parameters.cpp \
 /home/zhouw/softs/boost/numeric/bindings/traits/matrix_traits.hpp:
 
 /home/zhouw/softs/boost/numeric/bindings/traits/detail/ublas_ordering.hpp:
+
+../src/Input_Output/../Chemistry/Chemistry.h:

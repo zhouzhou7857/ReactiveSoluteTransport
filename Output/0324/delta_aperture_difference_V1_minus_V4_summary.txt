@@ -1,0 +1,12 @@
+Case A: V1
+Case B: V4
+Common segments compared = 4446
+Segments in V1 without match in V4 = 34
+
+delta_b(V1) - delta_b(V4):
+  count = 4446
+  min = -2.589e-06
+  max = 2.638e-06
+  mean = -3.17240215924e-09
+  median = 0
+  std = 1.27603748677e-07

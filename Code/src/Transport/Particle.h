@@ -25,6 +25,8 @@ public:
 	int no;	// identifier of current particle
 	double L_in_fract; // advective distance already covered by the particle in the current fracture
 	double t_in_fract; // total time (advection+diffusion) that the particle already spent in the current fracture (since its last entrance in the fracture)
+	double reactive_concentration; // reactive concentration carried by the particle; geometry updates stop when it reaches zero
+	double representative_volume; // dynamic fluid volume represented by this particle, assigned at injection from inlet flux and particle time share
 public:
 	Particle();
 	virtual ~Particle();

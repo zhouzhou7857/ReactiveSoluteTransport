@@ -12,6 +12,7 @@
 #include "../Domain_Definition/Domain.h"
 #include "../Domain_Definition/NetworkMeshes.h"
 #include "../Transport/Particle.h"
+#include "../Chemistry/Chemistry.h"
 #include "../Utilitaries/RandomNumber.h"
 #include "../Utilitaries/Constantes.h"
 #include "../Utilitaries/Segment.h"
@@ -85,10 +86,10 @@ public:
 	std::vector<Particle> Particles_Injection(int option_injection=0);
 	bool infinite_matrix_displacement(Particle&);
 	bool finite_matrix_displacement(Particle&);
-	bool infinite_matrix_displacement_step(Particle&,double,std::map<int,double>&);
-	bool finite_matrix_displacement_step(Particle&,double,std::map<int,double>&);
+	bool infinite_matrix_displacement_step(Particle&,double,std::map<int,double>&,std::map<int,double>&);
+	bool finite_matrix_displacement_step(Particle&,double,std::map<int,double>&,std::map<int,double>&);
 	bool particle_displacement(Particle&);
-	bool particle_displacement_step(Particle&,double,std::map<int,double>&);
+	bool particle_displacement_step(Particle&,double,std::map<int,double>&,std::map<int,double>&);
 	bool Particles_Transport(std::map<int,double>&,int option_injection=0);
 	void RecordPositions(double,const std::vector<Particle>&);
 	void WritePositionSnapshotsCSV(const std::string&) const;

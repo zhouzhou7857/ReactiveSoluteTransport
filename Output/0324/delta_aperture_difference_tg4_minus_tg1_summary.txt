@@ -1,0 +1,12 @@
+Case A: tg4
+Case B: tg1
+Common segments compared = 4393
+Segments in tg4 without match in tg1 = 71
+
+delta_b(tg4) - delta_b(tg1):
+  count = 4393
+  min = -1.5966e-05
+  max = 1.9615e-05
+  mean = 2.35613020715e-08
+  median = 0
+  std = 1.16823350314e-06

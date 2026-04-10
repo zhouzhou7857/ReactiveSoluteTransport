@@ -1727,6 +1727,7 @@ src/PERFORM.o: ../src/PERFORM.cpp ../src/Input_Output/Parameters.h \
  ../src/Transport/../Domain_Definition/NetworkMeshes.h \
  ../src/Transport/../Transport/Particle.h \
  ../src/Transport/../Transport/../Utilitaries/Pointcpp.h \
+ ../src/Transport/../Chemistry/Chemistry.h \
  ../src/Transport/../Utilitaries/RandomNumber.h \
  ../src/Transport/../Utilitaries/Constantes.h \
  ../src/Transport/../Utilitaries/Segment.h \
@@ -1773,7 +1774,8 @@ src/PERFORM.o: ../src/PERFORM.cpp ../src/Input_Output/Parameters.h \
  ../src/Input_Output/Results.h \
  ../src/Input_Output/../Input_Output/Parameters.h \
  ../src/Input_Output/../Utilitaries/Structures.h \
- ../src/Utilitaries/Structures.h ../src/Visualisation/DFNVisu.h \
+ ../src/Chemistry/Chemistry.h ../src/Utilitaries/Structures.h \
+ ../src/Visualisation/DFNVisu.h \
  ../src/Visualisation/../Domain_Definition/NetworkMeshes.h \
  ../src/Visualisation/DisplayResults.h ../src/Visualisation/DFNVisu.h \
  ../src/Flow/FlowComputation.h \
@@ -5238,6 +5240,8 @@ src/PERFORM.o: ../src/PERFORM.cpp ../src/Input_Output/Parameters.h \
 
 ../src/Transport/../Transport/../Utilitaries/Pointcpp.h:
 
+../src/Transport/../Chemistry/Chemistry.h:
+
 ../src/Transport/../Utilitaries/RandomNumber.h:
 
 ../src/Transport/../Utilitaries/Constantes.h:
@@ -5329,6 +5333,8 @@ src/PERFORM.o: ../src/PERFORM.cpp ../src/Input_Output/Parameters.h \
 ../src/Input_Output/../Input_Output/Parameters.h:
 
 ../src/Input_Output/../Utilitaries/Structures.h:
+
+../src/Chemistry/Chemistry.h:
 
 ../src/Utilitaries/Structures.h:
 

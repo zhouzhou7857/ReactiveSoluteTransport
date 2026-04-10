@@ -1726,6 +1726,7 @@ src/Transport/Projection.o: ../src/Transport/Projection.cpp \
  ../src/Transport/../Domain_Definition/../Chemistry/Chemistry.h \
  ../src/Transport/../Transport/Particle.h \
  ../src/Transport/../Transport/../Utilitaries/Pointcpp.h \
+ ../src/Transport/../Chemistry/Chemistry.h \
  ../src/Transport/../Utilitaries/RandomNumber.h \
  ../src/Transport/../Utilitaries/Constantes.h \
  ../src/Transport/../Utilitaries/Segment.h \
@@ -5223,6 +5224,8 @@ src/Transport/Projection.o: ../src/Transport/Projection.cpp \
 ../src/Transport/../Transport/Particle.h:
 
 ../src/Transport/../Transport/../Utilitaries/Pointcpp.h:
+
+../src/Transport/../Chemistry/Chemistry.h:
 
 ../src/Transport/../Utilitaries/RandomNumber.h:
 

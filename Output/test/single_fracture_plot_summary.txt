@@ -1,0 +1,10 @@
+Single-fracture plotting summary
+Segments in current geometry: 10
+Valid step files used: 3
+  used: DFN_step000000.txt time=0.0
+  used: DFN_step000001.txt time=300.0
+  used: DFN_step000002.txt time=600.0
+Skipped step files: 0
+Max aperture change: 1.021140e-05
+Min aperture change: 6.490730e-07
+Mean aperture change: 3.620074e-06
