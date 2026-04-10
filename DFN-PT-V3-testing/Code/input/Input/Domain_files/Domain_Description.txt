@@ -1,4 +1,0 @@
-% domain size in x and y direction [m]
-% matrix properties: diffusion coefficient [m2/s] and porosity [-] 
-% hydraulic head enforced on the left and right sides of the domain [m]
-
