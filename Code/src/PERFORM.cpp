@@ -19,9 +19,28 @@
 #include "Flow/FlowComputation.h"
 #include <iostream>
 #include <chrono>
-#include <fstream>
+#include <cstdlib>
 
 using namespace std;
+
+static string ApplyChemistryModeFromEnvironment()
+{
+	const char* chemistry_mode_env = std::getenv("RST_CHEM_MODE");
+	if (chemistry_mode_env==NULL){
+		return "default";
+	}
+	string chemistry_mode(chemistry_mode_env);
+	if (chemistry_mode=="gypsum_fast2"){
+		ConfigureMineralVolumeLaw(
+				0.0,0.0,
+				DEFAULT_DELTA_V_FAST2_AMPLITUDE,DEFAULT_DELTA_V_FAST2_RATE,
+				0.0);
+		return chemistry_mode;
+	}
+	cout << "WARNING in PERFORM.cpp: unknown RST_CHEM_MODE=" << chemistry_mode
+	     << ", using default chemistry law" << endl;
+	return "default";
+}
 
 int main(int argc, char **argv) {
 
@@ -33,12 +52,15 @@ int main(int argc, char **argv) {
 
 	// 1. Read parameters and define domain
 	// 1.1. Standard definition
-	Parameters param;
-	ConfigureChemistryParameters(param.chemistry_initial_reactive_concentration,
-			param.chemistry_reactive_concentration_decay,
-			param.chemistry_reactive_to_mineral_stoich,
-			param.chemistry_mineral_molar_volume,
-			param.chemistry_fracture_out_of_plane_thickness);
+	string file_names_override;
+	if (argc>=2){
+		file_names_override = argv[1];
+	}
+	Parameters param(file_names_override);
+	ResetChemistryParametersToDefaults();
+	ConfigureMineralVolumeScaling(param.mineral_volume_reference_water_volume);
+	ConfigureFractureOutOfPlaneThickness(param.fracture_out_of_plane_thickness);
+	string chemistry_mode = ApplyChemistryModeFromEnvironment();
 	Domain domain(param.Lx,param.Ly);
 
 	// 1.2. Parameters related to the fracture network
@@ -48,12 +70,23 @@ int main(int argc, char **argv) {
 	cout << "p_lim = " << param.proba_transfer << endl;
 	cout << "option matrix = " << param.simu_option << endl;
 	cout << "DFN file = " << param.file_name_DFN << endl;
-	cout << "Chemistry file = " << (param.file_name_chemistry.empty() ? std::string("(default)") : param.file_name_chemistry) << endl;
-	cout << "Chemistry parameters: C0=" << INITIAL_REACTIVE_CONCENTRATION
+	cout << "Chemistry mode = " << chemistry_mode << endl;
+	cout << "Active chemistry coupling: particle-age cumulative DeltaV law" << endl;
+	cout << "Chemistry DeltaV(t) = A1*(1-exp(-k1*t)) + A2*(1-exp(-k2*t)) - L*t" << endl;
+	cout << "Chemistry parameters: A1=" << DELTA_V_FAST1_AMPLITUDE
+	     << " k1=" << DELTA_V_FAST1_RATE
+	     << " A2=" << DELTA_V_FAST2_AMPLITUDE
+	     << " k2=" << DELTA_V_FAST2_RATE
+	     << " L=" << DELTA_V_SLOW_LINEAR_RATE
+	     << " Vref=" << DELTA_V_REFERENCE_WATER_VOLUME
+	     << " thickness=" << FRACTURE_OUT_OF_PLANE_THICKNESS
+	     << " min_aperture=" << MINIMUM_FRACTURE_APERTURE
+	     << " debug=" << CHEMISTRY_DEBUG_LOGGING << endl;
+	cout << "Deprecated inactive chemistry parameters retained for compatibility: C0="
+	     << INITIAL_REACTIVE_CONCENTRATION
 	     << " decay=" << REACTIVE_CONCENTRATION_DECAY
 	     << " stoich=" << REACTIVE_TO_MINERAL_STOICH
-	     << " molar_volume=" << MINERAL_MOLAR_VOLUME
-	     << " thickness=" << FRACTURE_OUT_OF_PLANE_THICKNESS << endl;
+	     << " molar_volume=" << MINERAL_MOLAR_VOLUME << endl;
 	cout << "Domain bounds: min(" << domain.min_pt.i << "," << domain.min_pt.j
 	     << "), max(" << domain.max_pt.i << "," << domain.max_pt.j << ")" << endl;
 

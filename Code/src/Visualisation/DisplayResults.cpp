@@ -7,9 +7,9 @@
 
 
 #include "DisplayResults.h"
-#include <glut.h>
-#include <gl.h>
-#include <glu.h>
+#include <GL/glut.h>
+#include <GL/gl.h>
+#include <GL/glu.h>
 
 using namespace std;
 
@@ -74,4 +74,3 @@ DisplayResults::DisplayResults(int argc,char **argv,DFNVisuSeg results_seg_){
 	glutDisplayFunc(display_DFN_Seg);
 	glutMainLoop();
 }
-

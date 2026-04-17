@@ -1,5 +1,5 @@
 ReactiveSoluteTransport Code Log
-Last updated: 2026-03-26
+Last updated: 2026-04-10
 
 ==================================================
 1. Current Purpose of the Code
@@ -18,8 +18,9 @@ Important characteristics of the current version:
 - The main entry point is `Code/src/PERFORM.cpp`;
 - Input files are selected through `Input/File_names.txt`;
 - Results are written to the `Output/` directory;
-- The code already includes chemistry-coupled aperture updates based on particle throughput and reaction time step;
+- The code now uses chemistry-driven aperture updates based on particle-carried reactive concentration loss on the active main path;
 - The code already supports staged outputs such as `DFN_step******.txt` and `particle_positions_t******.csv`.
+- The code now also writes `DFN_raw.txt` before backbone filtering.
 
 ==================================================
 2. Meaning of Main Directories and Files
@@ -40,10 +41,11 @@ Spreadsheet used for test cases or case organization.
 
 [Input related]
 Input/File_names.txt
-Entry file that specifies the 3 input files used by the current run, in this order:
+Entry file that specifies the 4 input files used by the current run, in this order:
 - Domain file
 - Simulation file
 - DFN file
+- Chemistry file
 
 Input/Domain_files/
 Contains domain size, matrix diffusion coefficient, porosity, and left/right hydraulic head parameters.
@@ -60,7 +62,7 @@ Contains simulation control parameters such as:
 - `reaction_dt`
 
 Input/DFN_files/
-Contains fracture network input files. The current code can read DFN data from file and still keeps interfaces for other generation options.
+Contains fracture network input files. The current code can read DFN data from file and also supports the constructor-based `generation_realistic3/4` path in the active main program.
 
 [Main packages in Code/src]
 Code/src/PERFORM.cpp
@@ -110,9 +112,9 @@ Key files:
 Code/src/Chemistry/
 Chemistry and aperture update module.
 Main responsibilities:
-- compute aperture changes from reaction time step and particle throughput;
-- provide `ComputeAperture`, `ComputeDeltaAperture`, and related functions;
-- support the reactive transport coupling.
+- update reactive concentration carried by particles;
+- convert reactive mass loss to mineral volume change and aperture change;
+- keep the old empirical `ComputeAperture` interfaces only as legacy compatibility code.
 
 Code/src/Flow/
 Flow computation module.
@@ -215,3 +217,32 @@ Physical or numerical impact:
 Notes:
 - For future major updates, append new records in this section instead of overwriting previous ones.
 - If the main development directory changes from `Code/src` in the future, update the directory description section first.
+
+[Update]
+Date: 2026-04-10
+Author: Wenyu Zhou
+Version/Tag: realistic3 constructor path + documentation refresh
+Files or Packages:
+- `Code/src/PERFORM.cpp`
+- `Code/src/Input_Output/Parameters.cpp`
+- `Code/src/Domain_Definition/NetworkMeshes.cpp`
+- `Input/File_names.txt`
+- `Input/DFN_files/DFN_generator_description.txt`
+- `README_CN.md`
+- `TECHNICAL_REPORT.md`
+- `TECHNICAL_REPORT_CN.md`
+Main changes:
+- Switched the active `generation_realistic3/4` DFN build path in `PERFORM.cpp` from the old file-driven route to the constructor-based `NetworkMeshes(density_param, exponent_param, param, domain)` route.
+- Extended `Parameters.cpp` so `generation_realistic3/4` parameters and optional chemistry-file parameters are read into `Parameters`.
+- Updated the active `generation_realistic3` constructor path so length and aperture use the same random draw, producing positive length-aperture correlation.
+- Added `Output/DFN_raw.txt` for inspecting the generated network before backbone filtering.
+- Refreshed README and technical reports to reflect the current chemistry-driven aperture update path and realistic3 generation path.
+Input/Output impact:
+- `Input/File_names.txt` now expects four lines: domain, simulation, DFN, and chemistry file.
+- `generation_realistic3/4` parameters are now actively consumed by the main execution path.
+- Added `Output/DFN_raw.txt`.
+Physical or numerical impact:
+- The documented active aperture update path is chemistry-driven rather than the old empirical particle-throughput law.
+- The active `generation_realistic3` path now tends to assign larger apertures to longer fractures.
+Notes:
+- Legacy empirical aperture update interfaces remain in the code but are not the default main-path mechanism.

@@ -1634,7 +1634,6 @@ src/Visualisation/DFNVisu.o: ../src/Visualisation/DFNVisu.cpp \
  /home/zhouw/softs/cgal/gcc95/5.5.2/include/CGAL/General_polygon_with_holes_2.h \
  ../src/Visualisation/../Domain_Definition/../Input_Output/../Input_Output/BoundaryConditions.h \
  ../src/Visualisation/../Domain_Definition/../Input_Output/../Input_Output/../Utilitaries/UblasStructures.h \
- /home/zhouw/softs/boost/numeric/bindings/traits/ublas_sparse.hpp \
  /home/zhouw/softs/boost/py37/gcc95/1.76.0/include/boost/numeric/ublas/matrix_sparse.hpp \
  /home/zhouw/softs/boost/py37/gcc95/1.76.0/include/boost/numeric/ublas/vector_sparse.hpp \
  /home/zhouw/softs/boost/py37/gcc95/1.76.0/include/boost/numeric/ublas/storage_sparse.hpp \
@@ -1698,13 +1697,6 @@ src/Visualisation/DFNVisu.o: ../src/Visualisation/DFNVisu.cpp \
  /home/zhouw/softs/boost/py37/gcc95/1.76.0/include/boost/numeric/ublas/detail/vector_assign.hpp \
  /home/zhouw/softs/boost/py37/gcc95/1.76.0/include/boost/numeric/ublas/matrix_expression.hpp \
  /home/zhouw/softs/boost/py37/gcc95/1.76.0/include/boost/numeric/ublas/detail/matrix_assign.hpp \
- /home/zhouw/softs/boost/numeric/bindings/traits/sparse_traits.hpp \
- /home/zhouw/softs/boost/numeric/bindings/traits/config.hpp \
- /home/zhouw/softs/boost/numeric/bindings/traits/traits.hpp \
- /home/zhouw/softs/boost/numeric/bindings/traits/vector_traits.hpp \
- /home/zhouw/softs/boost/numeric/bindings/traits/detail/generate_const.hpp \
- /home/zhouw/softs/boost/numeric/bindings/traits/matrix_traits.hpp \
- /home/zhouw/softs/boost/numeric/bindings/traits/detail/ublas_ordering.hpp \
  /home/zhouw/softs/boost/py37/gcc95/1.76.0/include/boost/numeric/ublas/vector.hpp \
  ../src/Visualisation/../Domain_Definition/FractureMesh.h \
  ../src/Visualisation/../Domain_Definition/../Utilitaries/FluxPoint2D.h \
@@ -1720,9 +1712,7 @@ src/Visualisation/DFNVisu.o: ../src/Visualisation/DFNVisu.cpp \
  ../src/Visualisation/../Domain_Definition/HydraulicProperties.h \
  ../src/Visualisation/../Domain_Definition/../Domain_Definition/FractureMesh.h \
  ../src/Visualisation/../Domain_Definition/../Utilitaries/UblasStructures.h \
- ../src/Visualisation/../Domain_Definition/../Chemistry/Chemistry.h \
- /usr/include/GL/gl.h /usr/include/GL/glut.h \
- /usr/include/GL/freeglut_std.h
+ ../src/Visualisation/../Domain_Definition/../Chemistry/Chemistry.h
 
 ../src/Visualisation/DFNVisu.h:
 
@@ -4994,8 +4984,6 @@ src/Visualisation/DFNVisu.o: ../src/Visualisation/DFNVisu.cpp \
 
 ../src/Visualisation/../Domain_Definition/../Input_Output/../Input_Output/../Utilitaries/UblasStructures.h:
 
-/home/zhouw/softs/boost/numeric/bindings/traits/ublas_sparse.hpp:
-
 /home/zhouw/softs/boost/py37/gcc95/1.76.0/include/boost/numeric/ublas/matrix_sparse.hpp:
 
 /home/zhouw/softs/boost/py37/gcc95/1.76.0/include/boost/numeric/ublas/vector_sparse.hpp:
@@ -5122,20 +5110,6 @@ src/Visualisation/DFNVisu.o: ../src/Visualisation/DFNVisu.cpp \
 
 /home/zhouw/softs/boost/py37/gcc95/1.76.0/include/boost/numeric/ublas/detail/matrix_assign.hpp:
 
-/home/zhouw/softs/boost/numeric/bindings/traits/sparse_traits.hpp:
-
-/home/zhouw/softs/boost/numeric/bindings/traits/config.hpp:
-
-/home/zhouw/softs/boost/numeric/bindings/traits/traits.hpp:
-
-/home/zhouw/softs/boost/numeric/bindings/traits/vector_traits.hpp:
-
-/home/zhouw/softs/boost/numeric/bindings/traits/detail/generate_const.hpp:
-
-/home/zhouw/softs/boost/numeric/bindings/traits/matrix_traits.hpp:
-
-/home/zhouw/softs/boost/numeric/bindings/traits/detail/ublas_ordering.hpp:
-
 /home/zhouw/softs/boost/py37/gcc95/1.76.0/include/boost/numeric/ublas/vector.hpp:
 
 ../src/Visualisation/../Domain_Definition/FractureMesh.h:
@@ -5167,9 +5141,3 @@ src/Visualisation/DFNVisu.o: ../src/Visualisation/DFNVisu.cpp \
 ../src/Visualisation/../Domain_Definition/../Utilitaries/UblasStructures.h:
 
 ../src/Visualisation/../Domain_Definition/../Chemistry/Chemistry.h:
-
-/usr/include/GL/gl.h:
-
-/usr/include/GL/glut.h:
-
-/usr/include/GL/freeglut_std.h:

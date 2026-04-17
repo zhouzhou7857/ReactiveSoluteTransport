@@ -8,7 +8,7 @@
 #ifndef UBLASSTRUCTURES_H_
 #define UBLASSTRUCTURES_H_
 
-#include <boost/numeric/bindings/traits/ublas_sparse.hpp>
+#include <boost/numeric/ublas/matrix_sparse.hpp>
 #include <boost/numeric/ublas/vector.hpp>
 
 typedef boost::numeric::ublas::compressed_matrix<double, boost::numeric::ublas::column_major, 0,boost::numeric::ublas::unbounded_array<int>, boost::numeric::ublas::unbounded_array<double> > ublas_matrix;

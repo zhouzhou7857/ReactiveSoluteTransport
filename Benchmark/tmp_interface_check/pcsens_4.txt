@@ -1,0 +1,4 @@
+benchmark_gsf10_domain_t1e05.txt
+pcsens_t1e05_np10000.txt
+benchmark_gsf10_dfn_n100.txt
+benchmark_gsf10_chem_pure_gypsum.txt

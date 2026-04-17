@@ -211,6 +211,7 @@ static int FindMatchingMeshIndex(const NetworkMeshes& new_mesh,const FractureMes
 static void ResetParticleForInlet(Particle& pa,double t_reset){
 	pa.t = t_reset;
 	pa.t_injection = t_reset;
+	pa.particle_age = 0.0;
 	pa.mesh_index = -1;
 	pa.M = pointcpp<double>(NOT_DEFINED,NOT_DEFINED);
 	pa.mesh_history.clear();
@@ -258,6 +259,7 @@ static void RemoveParticleFromSystem(Particle& pa,double t_stamp,const std::stri
 	pa.L_in_fract = 0.0;
 	pa.t_in_fract = 0.0;
 	pa.t_in_fract_prev = 0.0;
+	pa.particle_age = 0.0;
 	pa.representative_volume = 0.0;
 }
 static double ParticleInjectionTimeShare(const NumericalParam& num_param,int nb_part_tot){
@@ -284,43 +286,67 @@ static double ComputeParticleRepresentativeVolumeAtInjection(const NetworkMeshes
 	if (!std::isfinite(inlet_flux) || inlet_flux<0.0){return 0.0;}
 	return inlet_flux*particle_time_share;
 }
-// Update particle concentration in a dedicated chemistry module and accumulate
-// the segment-averaged aperture change that is equivalent to the local mineral
-// volume change over the actually traversed fraction of the segment.
-static void ApplyParticleChemistryToMesh(Particle& pa,const NetworkMeshes& net_mesh,
-                                         int mesh_index,double residence_time,
-                                         double traversed_length,
-                                         std::map<int,double>& aperture_changes)
+// Active chemistry-to-geometry coupling:
+// accumulate per-segment mineral volume change from particle age increments,
+// then map the total volume to aperture only after all particles are processed
+// for the current operator-split interval.
+static void AccumulateParticleMineralVolumeChange(Particle& pa,const NetworkMeshes& net_mesh,
+                                                  int mesh_index,double residence_time,
+                                                  std::map<int,double>& mineral_volume_changes)
 {
 	if (mesh_index<0){return;}
-	if (pa.reactive_concentration<=0.0){
-		pa.reactive_concentration = 0.0;
-		return;
-	}
-	FractureMesh mesh = net_mesh.return_mesh(mesh_index);
-	double segment_length = mesh.ReturnLength();
-	ChemistryStepResult chem_step = EvaluateReactiveStep(pa.reactive_concentration,residence_time,pa.representative_volume,segment_length,traversed_length);
-	pa.reactive_concentration = chem_step.concentration_out;
-	if (chem_step.segment_aperture_change!=0.0){
-		aperture_changes[mesh_index] += chem_step.segment_aperture_change;
+	double dt_local = std::max(0.0,residence_time);
+	double t_particle_start = std::max(0.0,pa.particle_age);
+	double t_particle_end = t_particle_start + dt_local;
+	double delta_mineral_volume = ComputeParticleSegmentMineralVolumeChange(
+			t_particle_start,t_particle_end,pa.representative_volume);
+	pa.particle_age = t_particle_end;
+	if (delta_mineral_volume==0.0){return;}
+	mineral_volume_changes[mesh_index] += delta_mineral_volume;
+	if (CHEMISTRY_DEBUG_LOGGING){
+		FractureMesh mesh = net_mesh.return_mesh(mesh_index);
+		double delta_b = ComputeApertureChangeFromMineralVolume(delta_mineral_volume,mesh.ReturnLength());
+		cout << "[chem-segment] particle=" << pa.no
+		     << " mesh=" << mesh_index
+		     << " t_start=" << t_particle_start
+		     << " t_end=" << t_particle_end
+		     << " V_particle=" << pa.representative_volume
+		     << " volume_scale=" << ComputeParticleVolumeScalingFactor(pa.representative_volume)
+		     << " DeltaV=" << delta_mineral_volume
+		     << " delta_b=" << delta_b << endl;
 	}
 }
-static void ApplyParticleChemistryImmediate(Particle& pa,NetworkMeshes& net_mesh_modified,
-                                            const NetworkMeshes& net_mesh_reference,
-                                            int mesh_index,double residence_time,
-                                            double traversed_length)
+static void ApplyAccumulatedGeometryChange(NetworkMeshes& net_mesh_modified,int mesh_id,
+                                           double total_mineral_volume_change,
+                                           bool& rebuild_needed,
+                                           std::set<int>& zero_aperture_logged)
 {
-	std::map<int,double> aperture_changes;
-	ApplyParticleChemistryToMesh(pa,net_mesh_reference,mesh_index,residence_time,traversed_length,aperture_changes);
-	for (std::map<int,double>::iterator it=aperture_changes.begin(); it!=aperture_changes.end(); it++){
-		for (size_t i=0;i<net_mesh_modified.meshes.size();i++){
-			if (net_mesh_modified.meshes[i].mesh_index==it->first){
-				double b_new = net_mesh_modified.meshes[i].aperture + it->second;
-				if (b_new<0.0){b_new = 0.0;}
-				net_mesh_modified.meshes[i].aperture = b_new;
-				break;
-			}
+	FractureMesh mesh = net_mesh_modified.return_mesh(mesh_id);
+	double aperture_old = mesh.aperture;
+	double delta_b = ComputeApertureChangeFromMineralVolume(total_mineral_volume_change,mesh.ReturnLength());
+	double aperture_new = ClampApertureToMinimumThreshold(aperture_old + delta_b);
+	for (size_t i=0;i<net_mesh_modified.meshes.size();i++){
+		if (net_mesh_modified.meshes[i].mesh_index==mesh_id){
+			net_mesh_modified.meshes[i].aperture = aperture_new;
+			break;
 		}
+	}
+	if (CHEMISTRY_DEBUG_LOGGING){
+		cout << "[geom-update] mesh=" << mesh_id
+		     << " DeltaV=" << total_mineral_volume_change
+		     << " delta_b=" << delta_b
+		     << " aperture_old=" << aperture_old
+		     << " aperture_new=" << aperture_new << endl;
+	}
+	if (aperture_old>0.0 && aperture_new==0.0){
+		rebuild_needed = true;
+	}
+	if (aperture_old>0.0 && aperture_new==0.0 && zero_aperture_logged.insert(mesh_id).second){
+		cout << "WARNING: aperture->0"
+		     << " mesh_index=" << mesh_id
+		     << ", aperture_old=" << aperture_old
+		     << ", DeltaV=" << total_mineral_volume_change
+		     << ", delta_b=" << delta_b << endl;
 	}
 }
 // Modified by Wenyu on 2026/1/15; reassign particle to the nearest connected mesh endpoint (USED)
@@ -394,6 +420,7 @@ static bool ReassignToNearestConnectedEndpoint(Particle& pa,const NetworkMeshes&
 		if (dt_remain>0.0){
 			pa.t = t_target;
 			pa.t_in_fract += dt_remain;
+			pa.particle_age += dt_remain;
 		}
 		cout << "Particle reassigned to nearest connected mesh endpoint: particle=" << pa.no
 		     << " from mesh " << old_mesh
@@ -524,6 +551,7 @@ vector<Particle> Transport::Particles_Injection(int option_injection){
 		part_vect[i].mesh_history.clear();
 		part_vect[i].t = (t_injection>0.0)? (i*dt_inject) : 0.0;
 		part_vect[i].t_injection = part_vect[i].t;
+		part_vect[i].particle_age = 0.0;
 		part_vect[i].no = i;
 		part_vect[i].L_in_fract = 0.0;
 		part_vect[i].t_in_fract = 0.0;
@@ -646,7 +674,10 @@ bool Transport::finite_matrix_displacement_step(Particle & pa, double t_target, 
 			pa.M = M_end;
 		}
 		double dt_remain = t_target - pa.t;
-		if (dt_remain>0.0){pa.t_in_fract+=dt_remain;}
+		if (dt_remain>0.0){
+			AccumulateParticleMineralVolumeChange(pa,net_mesh,pa.mesh_index,dt_remain,aperture_changes);
+			pa.t_in_fract+=dt_remain;
+		}
 		pa.t = t_target;
 		return true;
 	}
@@ -700,7 +731,8 @@ bool Transport::finite_matrix_displacement_step(Particle & pa, double t_target, 
 			double adv_time_used = std::min(dt_remain, t_advec);
 			M_init = current_mesh.Mesh_Scale_Advection(M_init_in, adv_time_used);
 			double traversed_length = fabs(current_mesh.velocity)*adv_time_used;
-			ApplyParticleChemistryToMesh(pa,net_mesh,pa.mesh_index,dt_remain,traversed_length,aperture_changes);
+			(void)traversed_length;
+			AccumulateParticleMineralVolumeChange(pa,net_mesh,pa.mesh_index,dt_remain,aperture_changes);
 			pa.t = t_target;
 			pa.M = M_init;
 			pa.t_in_fract+=dt_remain;
@@ -710,7 +742,8 @@ bool Transport::finite_matrix_displacement_step(Particle & pa, double t_target, 
 		}
 
 		double traversed_length = fabs(current_mesh.velocity)*t_advec;
-		ApplyParticleChemistryToMesh(pa,net_mesh,pa.mesh_index,particle_time,traversed_length,aperture_changes);
+		(void)traversed_length;
+		AccumulateParticleMineralVolumeChange(pa,net_mesh,pa.mesh_index,particle_time,aperture_changes);
 		moved_distances[pa.mesh_index]+=traversed_length;
 		if (transferred && transfer_mesh!=-1){
 			current_mesh = net_mesh.return_mesh(transfer_mesh);
@@ -802,7 +835,10 @@ bool Transport::infinite_matrix_displacement_step(Particle & pa, double t_target
 			pa.M = M_end;
 		}  
 		double dt_remain = t_target - pa.t;
-		if (dt_remain>0.0){pa.t_in_fract+=dt_remain;}
+		if (dt_remain>0.0){
+			AccumulateParticleMineralVolumeChange(pa,net_mesh,pa.mesh_index,dt_remain,aperture_changes);
+			pa.t_in_fract+=dt_remain;
+		}
 		pa.t = t_target;
 		return true;
 	}
@@ -824,7 +860,8 @@ bool Transport::infinite_matrix_displacement_step(Particle & pa, double t_target
 		double adv_time_used = std::min(dt_remain, advection_time);
 		pointcpp<double> M_new = current_mesh.Mesh_Scale_Advection(M_init, adv_time_used);
 		double traversed_length = fabs(current_mesh.velocity)*adv_time_used;
-		ApplyParticleChemistryToMesh(pa,net_mesh,pa.mesh_index,dt_remain,traversed_length,aperture_changes);
+		(void)traversed_length;
+		AccumulateParticleMineralVolumeChange(pa,net_mesh,pa.mesh_index,dt_remain,aperture_changes);
 		pa.M = M_new;
 		pa.t = t_target;
 		pa.t_in_fract+=dt_remain;
@@ -834,7 +871,8 @@ bool Transport::infinite_matrix_displacement_step(Particle & pa, double t_target
 	}
 
 	double traversed_length = fabs(current_mesh.velocity)*advection_time;
-	ApplyParticleChemistryToMesh(pa,net_mesh,pa.mesh_index,particle_time,traversed_length,aperture_changes);
+	(void)traversed_length;
+	AccumulateParticleMineralVolumeChange(pa,net_mesh,pa.mesh_index,particle_time,aperture_changes);
 	pa.M = M_out;
 	if (particle_time==-1){pa.t=-1;}
 	else{
@@ -1022,11 +1060,8 @@ bool Transport::particle_displacement(Particle & pa){
 			// determination of the next fracture from proportional flow
 			FractureMesh mesh_current = net_mesh[pa.mesh_index];
 			
-			// Legacy non-step path: keep chemistry modular by using the same
-			// concentration-based segment update as the active stepwise solver.
-			ApplyParticleChemistryImmediate(pa,net_mesh_modified,net_mesh,pa.mesh_index,pa.t_in_fract,pa.L_in_fract);
-			
-			
+			// Deprecated / inactive path: active chemistry-to-geometry coupling is
+			// applied only in the stepwise operator-split solver.
 			bool no_downstream = false;
 			if (!Mesh_Neighbour_Choice_And_Test(pa.M,mesh_current,rng_tracker,new_mesh_index,no_downstream)){
 				if (no_downstream){
@@ -1047,8 +1082,6 @@ bool Transport::particle_displacement(Particle & pa){
 			}
 		}
 	}
-
-	ApplyParticleChemistryImmediate(pa,net_mesh_modified,net_mesh,pa.mesh_index,pa.t_in_fract,pa.L_in_fract);
         if (nb_iter==nb_max_iter){cout << "Particle stopped because of nb_max_iter, simulation stopped"; pa.t=-1; return false;}
 
 	return cont_disp;
@@ -1174,7 +1207,7 @@ bool Transport::Particles_Transport(map<int,double> & arrival_times,int option_i
 		auto step_start = std::chrono::steady_clock::now();
 		bool any_active = false;
 		bool rebuild_needed = false;
-		std::map<int,double> step_aperture_change;
+		std::map<int,double> step_mineral_volume_change;
 		std::vector<int> ready_indices;
 		for (int i=0;i<nb_part;i++){
 			if (part_vect[i].t==-1){continue;}
@@ -1257,6 +1290,7 @@ bool Transport::Particles_Transport(map<int,double> & arrival_times,int option_i
 							pa.L_in_fract = 0.0;
 							pa.t_in_fract = 0.0;
 							pa.t_in_fract_prev = 0.0;
+							pa.particle_age = 0.0;
 							pa.reactive_concentration = INITIAL_REACTIVE_CONCENTRATION;
 							pa.representative_volume = ComputeParticleRepresentativeVolumeAtInjection(net_mesh_modified,mesh_ids[i],particle_time_share);
 							Initial_Position_Particles[pa.no] = pa.M;
@@ -1279,7 +1313,7 @@ bool Transport::Particles_Transport(map<int,double> & arrival_times,int option_i
 			if (pa.t>t_current+EPSILON){continue;}
 			any_active = true;
 			std::map<int,double> moved_distances;
-			if (!particle_displacement_step(pa,dt_step,moved_distances,step_aperture_change)){return false;}
+			if (!particle_displacement_step(pa,dt_step,moved_distances,step_mineral_volume_change)){return false;}
 			if (pa.t!=-1 && domain.on_output_limit(pa.M)){
 				if (std::isfinite(pa.t)){
 					arrival_times[pa.no]=pa.t;
@@ -1293,36 +1327,19 @@ bool Transport::Particles_Transport(map<int,double> & arrival_times,int option_i
 			}
 		}
 
-		// Each segment chemistry event already converted residence-time-driven
-		// reactive mass loss into a segment-averaged aperture increment. We now
-		// apply the accumulated local changes for this geometry-update interval.
-		for (std::map<int,double>::iterator it= step_aperture_change.begin(); it!=step_aperture_change.end(); it++){
+		// Operator splitting:
+		// 1. transport computed local DeltaV contributions during particle motion
+		// 2. this loop applies the accumulated segment totals to aperture
+		for (std::map<int,double>::iterator it= step_mineral_volume_change.begin(); it!=step_mineral_volume_change.end(); it++){
 			int mesh_id = it->first;
-			double aperture_delta = it->second;
-			if (!std::isfinite(aperture_delta)){
-				cout << "WARNING in Particles_Transport (Transport.cpp): aperture_delta is NaN/inf for mesh_index="
+			double total_mineral_volume_change = it->second;
+			if (!std::isfinite(total_mineral_volume_change)){
+				cout << "WARNING in Particles_Transport (Transport.cpp): DeltaV is NaN/inf for mesh_index="
 				     << mesh_id << endl;
 				continue;
 			}
-			double b_old = net_mesh_modified.return_mesh(mesh_id).aperture;
-			double b_new = b_old + aperture_delta;
-			if (b_new<0.0){b_new = 0.0;}
-			for (size_t i=0;i<net_mesh_modified.meshes.size();i++){
-				if (net_mesh_modified.meshes[i].mesh_index==mesh_id){
-					net_mesh_modified.meshes[i].aperture = b_new;
-					break;
-				}
-			}
-			if (b_old>0.0 && b_new==0.0){
-				rebuild_needed = true;
-			}
-			if (b_old>0.0 && b_new==0.0 && zero_aperture_logged.insert(mesh_id).second){
-				cout << "WARNING: aperture->0 at step=" << (step_index+1)
-				     << " t=" << (t_current+dt_step)
-				     << ", mesh_index=" << mesh_id
-				     << ", aperture_old=" << b_old
-				     << ", aperture_delta=" << aperture_delta << endl;
-			}
+			ApplyAccumulatedGeometryChange(net_mesh_modified,mesh_id,total_mineral_volume_change,
+				rebuild_needed,zero_aperture_logged);
 		}
 
 		t_current += dt_step;

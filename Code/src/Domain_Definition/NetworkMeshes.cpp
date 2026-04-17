@@ -587,13 +587,17 @@ NetworkMeshes::NetworkMeshes(double density_param, double exponent_param, Parame
 		while (density<density_param){
                         fract_center=CgalPoint2D(-0.5*Lx+Uniform()*Lx,-0.5*Ly+Uniform()*Ly);// center of the fracture
                        double rnd_value=Uniform();
-                       fract_length=pow(rnd_value,1./(1-exponent_param));
+                       fract_length=param.r_min*pow(rnd_value,1./(1-exponent_param));
 			//angle of the fracture
                 	angle=Uniform()*PI;
                         // definition of a segment
                         seg=Segment2D(fract_center,fract_length,angle);
                         domain.SegmentIntersectDomain(seg,seg);
-			fract_aperture=exp(sqrt(2)*param.RSD_lnb*boost::math::erf_inv(rnd_value*(erf((log(param.b_max)-param.mean_lnb)/
+			// For a>1, smaller rnd_value generates longer fractures. Reversing the
+			// same draw for aperture restores the intended positive length-aperture
+			// correlation used in Song (2024): longer fractures tend to be wider.
+			double aperture_rnd_value = 1.0-rnd_value;
+			fract_aperture=exp(sqrt(2)*param.RSD_lnb*boost::math::erf_inv(aperture_rnd_value*(erf((log(param.b_max)-param.mean_lnb)/
 			(sqrt(2)*param.RSD_lnb))-erf((log(param.b_min)-param.mean_lnb)/(sqrt(2)*param.RSD_lnb)))+erf((log(param.b_min)-
 			param.mean_lnb)/(sqrt(2)*param.RSD_lnb)))+param.mean_lnb);
                         frac_mesh=FractureMesh(seg,fract_aperture,cpt_fract-1);
@@ -605,7 +609,7 @@ NetworkMeshes::NetworkMeshes(double density_param, double exponent_param, Parame
 	else if (param.generation_option_DFN=="generation_realistic4"){		// Guofeng's study with not correlated length and aperture
                 while (density<density_param){
                         fract_center=CgalPoint2D(-0.5*Lx+Uniform()*Lx,-0.5*Ly+Uniform()*Ly);
-			fract_length=pow(Uniform(),1./(1-exponent_param));
+			fract_length=param.r_min*pow(Uniform(),1./(1-exponent_param));
                         angle=Uniform()*PI;
 			seg=Segment2D(fract_center,fract_length,angle);
                         domain.SegmentIntersectDomain(seg,seg);

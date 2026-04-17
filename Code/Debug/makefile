@@ -51,7 +51,7 @@ all: HeatTransport1D
 HeatTransport1D: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C++ Linker'
-	g++ -L/usr/lib/x86_64-linux-gnu -L/home/marwa/libraries/SuiteSparse/UMFPACK/Lib -L/home/marwa/libraries/libblas -L/home/marwa/libraries/SuiteSparse/AMD/Lib -L/home/marwa/libraries/SuiteSparse/CHOLMOD/Lib -L/home/marwa/libraries/SuiteSparse/COLAMD/Lib -L/home/marwa/libraries/SuiteSparse/CAMD/Lib -L/home/marwa/libraries/SuiteSparse/SuiteSparse_config -L/home/marwa/libraries/SuiteSparse/CCOLAMD/Lib -L/home/marwa/libraries/CGAL-4.12-beta1/lib -L/home/marwa/libraries/SuiteSparse/metis-5.1.0/build/Linux-x86_64/libmetis -o "HeatTransport1D" $(OBJS) $(USER_OBJS) $(LIBS)
+	g++ -L/usr/lib/x86_64-linux-gnu -L/home/zhouw/softs/suitesparse/gcc95/5.10.1/lib -I /home/zhouw/softs/ -I /home/zhouw/softs/boost/py37/gcc95/1.76.0/include/ -I /home/zhouw/softs/cgal/gcc95/5.5.2/include/ -I/usr/include/GL -I ./../../../Library -I /home/zhouw/softs/suitesparse/gcc95/5.10.1/include/ -o "HeatTransport1D" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 

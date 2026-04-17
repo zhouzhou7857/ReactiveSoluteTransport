@@ -34,13 +34,11 @@ public:
 	double t_injection;	// duration of particle injection; Modified by Wenyu on 2026/1/6
 	double output_interval;	// time interval for position outputs; Modified by Wenyu on 2026/1/8
 	double reaction_dt;	// fixed reaction update time step used for transport/aperture updates
-	double chemistry_initial_reactive_concentration;
-	double chemistry_reactive_concentration_decay;
-	double chemistry_reactive_to_mineral_stoich;
-	double chemistry_mineral_molar_volume;
-	double chemistry_fracture_out_of_plane_thickness;
+	double mineral_volume_reference_water_volume;	// PHREEQC reference water volume Vref
+	double fracture_out_of_plane_thickness;	// thickness used in volume-to-aperture conversion
 	//int num_simu_start;	// number of the starting simulation
 	std::string code_path;
+	std::string file_names_path;
 	std::string file_name_domain,file_name_DFN,file_name_simu,file_name_chemistry;	// parameter files
 	BoundaryConditionsDef bc_map_def;	// boundary conditions
 	//int seed;	// seed used for the generating the fracture networks (same seed for each pair of (C,D))
@@ -49,7 +47,7 @@ public:
 	double density_param,exponent_param,fract_aperture,r_min,coeff_theta1,coeff_theta2,b_min,b_max,mean_lnb,RSD_lnb;
 	int seed_simu;
 public:
-	Parameters();
+	Parameters(const std::string& file_names_override = "");
 	~Parameters(){};
 	void read_param();
 };

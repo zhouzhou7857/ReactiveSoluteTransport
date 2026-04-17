@@ -42,6 +42,3 @@ ublas_vector LinearSystemSolving(ublas_matrix mat_syst, ublas_vector vect_syst){
 
 
 
-
-
-

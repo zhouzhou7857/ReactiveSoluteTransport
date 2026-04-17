@@ -10,71 +10,59 @@
 
 #include <algorithm>
 
-// Default chemistry parameters used when no external chemistry input file is
-// provided. The active values below are runtime-configurable and may be
-// overwritten from Input/Chemistry_files/*.txt.
-const double DEFAULT_INITIAL_REACTIVE_CONCENTRATION = 500.0;
-const double DEFAULT_REACTIVE_CONCENTRATION_DECAY = 5.0E-3;
-const double DEFAULT_REACTIVE_TO_MINERAL_STOICH = 1.0;
-const double DEFAULT_MINERAL_MOLAR_VOLUME = 7.4E-5;
+// DFN-PT-V4 active chemistry core:
+// no external chemistry input file is required on the active path.
+// The current coupling uses a cumulative mineral-volume law per particle
+// parcel, while legacy concentration-based values are retained only for
+// deprecated inactive helpers.
+// Active default law:
+// DeltaV(t) =
+//   A1 * (1 - exp(-k1 * t)) +
+//   A2 * (1 - exp(-k2 * t)) +
+//   L  * t
+// Here A1, A2, and L are stored in m^3 units.
+// Converted from PHREEQC-fit coefficients in cm^3 using 1 cm^3 = 1.0E-6 m^3.
+// Positive DeltaV denotes dissolution; negative DeltaV denotes precipitation.
+const double DEFAULT_DELTA_V_FAST1_AMPLITUDE = 2.02192E-5;
+const double DEFAULT_DELTA_V_FAST1_RATE = 2.14128E-3;
+const double DEFAULT_DELTA_V_FAST2_AMPLITUDE = 2.50122E-6;
+const double DEFAULT_DELTA_V_FAST2_RATE = 2.72730E-5;
+const double DEFAULT_DELTA_V_SLOW_LINEAR_RATE = 2.48263E-16;
+const double DEFAULT_DELTA_V_REFERENCE_WATER_VOLUME = 1.0E-3;
+// change to 5 independent variables in volume function, with 5 parameters to fit (A1,k1,A2,k2,L) - DR on 2025/12/11
+const double DEFAULT_MINIMUM_FRACTURE_APERTURE = 1.0E-12;
+const double DEFAULT_INITIAL_REACTIVE_CONCENTRATION = 500.0; // not used in active DeltaV logic
+const double DEFAULT_REACTIVE_CONCENTRATION_DECAY = 5.0E-3; // not used in active DeltaV logic
+const double DEFAULT_REACTIVE_TO_MINERAL_STOICH = 1.0; // not used in active DeltaV logic
+const double DEFAULT_MINERAL_MOLAR_VOLUME = 7.4E-5; // not used in active DeltaV logic
 const double DEFAULT_FRACTURE_OUT_OF_PLANE_THICKNESS = 1.0;
 
-// Assumed inlet reactive concentration carried by each particle [mol/m^3].
-// This codebase does not currently read chemistry parameters from input files, so
-// the concentration evolution is parameterized here to keep chemistry modular.
-// Assumption: the reactive concentration represents a finite reagent inventory
-// carried by each particle. As it is consumed, mineral dissolves and aperture
-// opens. A precipitation-oriented closure is not parameterized in the current
-// input model, so the default active chemistry is reagent-limited dissolution.
-extern double INITIAL_REACTIVE_CONCENTRATION;
-// First-order depletion rate of the particle-carried reactive concentration [1/s].
-extern double REACTIVE_CONCENTRATION_DECAY;
-// Stoichiometric conversion from consumed reactive moles to dissolved/precipitated
-// mineral moles [mol mineral / mol reactive species].
-extern double REACTIVE_TO_MINERAL_STOICH;
-// Mineral molar volume used to convert reacted mineral moles to mineral volume
-// change [m^3/mol]. The default value is an assumed gypsum-scale molar volume. （1 unit of H2O convert 1 unit of Ca and SO4）
-extern double MINERAL_MOLAR_VOLUME;
-// Unit out-of-plane thickness for the 2D DFN representation [m] (1 m for simplifying).
+// DFN-PT-V4 active particle-based cumulative mineral volume law.
+extern double DELTA_V_FAST1_AMPLITUDE;
+extern double DELTA_V_FAST1_RATE;
+extern double DELTA_V_FAST2_AMPLITUDE;
+extern double DELTA_V_FAST2_RATE;
+extern double DELTA_V_SLOW_LINEAR_RATE;
+extern double DELTA_V_REFERENCE_WATER_VOLUME;
+extern double MINIMUM_FRACTURE_APERTURE;
+extern bool CHEMISTRY_DEBUG_LOGGING;
+
+// Deprecated / inactive legacy chemistry parameters.
+extern double INITIAL_REACTIVE_CONCENTRATION; // not used in active DeltaV logic
+extern double REACTIVE_CONCENTRATION_DECAY; // not used in active DeltaV logic
+extern double REACTIVE_TO_MINERAL_STOICH; // not used in active DeltaV logic
+extern double MINERAL_MOLAR_VOLUME; // not used in active DeltaV logic
 extern double FRACTURE_OUT_OF_PLANE_THICKNESS;
 
-// Legacy empirical particle-count coupling parameter.
-// 在 DFN-PT-V3 当前主路径中并未使用，仅保留给旧的 aperture 更新接口。
-const double K_REACTION = -1.5E-10; // Reaction factor calculated from trend line slope of Delta_V [MODIFIED!!][exp = 1.5e-10 m/s]
-// Gypsum dissolving rate is about 6e-9 m/s， dividing by porosity correction would be 6.7E-9 m/s
-/**
- * Legacy empirical aperture update interface.
- * 在 DFN-PT-V3 当前主路径中并未使用，仅保留给旧版本/兼容性代码。
- * Compute aperture b from the empirical formula:
- *   b_new = b - K_REACTION * t * (Nb / Nt)
- * with the ratio (Nb / Nt) capped at 1.
- * @param b  current aperture
- * @param t   reaction update time step (s)
- * @param Nb  effective particle count through the segment during the current reaction time step
- * @param Nt  reference injected particle count for the current reaction time step
- * @param clamp_nonnegative if true, b is clamped to >= 0 (Delta_b can be negative)
- * @return b_new  aperture (new aperture)
- */
-double ComputeAperture(double b, double t, double Nb, double Nt, bool clamp_nonnegative = true);
+// Deprecated / inactive empirical particle-count coupling parameter.
+const double K_REACTION = -1.5E-10;
 
-/**
- * Legacy empirical aperture-delta interface.
- * 在 DFN-PT-V3 当前主路径中并未使用，仅保留给旧版本/兼容性代码。
- * Compute delta aperture for updating an existing aperture:
- *   delta_b = b_new - b_old
- *
- * @param b current aperture
- * @param t     reaction update time step
- * @param Nb    effective particles through the segment during the current reaction time step
- * @param Nt    reference injected particle count for the current reaction time step
- * @param clamp_nonnegative if true, b_new is clamped to >= 0 before differencing
- * @return delta_b
- */
+double ComputeAperture(double b, double t, double Nb, double Nt, bool clamp_nonnegative = true);
 double ComputeDeltaAperture(double b, double t, double Nb, double Nt, bool clamp_nonnegative = true);
-// Legacy helper used only by the old particle-count aperture update path.
-// 在 DFN-PT-V3 当前主路径中并未使用。
 double safe_ratio(double Nb, double Nt);
 
+// Deprecated / inactive result type retained for compatibility with the legacy
+// concentration-based coupling helpers.
 class ChemistryStepResult{
 public:
 	double concentration_out;
@@ -101,6 +89,36 @@ double UpdateReactiveConcentration(double concentration_in,double residence_time
 ChemistryStepResult EvaluateReactiveStep(double concentration_in,double residence_time,double particle_representative_volume,double segment_length,double traversed_length);
 void ResetChemistryParametersToDefaults();
 void ConfigureChemistryParameters(double initial_concentration,double concentration_decay,
-		double stoich,double molar_volume,double fracture_thickness);
+		double stoich,double molar_volume,double fracture_thickness,
+		double minimum_fracture_aperture,bool chemistry_debug_logging);
+// Set the cumulative PHREEQC-derived DeltaV law:
+// DeltaV(t) = A1 * (1 - exp(-k1 * t))
+//           + A2 * (1 - exp(-k2 * t))
+//           + L * t
+void ConfigureMineralVolumeLaw(double fast1_amplitude,double fast1_rate,
+		double fast2_amplitude,double fast2_rate,double slow_linear_rate);
+// Set the PHREEQC reference water volume Vref used in the scaling factor:
+// scale = V_particle / Vref
+void ConfigureMineralVolumeScaling(double reference_water_volume);
+// Set the out-of-plane fracture thickness used in the volume-to-aperture map:
+// delta_b = delta_V / (segment_length * thickness * 2)
+void ConfigureFractureOutOfPlaneThickness(double fracture_thickness);
+
+// Return the cumulative PHREEQC-derived mineral volume change for a reference
+// water parcel:
+// DeltaV_ref(t) = A1 * (1 - exp(-k1 * t))
+//               + A2 * (1 - exp(-k2 * t))
+//               + L * t
+double GetCumulativeMineralVolumeChange(double t_particle);
+// Return the particle-volume scaling factor:
+// scale = V_particle / Vref
+double ComputeParticleVolumeScalingFactor(double particle_representative_volume);
+// Return the mineral-volume increment over one particle time interval:
+// DeltaV_particle[t_start,t_end]
+//   = (DeltaV_ref(t_end) - DeltaV_ref(t_start)) * (V_particle / Vref)
+double ComputeParticleSegmentMineralVolumeChange(double t_particle_start,double t_particle_end,
+		double particle_representative_volume);
+double ComputeApertureChangeFromMineralVolume(double mineral_volume_change,double segment_length);
+double ClampApertureToMinimumThreshold(double aperture_value);
 
 #endif /* CHEMISTRY_H_ */

@@ -7,8 +7,8 @@
 
 
 #include "DFNVisu.h"
-#include <gl.h>
-#include <glut.h>
+#include <GL/gl.h>
+#include <GL/glut.h>
 #include <iostream>
 #include <string>
 #include <fstream>
@@ -235,4 +235,3 @@ void SetColorBis(double x){
 void SetColor(double x, double x_min, double x_max){
 	SetColor((x-x_min)/(x_max-x_min));
 }
-

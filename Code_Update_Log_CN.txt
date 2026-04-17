@@ -1,0 +1,256 @@
+ReactiveSoluteTransport 代码更新日志
+最后更新：2026-04-10
+
+==================================================
+1. 当前代码用途
+==================================================
+本项目是一个用于模拟裂隙多孔介质中反应性溶质运移的 C++ 程序。
+
+基于当前 `Code/src` 与 `Input` 的内容，主流程为：
+1. 读取域、模拟、DFN 与 chemistry 输入文件名；
+2. 构建离散裂隙网络（DFN）与计算域；
+3. 计算裂隙网络中的流动并提取连通 backbone；
+4. 执行带基质扩散与注入控制的粒子输运；
+5. 在输运过程中按反应时间步更新裂隙 aperture；
+6. 输出到达时间统计、粒子位置快照以及初始/更新后的 DFN 文件。
+
+当前版本的重要特点：
+- 主入口文件是 `Code/src/PERFORM.cpp`；
+- 输入文件通过 `Input/File_names.txt` 选择；
+- 结果写入 `Output/` 目录；
+- 当前主路径中的 aperture 更新已改为基于粒子携带反应物浓度损耗的 chemistry-driven 机制；
+- 当前版本支持阶段性输出，例如 `DFN_step******.txt` 与 `particle_positions_t******.csv`；
+- 当前版本会在 backbone 筛选前额外输出 `DFN_raw.txt`。
+
+==================================================
+2. 主要目录与文件含义
+==================================================
+
+[根目录]
+Code/
+主源码目录。当前有效开发版本应视为 `Code/src`。
+
+Input/
+输入参数目录。控制域、模拟、DFN 与 chemistry 输入。
+
+Output/
+输出目录。存储 DFN 结果、CDF/PDF 文件、粒子位置快照以及其他模拟输出。
+
+test_case_matrix.xlsx
+用于测试案例或案例整理的表格。
+
+[输入相关]
+Input/File_names.txt
+当前运行使用的 4 个输入文件入口，顺序为：
+- 域文件
+- 模拟文件
+- DFN 文件
+- Chemistry 文件
+
+Input/Domain_files/
+包含域尺寸、基质扩散系数、孔隙度以及左右边界水头参数。
+
+Input/Simulation_files/
+包含模拟控制参数，例如：
+- 粒子数 `nb_part`
+- 转移概率参数 `proba_transfer`
+- `simu_option`（无限/有限基质）
+- `t_min`、`t_max`、`Nt`
+- `seed_simu`
+- `t_injection`
+- `output_interval`
+- `reaction_dt`
+
+Input/DFN_files/
+包含裂隙网络输入文件。当前代码既支持直接从文件读取 DFN，也支持在主程序中启用构造函数版 `generation_realistic3/4` 生成路径。
+
+Input/Chemistry_files/
+包含 chemistry 参数文件，例如：
+- 初始反应物浓度
+- 浓度衰减率
+- 化学计量系数
+- 矿物摩尔体积
+- 裂隙面外厚度
+
+[Code/src 中的主要模块]
+Code/src/PERFORM.cpp
+程序主入口。负责连接参数读取、DFN 构建、流动计算、backbone 提取、粒子输运与结果输出。
+
+Code/src/Input_Output/
+输入输出模块。
+主要职责：
+- 读取参数文件；
+- 定义边界条件；
+- 生成 `cdf.txt` 与 `pdf.txt` 等结果文件。
+关键文件：
+- `Parameters.h` / `Parameters.cpp`：读取主输入参数；
+- `BoundaryConditions.h` / `.cpp`：定义边界条件；
+- `Results.h` / `.cpp`：后处理并写出结果。
+
+Code/src/Domain_Definition/
+几何与裂隙网络定义模块。
+主要职责：
+- 定义模拟域；
+- 定义 `FractureMesh` 与 `NetworkMeshes`；
+- 计算节点、交点和裂隙连通性；
+- 计算并更新水力性质；
+- 支持 backbone 提取与 DFN 输出。
+关键文件：
+- `Domain.h` / `.cpp`：域边界与几何检查；
+- `FractureMesh.h` / `.cpp`：离散裂隙单元；
+- `NetworkMeshes.h` / `.cpp`：完整裂隙网络；
+- `HydraulicProperties.h` / `.cpp`：长度、aperture、transmissivity；
+- `DFNComputation.h` / `.cpp`：DFN 流动计算支持。
+
+Code/src/Transport/
+核心粒子输运模块。
+主要职责：
+- 粒子注入；
+- 裂隙内输运与裂隙间转移；
+- 基质扩散；
+- 记录 `arrival_times`；
+- 写出粒子位置快照；
+- 按 `reaction_dt` 更新 aperture 与网络状态。
+关键文件：
+- `Transport.h` / `.cpp`：主输运流程；
+- `Particle.h` / `.cpp`：粒子状态定义；
+- `Projection.cpp`：裂隙间投影；
+- `Transfer.cpp`：转移概率与转移时间计算。
+
+Code/src/Chemistry/
+化学与 aperture 更新模块。
+主要职责：
+- 更新粒子携带的反应物浓度；
+- 将反应物损耗换算为矿物体积变化与 aperture 变化；
+- 保留旧的经验型 `ComputeAperture` 接口作为兼容代码。
+
+Code/src/Flow/
+流动计算模块。
+公共头文件较小，但整体速度与水头相关逻辑与 `NetworkMeshes` 和 DFN 流动求解紧密耦合。
+
+Code/src/Visualisation/
+可视化与展示支持模块。
+主要职责：
+- 显示裂隙网络；
+- 显示基于裂隙段的结果；
+- 辅助检查 DFN 和输运行为。
+
+Code/src/Utilitaries/
+底层工具模块。
+主要职责：
+- 点、线段与几何结构；
+- 线性系统；
+- 随机数工具；
+- 常量；
+- 通用数值辅助函数。
+
+Code/src/RngStream/
+用于粒子输运随机采样的随机流实现。
+
+[其他目录]
+Code/Debug/
+构建输出目录，包含目标文件、makefile 与可执行文件。不应作为主要开发说明来源。
+
+Code/Backup0318/ 与 Code/Backup0318_unmodified/
+历史备份目录。可用于比较或回退参考，但不是当前主开发目标。
+
+==================================================
+3. 建议阅读顺序
+==================================================
+建议的阅读顺序为：
+
+1. `Code/src/PERFORM.cpp`
+2. `Code/src/Input_Output/Parameters.cpp`
+3. `Code/src/Domain_Definition/NetworkMeshes.cpp`
+4. `Code/src/Transport/Transport.cpp`
+5. `Code/src/Chemistry/Chemistry.cpp`
+6. `Code/src/Input_Output/Results.cpp`
+
+==================================================
+4. 主要更新记录规则
+==================================================
+今后每次重大代码更新，建议在下方追加一条新记录。
+建议至少记录：
+- 日期
+- 作者
+- 版本/标签
+- 修改范围
+- 新增/修改的主要函数
+- 对输入输出格式的影响
+- 对物理意义或数值稳定性的影响
+
+推荐模板：
+
+[更新]
+日期：
+作者：
+版本/标签：
+文件或模块：
+主要修改：
+- 
+- 
+- 
+输入/输出影响：
+- 
+物理或数值影响：
+- 
+备注：
+- 
+
+==================================================
+5. 主要更新记录
+==================================================
+
+[更新]
+日期：2026-03-26
+作者：Wenyu Zhou
+版本/标签：初始日志创建
+文件或模块：
+- `Code/src/PERFORM.cpp`
+- `Code/src/Input_Output`
+- `Code/src/Domain_Definition`
+- `Code/src/Transport`
+- `Code/src/Chemistry`
+- `Input/`
+- `Output/`
+主要修改：
+- 创建首版代码日志文件，用于记录当前代码用途、主要模块含义以及后续重大更新。
+- 总结当前已实现的主流程：DFN 构建、流动计算、backbone 提取、粒子输运、结果统计与输出生成。
+- 记录当前版本已包含反应 aperture 更新、阶段性 DFN 快照与粒子位置快照输出。
+输入/输出影响：
+- 未新增程序输入参数。
+- 新增了本日志文件 `Code_Update_Log.txt`，作为人工维护的项目记录。
+物理或数值影响：
+- 对模拟本身没有直接数值影响，此次更新仅增加文档。
+备注：
+- 今后重大更新请在本节追加，不要覆盖旧记录。
+- 如果未来主开发目录不再是 `Code/src`，应优先更新目录说明部分。
+
+[更新]
+日期：2026-04-10
+作者：Wenyu Zhou
+版本/标签：realistic3 构造函数路径 + 文档刷新
+文件或模块：
+- `Code/src/PERFORM.cpp`
+- `Code/src/Input_Output/Parameters.cpp`
+- `Code/src/Domain_Definition/NetworkMeshes.cpp`
+- `Input/File_names.txt`
+- `Input/DFN_files/DFN_generator_description.txt`
+- `README_CN.md`
+- `TECHNICAL_REPORT.md`
+- `TECHNICAL_REPORT_CN.md`
+主要修改：
+- 在 `PERFORM.cpp` 中，将主路径里的 `generation_realistic3/4` DFN 构建方式从旧的文件驱动路径切换为构造函数版 `NetworkMeshes(density_param, exponent_param, param, domain)`。
+- 在 `Parameters.cpp` 中扩展了 `generation_realistic3/4` 参数读取，并加入可选 chemistry 文件参数读取。
+- 更新了 `generation_realistic3` 的构造函数版实现，使裂隙长度与 aperture 使用同一个随机数驱动，从而形成正相关关系。
+- 新增 `Output/DFN_raw.txt`，用于检查 backbone 筛选前的原始 DFN。
+- 刷新 README 与技术报告，使其反映当前 chemistry-driven aperture 更新路径和 `realistic3` 生成路径。
+输入/输出影响：
+- `Input/File_names.txt` 现在要求 4 行：域文件、模拟文件、DFN 文件、chemistry 文件。
+- `generation_realistic3/4` 的参数现在会被主执行路径实际读取并使用。
+- 新增输出文件 `Output/DFN_raw.txt`。
+物理或数值影响：
+- 当前文档所描述的主路径 aperture 更新已从旧的粒子通过量经验公式切换为 chemistry-driven 机制。
+- 当前 `generation_realistic3` 主路径会更倾向于把较长裂隙对应到较大的 aperture。
+备注：
+- 旧的经验 aperture 更新接口仍保留在代码中，但不再是主路径默认机制。

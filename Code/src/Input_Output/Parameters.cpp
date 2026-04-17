@@ -6,29 +6,26 @@
  */
 
 #include "Parameters.h"
-#include "../Chemistry/Chemistry.h"
 #include <fstream>
 #include <iostream>
 
 using namespace std;
 
 /********************** PARAMETERS **************************/
-Parameters::Parameters(){
+Parameters::Parameters(const std::string& file_names_override){
 	code_path="./../..";
-	chemistry_initial_reactive_concentration = DEFAULT_INITIAL_REACTIVE_CONCENTRATION;
-	chemistry_reactive_concentration_decay = DEFAULT_REACTIVE_CONCENTRATION_DECAY;
-	chemistry_reactive_to_mineral_stoich = DEFAULT_REACTIVE_TO_MINERAL_STOICH;
-	chemistry_mineral_molar_volume = DEFAULT_MINERAL_MOLAR_VOLUME;
-	chemistry_fracture_out_of_plane_thickness = DEFAULT_FRACTURE_OUT_OF_PLANE_THICKNESS;
 	//code_path="/Users/delphineroubinet/Documents/Projets/FracTherm/CodeHeatTransport";
-	string file_name = code_path+"/Input/File_names.txt";
+	file_name_chemistry.clear();
+	file_names_path = file_names_override.empty() ? (code_path+"/Input/File_names.txt") : file_names_override;
+	string file_name = file_names_path;
 	ifstream fichier(file_name.c_str());
 	if (fichier.is_open()){
 		fichier >> file_name_domain;
 		fichier >> file_name_simu;
 		fichier >> file_name_DFN;
-		file_name_chemistry.clear();
-		fichier >> file_name_chemistry;
+		if (!(fichier >> file_name_chemistry)){
+			file_name_chemistry.clear();
+		}
 	}
 	else{cout << "Parameters files not found" << endl;}
 	read_param();
@@ -84,6 +81,12 @@ void Parameters::read_param(){
 				reaction_dt = t_injection;
 			}
 		}
+		if (!(fichier2 >> mineral_volume_reference_water_volume)){
+			mineral_volume_reference_water_volume = DEFAULT_DELTA_V_REFERENCE_WATER_VOLUME;
+		}
+		if (!(fichier2 >> fracture_out_of_plane_thickness)){
+			fracture_out_of_plane_thickness = DEFAULT_FRACTURE_OUT_OF_PLANE_THICKNESS;
+		}
 	}
 	else{
 		cout << "WARNING in Parameters (Parameters.cpp) : unknown file2" << endl;
@@ -117,23 +120,6 @@ void Parameters::read_param(){
         }
         else{cout << "WARNING in Parameters (Parameters.cpp) : unknown file2" << endl;}
         fichier3.close();
-
-	// 4. Read optional chemistry parameters for concentration-driven aperture evolution
-	if (!file_name_chemistry.empty()){
-		file_name=code_path+"/Input/Chemistry_files/"+file_name_chemistry;
-		ifstream fichier4(file_name.c_str());
-		if (fichier4.is_open()){
-			fichier4 >> chemistry_initial_reactive_concentration;
-			fichier4 >> chemistry_reactive_concentration_decay;
-			fichier4 >> chemistry_reactive_to_mineral_stoich;
-			fichier4 >> chemistry_mineral_molar_volume;
-			fichier4 >> chemistry_fracture_out_of_plane_thickness;
-		}
-		else{
-			cout << "WARNING in Parameters (Parameters.cpp) : unknown chemistry file" << endl;
-		}
-		fichier4.close();
-	}
 }
 
 /********************** INV_PARAM **************************/

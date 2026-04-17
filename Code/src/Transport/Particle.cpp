@@ -15,6 +15,7 @@ Particle::Particle(){
 	intersection_history.clear();
 	t=-1;
 	t_injection=-1;
+	particle_age=0.0;
 	no=-1;
 	L_in_fract=0;
 	t_in_fract=-1;

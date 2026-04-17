@@ -1,4 +1,3 @@
 Domain_10cm_square.txt
 Simulation.txt
 DFN_realistic3_10cm_target200-2.txt
-Chemistry_decay_reactivity_case_3.txt
