@@ -22,7 +22,11 @@ double DELTA_V_FAST2_AMPLITUDE = DEFAULT_DELTA_V_FAST2_AMPLITUDE;
 double DELTA_V_FAST2_RATE = DEFAULT_DELTA_V_FAST2_RATE;
 double DELTA_V_SLOW_LINEAR_RATE = DEFAULT_DELTA_V_SLOW_LINEAR_RATE;
 double DELTA_V_REFERENCE_WATER_VOLUME = DEFAULT_DELTA_V_REFERENCE_WATER_VOLUME;
+double EFFECTIVE_DIFFUSION_COEFFICIENT = 0.0;
+double EFFECTIVE_DIFFUSION_TIME = 0.0;
 double MINIMUM_FRACTURE_APERTURE = DEFAULT_MINIMUM_FRACTURE_APERTURE;
+bool USE_VP_WIDTH_CORRECTION = false;
+bool USE_EFFECTIVE_DIFFUSION_HEIGHT_FACTOR = false;
 bool CHEMISTRY_DEBUG_LOGGING = false;
 
 // DFN-PT-V4 chemistry core:
@@ -91,7 +95,11 @@ void ResetChemistryParametersToDefaults()
 	DELTA_V_FAST2_RATE = DEFAULT_DELTA_V_FAST2_RATE;
 	DELTA_V_SLOW_LINEAR_RATE = DEFAULT_DELTA_V_SLOW_LINEAR_RATE;
 	DELTA_V_REFERENCE_WATER_VOLUME = DEFAULT_DELTA_V_REFERENCE_WATER_VOLUME;
+	EFFECTIVE_DIFFUSION_COEFFICIENT = 0.0;
+	EFFECTIVE_DIFFUSION_TIME = 0.0;
 	MINIMUM_FRACTURE_APERTURE = DEFAULT_MINIMUM_FRACTURE_APERTURE;
+	USE_VP_WIDTH_CORRECTION = false;
+	USE_EFFECTIVE_DIFFUSION_HEIGHT_FACTOR = false;
 	CHEMISTRY_DEBUG_LOGGING = false;
 }
 
@@ -134,6 +142,22 @@ void ConfigureFractureOutOfPlaneThickness(double fracture_thickness)
 	}
 }
 
+void ConfigureVpWidthCorrection(bool enable_width_correction)
+{
+	USE_VP_WIDTH_CORRECTION = enable_width_correction;
+}
+
+void ConfigureEffectiveDiffusionHeightFactor(bool enable_factor,double diffusion_coefficient,double diffusion_time)
+{
+	USE_EFFECTIVE_DIFFUSION_HEIGHT_FACTOR = enable_factor;
+	if (diffusion_coefficient>=0.0){
+		EFFECTIVE_DIFFUSION_COEFFICIENT = diffusion_coefficient;
+	}
+	if (diffusion_time>=0.0){
+		EFFECTIVE_DIFFUSION_TIME = diffusion_time;
+	}
+}
+
 // DFN-PT-V4 chemistry core functions below. Modified by WZ on 10/04/2026
 // The active PHREEQC-derived law is expressed as a cumulative mineral-volume
 // change for one particle parcel:
@@ -164,16 +188,30 @@ double GetCumulativeMineralVolumeChange(double t_particle)
 
 // Particle-specific volume scaling relative to the PHREEQC calibration water:
 // scale = V_particle / Vref ; Vref is set by phreeqc model, here we used 1000 cm3 as the default value for Vref, which corresponds to 1 liter of water.
-double ComputeParticleVolumeScalingFactor(double particle_representative_volume)
+double ComputeParticleVolumeScalingFactor(double particle_representative_volume,double aperture_height)
 {
 	if (particle_representative_volume<=0.0){return 0.0;}
 	double reference_volume = DELTA_V_REFERENCE_WATER_VOLUME;
 	if (reference_volume<=0.0){return 0.0;}
-	return particle_representative_volume/reference_volume;
+	double scale = particle_representative_volume/reference_volume;
+	if (USE_EFFECTIVE_DIFFUSION_HEIGHT_FACTOR){
+		if (aperture_height<=0.0){return 0.0;}
+		double diffusion_argument = EFFECTIVE_DIFFUSION_COEFFICIENT*EFFECTIVE_DIFFUSION_TIME;
+		if (diffusion_argument<0.0){diffusion_argument = 0.0;}
+		double effective_diffusion_height_factor = std::sqrt(diffusion_argument)/aperture_height;
+		scale *= effective_diffusion_height_factor;
+	}
+	if (!USE_VP_WIDTH_CORRECTION){
+		return scale;
+	}
+	if (aperture_height<=0.0 || FRACTURE_OUT_OF_PLANE_THICKNESS<=0.0){return 0.0;}
+	double width_correction = std::cbrt(particle_representative_volume)/
+		(particle_representative_volume*aperture_height*FRACTURE_OUT_OF_PLANE_THICKNESS);
+	return scale*width_correction;
 }
 
 double ComputeParticleSegmentMineralVolumeChange(double t_particle_start,double t_particle_end,
-		double particle_representative_volume)
+		double particle_representative_volume,double aperture_height)
 {
 	// DFN-PT-V4 segment chemistry contribution:
 	// DeltaV_particle[t_start,t_end]
@@ -182,7 +220,7 @@ double ComputeParticleSegmentMineralVolumeChange(double t_particle_start,double 
 	double t_end = std::max(t_start,t_particle_end);
 	double cumulative_delta_v =
 		GetCumulativeMineralVolumeChange(t_end)-GetCumulativeMineralVolumeChange(t_start);
-	return cumulative_delta_v*ComputeParticleVolumeScalingFactor(particle_representative_volume);
+	return cumulative_delta_v*ComputeParticleVolumeScalingFactor(particle_representative_volume,aperture_height);
 }
 
 double ComputeApertureChangeFromMineralVolume(double mineral_volume_change,double segment_length)

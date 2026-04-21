@@ -23,23 +23,96 @@
 
 using namespace std;
 
+static bool ReadEnvironmentDouble(const char* name,double& value)
+{
+	const char* env = std::getenv(name);
+	if (env==NULL){
+		return false;
+	}
+	char* end_ptr = NULL;
+	double parsed = std::strtod(env,&end_ptr);
+	if (end_ptr==env || (end_ptr!=NULL && *end_ptr!='\0')){
+		cout << "WARNING in PERFORM.cpp: invalid floating-point value for "
+		     << name << "=" << env << endl;
+		return false;
+	}
+	value = parsed;
+	return true;
+}
+
+static bool ReadEnvironmentBool(const char* name,bool& value)
+{
+	const char* env = std::getenv(name);
+	if (env==NULL){
+		return false;
+	}
+	string text(env);
+	if (text=="1" || text=="true" || text=="TRUE" || text=="on" || text=="ON"){
+		value = true;
+		return true;
+	}
+	if (text=="0" || text=="false" || text=="FALSE" || text=="off" || text=="OFF"){
+		value = false;
+		return true;
+	}
+	cout << "WARNING in PERFORM.cpp: invalid boolean value for "
+	     << name << "=" << env << endl;
+	return false;
+}
+
 static string ApplyChemistryModeFromEnvironment()
 {
 	const char* chemistry_mode_env = std::getenv("RST_CHEM_MODE");
-	if (chemistry_mode_env==NULL){
-		return "default";
-	}
-	string chemistry_mode(chemistry_mode_env);
+	string chemistry_mode = (chemistry_mode_env==NULL)? "default" : string(chemistry_mode_env);
 	if (chemistry_mode=="gypsum_fast2"){
+		double slow_linear_rate = 0.0;
+		ReadEnvironmentDouble("RST_DELTA_V_L",slow_linear_rate);
 		ConfigureMineralVolumeLaw(
 				0.0,0.0,
 				DEFAULT_DELTA_V_FAST2_AMPLITUDE,DEFAULT_DELTA_V_FAST2_RATE,
-				0.0);
-		return chemistry_mode;
+				slow_linear_rate);
 	}
-	cout << "WARNING in PERFORM.cpp: unknown RST_CHEM_MODE=" << chemistry_mode
-	     << ", using default chemistry law" << endl;
-	return "default";
+	else if (chemistry_mode=="custom_delta_v"){
+		double fast1_amplitude = 0.0;
+		double fast1_rate = 0.0;
+		double fast2_amplitude = 0.0;
+		double fast2_rate = 0.0;
+		double slow_linear_rate = 0.0;
+		ReadEnvironmentDouble("RST_DELTA_V_A1",fast1_amplitude);
+		ReadEnvironmentDouble("RST_DELTA_V_K1",fast1_rate);
+		ReadEnvironmentDouble("RST_DELTA_V_A2",fast2_amplitude);
+		ReadEnvironmentDouble("RST_DELTA_V_K2",fast2_rate);
+		ReadEnvironmentDouble("RST_DELTA_V_L",slow_linear_rate);
+		ConfigureMineralVolumeLaw(
+				fast1_amplitude,fast1_rate,
+				fast2_amplitude,fast2_rate,
+				slow_linear_rate);
+	}
+	else if (chemistry_mode!="default"){
+		cout << "WARNING in PERFORM.cpp: unknown RST_CHEM_MODE=" << chemistry_mode
+		     << ", using default chemistry law" << endl;
+		chemistry_mode = "default";
+	}
+	double override_value = 0.0;
+	if (ReadEnvironmentDouble("RST_DELTA_V_VREF",override_value)){
+		ConfigureMineralVolumeScaling(override_value);
+	}
+	if (ReadEnvironmentDouble("RST_FRACTURE_THICKNESS",override_value)){
+		ConfigureFractureOutOfPlaneThickness(override_value);
+	}
+	bool override_bool = false;
+	if (ReadEnvironmentBool("RST_USE_VP_WIDTH_CORRECTION",override_bool)){
+		ConfigureVpWidthCorrection(override_bool);
+	}
+	bool use_effective_diffusion_height_factor = false;
+	if (ReadEnvironmentBool("RST_USE_EFFECTIVE_DIFFUSION_HEIGHT_FACTOR",use_effective_diffusion_height_factor)){
+		double diffusion_coefficient = 0.0;
+		double diffusion_time = 0.0;
+		ReadEnvironmentDouble("RST_EFFECTIVE_DIFFUSION_COEFFICIENT",diffusion_coefficient);
+		ReadEnvironmentDouble("RST_EFFECTIVE_DIFFUSION_TIME",diffusion_time);
+		ConfigureEffectiveDiffusionHeightFactor(use_effective_diffusion_height_factor,diffusion_coefficient,diffusion_time);
+	}
+	return chemistry_mode;
 }
 
 int main(int argc, char **argv) {
@@ -72,7 +145,7 @@ int main(int argc, char **argv) {
 	cout << "DFN file = " << param.file_name_DFN << endl;
 	cout << "Chemistry mode = " << chemistry_mode << endl;
 	cout << "Active chemistry coupling: particle-age cumulative DeltaV law" << endl;
-	cout << "Chemistry DeltaV(t) = A1*(1-exp(-k1*t)) + A2*(1-exp(-k2*t)) - L*t" << endl;
+	cout << "Chemistry DeltaV(t) = A1*(1-exp(-k1*t)) + A2*(1-exp(-k2*t)) + L*t" << endl;
 	cout << "Chemistry parameters: A1=" << DELTA_V_FAST1_AMPLITUDE
 	     << " k1=" << DELTA_V_FAST1_RATE
 	     << " A2=" << DELTA_V_FAST2_AMPLITUDE
@@ -80,6 +153,10 @@ int main(int argc, char **argv) {
 	     << " L=" << DELTA_V_SLOW_LINEAR_RATE
 	     << " Vref=" << DELTA_V_REFERENCE_WATER_VOLUME
 	     << " thickness=" << FRACTURE_OUT_OF_PLANE_THICKNESS
+	     << " eff_diff_height_factor=" << USE_EFFECTIVE_DIFFUSION_HEIGHT_FACTOR
+	     << " D_eff=" << EFFECTIVE_DIFFUSION_COEFFICIENT
+	     << " t_eff=" << EFFECTIVE_DIFFUSION_TIME
+	     << " vp_width_correction=" << USE_VP_WIDTH_CORRECTION
 	     << " min_aperture=" << MINIMUM_FRACTURE_APERTURE
 	     << " debug=" << CHEMISTRY_DEBUG_LOGGING << endl;
 	cout << "Deprecated inactive chemistry parameters retained for compatibility: C0="

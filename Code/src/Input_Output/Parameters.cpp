@@ -6,6 +6,7 @@
  */
 
 #include "Parameters.h"
+#include "../Chemistry/Chemistry.h"
 #include <fstream>
 #include <iostream>
 

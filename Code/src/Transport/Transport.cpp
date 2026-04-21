@@ -295,23 +295,23 @@ static void AccumulateParticleMineralVolumeChange(Particle& pa,const NetworkMesh
                                                   std::map<int,double>& mineral_volume_changes)
 {
 	if (mesh_index<0){return;}
+	FractureMesh mesh = net_mesh.return_mesh(mesh_index);
 	double dt_local = std::max(0.0,residence_time);
 	double t_particle_start = std::max(0.0,pa.particle_age);
 	double t_particle_end = t_particle_start + dt_local;
 	double delta_mineral_volume = ComputeParticleSegmentMineralVolumeChange(
-			t_particle_start,t_particle_end,pa.representative_volume);
+			t_particle_start,t_particle_end,pa.representative_volume,mesh.aperture);
 	pa.particle_age = t_particle_end;
 	if (delta_mineral_volume==0.0){return;}
 	mineral_volume_changes[mesh_index] += delta_mineral_volume;
 	if (CHEMISTRY_DEBUG_LOGGING){
-		FractureMesh mesh = net_mesh.return_mesh(mesh_index);
 		double delta_b = ComputeApertureChangeFromMineralVolume(delta_mineral_volume,mesh.ReturnLength());
 		cout << "[chem-segment] particle=" << pa.no
 		     << " mesh=" << mesh_index
 		     << " t_start=" << t_particle_start
 		     << " t_end=" << t_particle_end
 		     << " V_particle=" << pa.representative_volume
-		     << " volume_scale=" << ComputeParticleVolumeScalingFactor(pa.representative_volume)
+		     << " volume_scale=" << ComputeParticleVolumeScalingFactor(pa.representative_volume,mesh.aperture)
 		     << " DeltaV=" << delta_mineral_volume
 		     << " delta_b=" << delta_b << endl;
 	}

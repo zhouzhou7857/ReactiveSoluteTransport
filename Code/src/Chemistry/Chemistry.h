@@ -44,7 +44,11 @@ extern double DELTA_V_FAST2_AMPLITUDE;
 extern double DELTA_V_FAST2_RATE;
 extern double DELTA_V_SLOW_LINEAR_RATE;
 extern double DELTA_V_REFERENCE_WATER_VOLUME;
+extern double EFFECTIVE_DIFFUSION_COEFFICIENT;
+extern double EFFECTIVE_DIFFUSION_TIME;
 extern double MINIMUM_FRACTURE_APERTURE;
+extern bool USE_VP_WIDTH_CORRECTION;
+extern bool USE_EFFECTIVE_DIFFUSION_HEIGHT_FACTOR;
 extern bool CHEMISTRY_DEBUG_LOGGING;
 
 // Deprecated / inactive legacy chemistry parameters.
@@ -103,6 +107,8 @@ void ConfigureMineralVolumeScaling(double reference_water_volume);
 // Set the out-of-plane fracture thickness used in the volume-to-aperture map:
 // delta_b = delta_V / (segment_length * thickness * 2)
 void ConfigureFractureOutOfPlaneThickness(double fracture_thickness);
+void ConfigureVpWidthCorrection(bool enable_width_correction);
+void ConfigureEffectiveDiffusionHeightFactor(bool enable_factor,double diffusion_coefficient,double diffusion_time);
 
 // Return the cumulative PHREEQC-derived mineral volume change for a reference
 // water parcel:
@@ -112,12 +118,13 @@ void ConfigureFractureOutOfPlaneThickness(double fracture_thickness);
 double GetCumulativeMineralVolumeChange(double t_particle);
 // Return the particle-volume scaling factor:
 // scale = V_particle / Vref
-double ComputeParticleVolumeScalingFactor(double particle_representative_volume);
+// optionally multiplied by cbrt(V_particle)/(V_particle * aperture_height * width)
+double ComputeParticleVolumeScalingFactor(double particle_representative_volume,double aperture_height);
 // Return the mineral-volume increment over one particle time interval:
 // DeltaV_particle[t_start,t_end]
 //   = (DeltaV_ref(t_end) - DeltaV_ref(t_start)) * (V_particle / Vref)
 double ComputeParticleSegmentMineralVolumeChange(double t_particle_start,double t_particle_end,
-		double particle_representative_volume);
+		double particle_representative_volume,double aperture_height);
 double ComputeApertureChangeFromMineralVolume(double mineral_volume_change,double segment_length);
 double ClampApertureToMinimumThreshold(double aperture_value);
 
