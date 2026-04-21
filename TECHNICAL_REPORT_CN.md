@@ -2,19 +2,22 @@
 
 ## 说明
 
-本报告基于当前有效代码 `Code/src` 与当前输入格式 `Input/` 编写。
+本报告基于当前有效代码 `Code/src` 与当前维护的输入格式 `Input/` 编写。
 
 ## A. 总体目标
 
-该代码用于模拟二维离散裂隙网络（DFN）中的粒子追踪溶质运移，并将输运过程与 DFN 结构演化耦合。当前主路径中的耦合方式是 chemistry-driven aperture 更新：
+该代码用于模拟二维离散裂隙网络（DFN）中的粒子追踪溶质运移，并将输运过程与裂隙几何演化耦合。当前主路径中的耦合方式已经变成基于 PHREEQC 标定的累计矿物体积变化律：
 
-- 每个注入粒子携带初始反应物浓度；
-- 粒子在裂隙段中停留时，反应物浓度随时间衰减；
-- 反应物损耗换算为矿物体积变化；
-- 矿物体积变化换算为裂隙段平均 aperture 增量；
-- aperture 变化后，裂隙网络流场按需要重新计算。
+- 每个注入粒子携带一个代表性流体体积；
+- 每个粒子还保存累计反应年龄 `particle_age`；
+- chemistry 模块计算参考累计律 `DeltaV_ref(t)`；
+- 单个输运时间段上的矿物体积增量为
+  `DeltaV_ref(t_end) - DeltaV_ref(t_start)`；
+- 该体积增量再乘以 `V_particle / Vref`，并可选乘以额外几何缩放因子；
+- 各 segment 上累计的矿物体积变化再换算为平均 aperture 增量；
+- aperture 更新后按需要重算流场。
 
-这与旧版本基于粒子通过量的经验 aperture 更新不同。旧接口仍保留在代码中，但不再是当前主执行路径的默认机制。
+旧的浓度衰减主路径和 `Nb/Nt` 经验 aperture 公式仍保留在代码中，但不再是当前默认执行路径。
 
 ## B. 主流程
 
@@ -36,13 +39,15 @@
 ### 当前执行顺序
 
 1. `PERFORM.cpp` 创建 `Parameters param`
-2. `Parameters::Parameters()` 读取 `Input/File_names.txt`
+2. `Parameters::Parameters()` 读取 `Input/File_names.txt`，或读取命令行传入的替代文件列表
 3. `Parameters::read_param()` 读取：
    - 域参数
    - 模拟参数
    - DFN 模式与 DFN 参数
-   - 可选 chemistry 参数
-4. `PERFORM.cpp` 通过 `ConfigureChemistryParameters(...)` 配置当前 chemistry 常量
+4. `PERFORM.cpp` 先重置 chemistry 默认值，再根据：
+   - simulation input 中的 `Vref` 和 `fracture thickness`
+   - 运行时环境变量 `RST_CHEM_MODE`、`RST_DELTA_V_A*`、`RST_DELTA_V_K*`、`RST_DELTA_V_L`、`RST_USE_EFFECTIVE_DIFFUSION_HEIGHT_FACTOR`、`RST_USE_VP_WIDTH_CORRECTION`
+   配置当前活跃 chemistry
 5. `PERFORM.cpp` 根据 DFN 模式分流：
    - `generation_realistic3/4`：
      `NetworkMeshes(param.density_param, param.exponent_param, param, domain)`
@@ -57,7 +62,28 @@
    - `DFN.txt`
    - `DFN_aperture_delta.txt`
 
-## C. DFN 构建路径
+## C. 输入格式
+
+### File list
+
+`Input/File_names.txt` 现在主用为 3 行格式：
+
+1. domain file
+2. simulation file
+3. DFN file
+
+第 4 行 chemistry file 仍然兼容旧格式，但当前主路径不会再读取 chemistry input 文件。
+
+### Simulation 文件
+
+simulation 文件末尾现在包含两个真正参与当前 chemistry 主路径的参数：
+
+11. `Vref` `[m^3]`
+12. `fracture thickness` `[m]`
+
+它们在 `Parameters.cpp` 中读入，并在 `PERFORM.cpp` 中传给 chemistry 模块。
+
+## D. DFN 构建路径
 
 ### 从旧版 `realistic3` 到当前版本的切换
 
@@ -92,7 +118,7 @@
 - `density_param` 不是精确裂缝条数
 - 当前 `generation_realistic3` 是“密度阈值停止”，不是“固定裂缝条数停止”
 
-## D. 粒子模型
+## E. 粒子模型
 
 每个粒子保存以下关键信息：
 
@@ -104,50 +130,55 @@
 - 注入时间
 - 当前裂隙内累计平流距离
 - 当前裂隙内累计停留时间
-- 粒子当前携带的反应物浓度
-- 粒子代表的流体体积
+- 累计 chemistry 年龄 `particle_age`
+- 粒子代表的流体体积 `representative_volume`
 
 粒子注入时会被赋予：
 
 - 入口位置和入口裂隙
 - 清零后的局部输运状态
-- `reactive_concentration = INITIAL_REACTIVE_CONCENTRATION`
-- 按入口通量和粒子时间份额计算得到的 `representative_volume`
+- 按入口通量和粒子时间份额计算得到的 `representative_volume`：
+  `V_particle = |u_inlet| * aperture_inlet * thickness * dt_particle`
 
-## E. Chemistry-driven 几何更新
+## F. 当前活跃 chemistry-driven 几何更新
 
 ### 当前主路径的更新方式
 
-当前主路径中的 aperture 更新不再依赖旧的 `Nb/Nt` 经验公式。
+当前主路径中的 aperture 更新基于 `Chemistry.cpp` 中的累计矿物体积变化律：
 
-当前链条是：
+`DeltaV_ref(t) = A1 * (1 - exp(-k1 * t)) + A2 * (1 - exp(-k2 * t)) + L * t`
 
-1. `UpdateReactiveConcentration()` 计算：
-   - `C_out = C_in * exp(-k * t_residence)`
-2. `EvaluateReactiveStep()` 继续计算：
-   - 反应物摩尔损失
-   - 矿物摩尔变化
-   - 矿物体积变化
-   - 局部 aperture 变化
-   - 段平均 aperture 变化
-3. `Transport.cpp` 将这些变化累计到 `step_aperture_change`
-4. 当前裂隙段 aperture 加上该段平均增量
-5. 若 aperture 归零，则可能触发网络重建和流场重算
+单个粒子在一个输运时间段上的体积增量为：
 
-### 所需 chemistry 参数
+`DeltaV_particle[t_start,t_end] = (DeltaV_ref(t_end) - DeltaV_ref(t_start)) * scale`
 
-chemistry 文件当前提供：
+其中 `scale`：
 
-- 初始反应物浓度
-- 浓度衰减率
-- 反应物到矿物的化学计量系数
-- 矿物摩尔体积
-- 裂隙面外厚度
+- 至少包含 `V_particle / Vref`
+- 可选乘以 effective diffusion-height factor
+- 可选乘以 Vp-width correction
 
-## F. 旧接口的状态
+`Transport.cpp` 会先把每个 segment 上的矿物体积变化累计起来，再统一执行：
+
+`delta_b = delta_V / (segment_length * thickness * 2)`
+
+### 可选缩放控制
+
+当前代码支持以下可选运行时控制：
+
+- `RST_USE_EFFECTIVE_DIFFUSION_HEIGHT_FACTOR`
+- `RST_EFFECTIVE_DIFFUSION_COEFFICIENT`
+- `RST_EFFECTIVE_DIFFUSION_TIME`
+- `RST_USE_VP_WIDTH_CORRECTION`
+
+这些主要用于 benchmark 和敏感性分析，不是默认必须开启的项。
+
+## G. 旧接口状态
 
 以下旧接口仍保留在代码中：
 
+- `UpdateReactiveConcentration()`
+- `EvaluateReactiveStep()`
 - `ComputeAperture()`
 - `ComputeDeltaAperture()`
 - `NetworkMeshes::ChangeAperture()`
@@ -155,7 +186,7 @@ chemistry 文件当前提供：
 
 它们主要用于兼容性和历史参考，不是当前主执行路径的默认机制。
 
-## G. 输出
+## H. 输出
 
 当前运行可能生成：
 

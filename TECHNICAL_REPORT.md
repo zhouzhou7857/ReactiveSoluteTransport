@@ -2,20 +2,23 @@
 
 ## Scope
 
-This report reflects the active code under `Code/src` and the currently maintained input format under `Input/`.
+This report describes the current active code under `Code/src` and the maintained input format under `Input/`.
 
 ## A. Overall purpose
 
-The code simulates particle-based solute transport in a two-dimensional discrete fracture network embedded in a porous matrix. The active main path couples transport to DFN evolution through chemistry-driven aperture updates:
+The code simulates particle-based solute transport in a two-dimensional discrete fracture network embedded in a porous matrix. The current main path couples transport to fracture evolution through a PHREEQC-calibrated cumulative mineral-volume law:
 
-- each injected particle carries an initial reactive concentration;
-- concentration decays during residence inside a fracture segment;
-- reactive mass loss is converted to mineral volume change;
-- mineral volume change is converted to a segment-averaged aperture increment;
+- each injected particle carries a representative fluid volume;
+- each particle also stores a cumulative reaction age `particle_age`;
+- the chemistry module evaluates the cumulative reference law `DeltaV_ref(t)`;
+- the mineral-volume increment over one transport interval is
+  `DeltaV_ref(t_end) - DeltaV_ref(t_start)`;
+- that increment is scaled by `V_particle / Vref`, with optional additional geometry-based factors;
+- the accumulated mineral volume on each segment is converted to a segment-averaged aperture increment;
 - updated aperture modifies transmissivity and velocity;
-- the flow field is recomputed when needed.
+- the flow field is recomputed when required.
 
-This is different from the older empirical particle-throughput aperture law, which is still present as legacy code but is not the default active mechanism in the current main path.
+The older concentration-decay path and empirical `Nb/Nt` aperture laws still exist as legacy code, but they are not the default mechanism on the current main execution path.
 
 ## B. Main workflow
 
@@ -37,13 +40,14 @@ Main supporting modules:
 ### Active execution sequence
 
 1. `PERFORM.cpp` constructs `Parameters param`.
-2. `Parameters::Parameters()` reads `Input/File_names.txt`.
+2. `Parameters::Parameters()` reads `Input/File_names.txt`, or an override path passed on the command line.
 3. `Parameters::read_param()` reads:
    - domain parameters;
    - simulation parameters;
-   - DFN mode and DFN parameters;
-   - optional chemistry parameters.
-4. `PERFORM.cpp` configures active chemistry constants through `ConfigureChemistryParameters(...)`.
+   - DFN mode and DFN parameters.
+4. `PERFORM.cpp` resets chemistry defaults, then configures the active chemistry law from:
+   - simulation input (`Vref`, `fracture thickness`);
+   - optional runtime environment overrides such as `RST_CHEM_MODE`, `RST_DELTA_V_A*`, `RST_DELTA_V_K*`, `RST_DELTA_V_L`, `RST_USE_EFFECTIVE_DIFFUSION_HEIGHT_FACTOR`, and `RST_USE_VP_WIDTH_CORRECTION`.
 5. `PERFORM.cpp` selects the DFN construction path:
    - `generation_realistic3/4`:
      `NetworkMeshes(param.density_param, param.exponent_param, param, domain)`
@@ -58,14 +62,35 @@ Main supporting modules:
    - `DFN.txt`
    - `DFN_aperture_delta.txt`
 
-## C. DFN construction path
+## C. Input format
+
+### File list
+
+`Input/File_names.txt` is now used primarily as a 3-line file:
+
+1. domain file
+2. simulation file
+3. DFN file
+
+A fourth chemistry line is still accepted for backward compatibility, but the active main path does not read chemistry-input files anymore.
+
+### Simulation file
+
+The simulation file now includes two active chemistry-related inputs at the end:
+
+11. `Vref` `[m^3]`
+12. `fracture thickness` `[m]`
+
+These are read in `Parameters.cpp` and then applied in `PERFORM.cpp`.
+
+## D. DFN construction path
 
 ### Current path split
 
 The key switch from the old `generation_realistic3` path to the current one is implemented by two core changes:
 
-1. `Parameters.cpp` now reads the parameter set required by `generation_realistic3/4` into `Parameters`.
-2. `PERFORM.cpp` now routes `generation_realistic3/4` to the constructor-based `NetworkMeshes(double,double,Parameters,Domain)` path instead of the older `NetworkMeshes(code_path,file_name_DFN,domain)` path.
+1. `Parameters.cpp` reads the parameter set required by `generation_realistic3/4` into `Parameters`.
+2. `PERFORM.cpp` routes `generation_realistic3/4` to the constructor-based `NetworkMeshes(double,double,Parameters,Domain)` path instead of the older `NetworkMeshes(code_path,file_name_DFN,domain)` path.
 
 ### Current `generation_realistic3` behavior
 
@@ -89,7 +114,7 @@ Important note:
 - `density_param` is not an exact fracture count target.
 - the current `generation_realistic3` path is density-threshold-driven, not count-driven.
 
-## D. Particle model
+## E. Particle model
 
 Each particle stores:
 
@@ -101,50 +126,57 @@ Each particle stores:
 - injection time;
 - cumulative distance in the current fracture;
 - cumulative residence time in the current fracture;
-- reactive concentration carried by the particle;
-- representative fluid volume carried by the particle.
+- cumulative chemistry age `particle_age`;
+- representative fluid volume `representative_volume`.
 
 Injection assigns:
 
 - inlet position and mesh;
 - reset transport counters;
-- `reactive_concentration = INITIAL_REACTIVE_CONCENTRATION`;
-- representative volume based on inlet flux and particle time share.
+- representative volume based on inlet flux and particle time share:
+  `V_particle = |u_inlet| * aperture_inlet * thickness * dt_particle`.
 
-## E. Chemistry-driven geometry update
+## F. Active chemistry-driven geometry update
 
 ### Active mechanism
 
-The active geometry update no longer relies on the old empirical `Nb/Nt` aperture law on the main path.
+The active geometry update is now based on the cumulative mineral-volume law in `Chemistry.cpp`.
 
-Instead:
+The reference law is:
 
-1. `UpdateReactiveConcentration()` computes:
-   - `C_out = C_in * exp(-k * t_residence)`
-2. `EvaluateReactiveStep()` computes:
-   - reactive moles consumed;
-   - mineral moles changed;
-   - mineral volume changed;
-   - local aperture change;
-   - segment-averaged aperture change.
-3. `Transport.cpp` accumulates those changes in `step_aperture_change`.
-4. Segment apertures are updated by adding the accumulated segment-averaged increment.
-5. If aperture reaches zero, the network may be rebuilt and flow recomputed.
+`DeltaV_ref(t) = A1 * (1 - exp(-k1 * t)) + A2 * (1 - exp(-k2 * t)) + L * t`
 
-### Required chemistry parameters
+For one particle over one transport interval:
 
-The current chemistry file provides:
+`DeltaV_particle[t_start,t_end] = (DeltaV_ref(t_end) - DeltaV_ref(t_start)) * scale`
 
-- initial reactive concentration;
-- concentration decay rate;
-- reactive-to-mineral stoichiometric factor;
-- mineral molar volume;
-- fracture out-of-plane thickness.
+where `scale` is:
 
-## F. Legacy code status
+- always `V_particle / Vref`;
+- optionally multiplied by an effective diffusion-height factor;
+- optionally multiplied by a Vp-width correction factor.
+
+`Transport.cpp` accumulates these mineral-volume increments per segment, then applies the total segment change through:
+
+`delta_b = delta_V / (segment_length * thickness * 2)`
+
+### Optional scaling controls
+
+The current code supports optional runtime controls:
+
+- `RST_USE_EFFECTIVE_DIFFUSION_HEIGHT_FACTOR`
+- `RST_EFFECTIVE_DIFFUSION_COEFFICIENT`
+- `RST_EFFECTIVE_DIFFUSION_TIME`
+- `RST_USE_VP_WIDTH_CORRECTION`
+
+These are intended for benchmark testing and sensitivity analysis. They are not mandatory on the default path.
+
+## G. Legacy code status
 
 The following legacy interfaces still exist:
 
+- `UpdateReactiveConcentration()`
+- `EvaluateReactiveStep()`
 - `ComputeAperture()`
 - `ComputeDeltaAperture()`
 - `NetworkMeshes::ChangeAperture()`
@@ -152,7 +184,7 @@ The following legacy interfaces still exist:
 
 They are retained for compatibility and historical reference, but they are not the default mechanism on the current main execution path.
 
-## G. Outputs
+## H. Outputs
 
 The current run can produce:
 

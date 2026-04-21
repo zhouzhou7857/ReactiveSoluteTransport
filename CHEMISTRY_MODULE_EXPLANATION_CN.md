@@ -1,8 +1,8 @@
-# 化学反应模块说明
+# Chemistry 模块说明
 
 ## 1. 文件位置与职责
 
-当前代码中，化学反应相关的核心实现位于：
+当前 chemistry 主路径的核心实现位于：
 
 - [Chemistry.h](/home/zhouw/Documents/Codes/ReactiveSoluteTransport/Code/src/Chemistry/Chemistry.h)
 - [Chemistry.cpp](/home/zhouw/Documents/Codes/ReactiveSoluteTransport/Code/src/Chemistry/Chemistry.cpp)
@@ -12,306 +12,205 @@
 - [Particle.h](/home/zhouw/Documents/Codes/ReactiveSoluteTransport/Code/src/Transport/Particle.h)
 - [Transport.cpp](/home/zhouw/Documents/Codes/ReactiveSoluteTransport/Code/src/Transport/Transport.cpp)
 
-输入读取与运行时 chemistry 参数配置位于：
+运行时参数读取与 chemistry 配置位于：
 
 - [Parameters.h](/home/zhouw/Documents/Codes/ReactiveSoluteTransport/Code/src/Input_Output/Parameters.h)
 - [Parameters.cpp](/home/zhouw/Documents/Codes/ReactiveSoluteTransport/Code/src/Input_Output/Parameters.cpp)
 - [PERFORM.cpp](/home/zhouw/Documents/Codes/ReactiveSoluteTransport/Code/src/PERFORM.cpp)
 
-## 2. 模块的设计目标
+## 2. 当前模块的设计目标
 
-当前化学模块的目标不是构建一个完整的多组分地球化学求解器，而是在现有粒子追踪框架中，以尽量小的改动实现：
+当前 chemistry 模块不再把主路径建立在“粒子浓度一阶衰减再换算 aperture”上，而是采用一个更直接的 PHREEQC 标定体积律：
 
-1. 粒子携带可反应浓度
-2. 该浓度随粒子在裂缝中的停留时间而衰减
-3. 浓度损失转换为反应物消耗量
-4. 反应物消耗量通过化学计量和矿物摩尔体积转换为矿物体积变化
-5. 矿物体积变化进一步转换为裂缝开度变化
+1. 给定参考累计矿物体积变化 `DeltaV_ref(t)`
+2. 用粒子的年龄区间 `t_start -> t_end` 计算本时间段的体积增量
+3. 用 `V_particle / Vref` 把参考 parcel 的体积变化缩放到当前粒子
+4. 可选再乘以几何相关修正因子
+5. 把矿物体积变化转换为 segment aperture 变化
 
-因此，这一模块本质上是一个：
+因此，这一模块当前更准确地说是：
 
-`粒子输运 + 一阶反应衰减 + 质量守恒几何更新`
-
-的耦合模块。
+`粒子年龄驱动的 DeltaV 累积律 + 体积缩放 + 几何反馈`
 
 ## 3. 当前实现的核心思想
 
-### 3.1 粒子携带反应浓度
+### 3.1 粒子代表体积
 
-在 [Particle.h](/home/zhouw/Documents/Codes/ReactiveSoluteTransport/Code/src/Transport/Particle.h) 中，每个粒子包含两个与 chemistry 直接相关的量：
-
-- `reactive_concentration`
-- `representative_volume`
-
-含义分别是：
-
-- `reactive_concentration`
-  粒子当前携带的可反应浓度
+在 [Particle.h](/home/zhouw/Documents/Codes/ReactiveSoluteTransport/Code/src/Transport/Particle.h) 中，每个粒子包含：
 
 - `representative_volume`
-  该数值粒子所代表的真实流体体积
-
-其中第二项非常关键，因为从浓度变化转换为摩尔数变化时，必须乘以体积。
-
-### 3.2 粒子浓度的时间演化
-
-在 [Chemistry.cpp](/home/zhouw/Documents/Codes/ReactiveSoluteTransport/Code/src/Chemistry/Chemistry.cpp) 中，浓度演化由：
-
-`UpdateReactiveConcentration(double concentration_in, double residence_time)`
-
-实现。
-
-当前使用的一阶衰减关系为：
-
-```text
-C_out = C_in * exp(-k * dt)
-```
+- `particle_age`
 
 其中：
 
-- `C_in` 是进入当前段前的粒子浓度
-- `C_out` 是离开当前段或本次反应步后的粒子浓度
-- `k` 是 `REACTIVE_CONCENTRATION_DECAY`
-- `dt` 是该粒子在当前裂缝段中的停留时间
+- `representative_volume` 表示该数值粒子所代表的真实流体体积
+- `particle_age` 表示该粒子已经经历的累计反应时间
 
-这个关系的优点是：
+### 3.2 参考累计体积律
 
-- 数值稳定
-- 不会自然产生负浓度
-- 易于和粒子停留时间耦合
+当前活跃函数在 [Chemistry.cpp](/home/zhouw/Documents/Codes/ReactiveSoluteTransport/Code/src/Chemistry/Chemistry.cpp) 中由
 
-但它是一个简化反应律，并不包含：
+- `GetCumulativeMineralVolumeChange(double t_particle)`
 
-- 饱和指数
-- 平衡浓度
-- pH
-- 温度
-- 表面积动力学
-- 多组分耦合
+定义：
 
-因此，它应理解为“有效反应能力衰减模型”，而不是完整地球化学模型。
+`DeltaV_ref(t) = A1 * (1 - exp(-k1 * t)) + A2 * (1 - exp(-k2 * t)) + L * t`
 
-## 4. 质量守恒如何实现
+这条曲线表示：对一个参考水体积 `Vref`，当反应时间累积到 `t` 时，总矿物体积变化是多少。
 
-### 4.1 从浓度损失到反应物摩尔数
+### 3.3 单个粒子在一个时间段上的体积增量
 
-在 `EvaluateReactiveStep(...)` 中，首先计算浓度损失：
+当前主路径不是直接使用 `DeltaV_ref(t)`，而是使用其在相邻粒子年龄之间的差值：
 
-```text
-ΔC = C_in - C_out
-```
+`DeltaV_particle[t_start,t_end] = (DeltaV_ref(t_end) - DeltaV_ref(t_start)) * scale`
 
-然后乘以该粒子代表的流体体积：
+对应实现为：
 
-```text
-Δn_reactive = ΔC * V_particle
-```
+- `ComputeParticleSegmentMineralVolumeChange(...)`
+
+这里：
+
+- `t_start = particle_age`
+- `t_end = particle_age + dt_local`
+
+也就是说，粒子每前进一段时间，就从累计曲线上取一段增量，而不是从头重复计算整条曲线。
+
+## 4. 体积缩放如何实现
+
+### 4.1 基本缩放
+
+最基础的缩放是：
+
+`scale = V_particle / Vref`
+
+对应实现：
+
+- `ComputeParticleVolumeScalingFactor(...)`
+
+这表示：
+
+- `PHREEQC` 或拟合公式给出的是参考水体积 `Vref` 的反应结果
+- 当前粒子的实际贡献按它所代表的水体积线性缩放
+
+### 4.2 可选修正项
+
+当前代码还支持两个可选修正项：
+
+1. effective diffusion-height factor
+2. Vp-width correction
+
+它们都通过环境变量在 `PERFORM.cpp` 中启用，不是默认主路径的一部分。
+
+## 5. 从矿物体积变化到 aperture 变化
+
+当前 aperture 更新不是通过旧的经验 `Nb/Nt` 公式完成，而是通过：
+
+`delta_b = delta_V / (segment_length * thickness * 2)`
 
 其中：
 
-- `Δn_reactive` 的单位是 `mol`
-- `V_particle` 即 `representative_volume`
+- `segment_length` 是当前 fracture segment 的长度
+- `thickness` 是出平面厚度
+- `/2` 对应双侧壁面均匀换算
 
-这一步是质量守恒的关键桥梁。
+实际实现位于：
 
-### 4.2 从反应物摩尔数到矿物体积变化
+- `ComputeApertureChangeFromMineralVolume(...)`
 
-随后代码使用：
+## 6. 粒子代表体积为什么是动态的
 
-```text
-Δn_mineral = Δn_reactive * ν
-ΔV_mineral = Δn_mineral * V_m
-```
+粒子不是固定携带常数体积，而是在注入时根据入口流动状态确定：
 
-其中：
+`V_particle = |u_inlet| * aperture_inlet * thickness * dt_particle`
 
-- `ν = REACTIVE_TO_MINERAL_STOICH`
-- `V_m = MINERAL_MOLAR_VOLUME`
-
-因此：
-
-- `REACTIVE_TO_MINERAL_STOICH` 控制化学计量关系
-- `MINERAL_MOLAR_VOLUME` 控制每摩尔矿物对应多少固体体积变化
-
-### 4.3 从矿物体积变化到裂缝开度变化
-
-当前模型是二维 DFN，因此需要一个出平面厚度：
-
-- `FRACTURE_OUT_OF_PLANE_THICKNESS`
-
-局部开度变化写为：
-
-```text
-Δb_local = ΔV_mineral / (L_traversed * thickness)
-```
-
-因为当前代码中每条 fracture segment 只存储一个统一 aperture，而不是子段 aperture 场，所以最终应用的是等效段平均变化：
-
-```text
-Δb_segment = (L_traversed / L_segment) * Δb_local
-```
-
-这等价于：
-
-```text
-Δb_segment = ΔV_mineral / (L_segment * thickness)
-```
-
-## 5. 为什么粒子代表体积是动态的
-
-当前代码不是把每个粒子赋予固定体积，而是在注入时根据入口流动状态计算：
-
-```text
-V_particle = |u_inlet| * aperture_inlet * thickness * dt_particle
-```
-
-这在 [Transport.cpp](/home/zhouw/Documents/Codes/ReactiveSoluteTransport/Code/src/Transport/Transport.cpp) 中的
+实现位于：
 
 - `ComputeParticleRepresentativeVolumeAtInjection(...)`
 
-实现。
+它表示：每个粒子代表该注入时间份额内通过入口裂缝的真实流体体积。
 
-它的物理含义是：
+这使得在压力差边界条件下，粒子体积会随流速和 aperture 改变而动态调整。
 
-每个粒子代表“在该注入时间份额内，通过入口裂缝的流体体积”。
+## 7. 主路径中的几何更新逻辑
 
-这样做比固定常数体积更适合压力差边界条件，因为入口流速和开度会随网络状态变化。
+当前活跃逻辑位于 `Transport.cpp`：
 
-## 6. 局部更新与部分穿越
+1. `AccumulateParticleMineralVolumeChange(...)`
+   - 根据粒子年龄区间和 `representative_volume` 计算 segment 上的 `DeltaV`
+2. 每个 operator-splitting 时间步内，把所有粒子的 `DeltaV` 累计到对应 segment
+3. `ApplyAccumulatedGeometryChange(...)`
+   - 把 segment 总体积变化统一转换为 aperture 变化
+4. 若某些 aperture 变为零，则触发网络重建与流场更新
 
-当前实现支持“一个 reaction/update interval 内，粒子只走过裂缝段的一部分”这种情况。
+## 8. 当前 chemistry 参数从哪里来
 
-代码中会记录：
+### 默认值
 
-- `segment_length`
-- `traversed_length`
+`A1 / k1 / A2 / k2 / L / Vref / thickness` 都在 `Chemistry.h` 中有默认值。
 
-如果粒子没有走完整段，则只对走过的那部分计算局部反应，并折算为该段的等效平均 aperture change。
+### 当前主用输入
 
-因此，当前实现不是简单地“粒子碰到该段就给整段一次完整更新”，而是考虑了实际走过的距离比例。
+当前主路径中：
 
-## 7. 零浓度粒子的处理
+- chemistry input 文件不再参与活跃路径
+- `Vref` 和 `fracture thickness` 从 simulation input 读取
+- 其他 `DeltaV` 系数默认来自代码
 
-如果粒子浓度降到零或非常接近零：
+### 运行时覆盖
 
-- 该粒子仍然可以继续输运
-- 但它不再继续改几何
+`PERFORM.cpp` 支持通过环境变量覆盖：
 
-这在逻辑上表示：
+- `RST_CHEM_MODE`
+- `RST_DELTA_V_A1`
+- `RST_DELTA_V_K1`
+- `RST_DELTA_V_A2`
+- `RST_DELTA_V_K2`
+- `RST_DELTA_V_L`
+- `RST_DELTA_V_VREF`
+- `RST_FRACTURE_THICKNESS`
+- `RST_USE_EFFECTIVE_DIFFUSION_HEIGHT_FACTOR`
+- `RST_EFFECTIVE_DIFFUSION_COEFFICIENT`
+- `RST_EFFECTIVE_DIFFUSION_TIME`
+- `RST_USE_VP_WIDTH_CORRECTION`
 
-- 它仍然是一个示踪/流体包
-- 但它携带的可反应组分已经耗尽
+这套接口主要用于 benchmark 和敏感性分析。
 
-这是当前代码中非常重要的设计选择。
+## 9. 当前物理含义与适用解释
 
-## 8. 当前 chemistry 参数是如何进入程序的
+当前 chemistry 模块更适合解释为：
 
-现在 chemistry 参数可以通过：
+“每个粒子代表一份真实流体体积；该流体包在裂缝中随着粒子年龄增长，按参考 `DeltaV` 累积律产生矿物体积变化；这些体积变化再反馈到裂缝 aperture。”
 
-- `Input/Chemistry_files/*.txt`
+它更接近：
 
-输入。
+- PHREEQC 标定的等效反应 parcel 模型
+- 粒子年龄驱动的累计反应模型
+- 体积守恒驱动的几何演化模型
 
-由 [Parameters.cpp](/home/zhouw/Documents/Codes/ReactiveSoluteTransport/Code/src/Input_Output/Parameters.cpp) 读取后，
-在 [PERFORM.cpp](/home/zhouw/Documents/Codes/ReactiveSoluteTransport/Code/src/PERFORM.cpp) 中通过：
+而不是：
 
-- `ConfigureChemistryParameters(...)`
+- 显式多组分平衡-动力学求解器
+- 当前主路径上的浓度衰减控制模型
 
-写入运行时 chemistry 模块。
-
-因此，当前程序已经支持：
-
-- 不改代码
-- 只换 chemistry 输入文件
-
-来运行不同反应性 case。
-
-## 9. 当前模型的物理背景与适用解释
-
-从原理上看，当前化学模块适合解释为：
-
-“粒子携带有限可反应物，沿裂缝输运时逐步消耗，该消耗通过质量守恒映射到矿物体积变化，并最终导致裂缝开度演化。”
-
-它更接近以下类型的简化模型：
-
-- 反应能力衰减模型
-- 有效一阶动力学模型
-- 质量守恒驱动的几何演化模型
-
-而不属于：
-
-- 完整 PHREEQC/PFLOTRAN 型多组分平衡-动力学反应模型
-- 具有显式饱和度控制的矿物反应模型
-
-## 10. 当前实现中“已实现”的部分
+## 10. 已实现部分
 
 明确已实现：
 
-1. 粒子携带浓度
-2. 浓度按停留时间衰减
-3. 段内局部反应更新
-4. 部分穿越比例处理
-5. 浓度损失到摩尔数的质量守恒转换
-6. 摩尔变化到矿物体积变化的转换
-7. 矿物体积变化到 aperture change 的转换
-8. 更新后的 aperture 反馈到后续流场与输运
+1. 参考累计体积律 `DeltaV_ref(t)`
+2. 粒子年龄区间增量计算
+3. `V_particle / Vref` 体积缩放
+4. 可选几何修正因子
+5. segment 上累计矿物体积变化
+6. 体积变化到 aperture 变化的换算
+7. aperture 更新后反馈到流场与输运
 
-## 11. 当前实现中“未实现或仅简化处理”的部分
+## 11. 保留但非主路径的旧功能
 
-未实现或只做了简化：
+以下内容仍存在，但不是当前默认主路径：
 
-1. 多组分反应网络
-2. 显式平衡浓度/饱和指数
-3. pH、温度、离子强度影响
-4. 基于表面积或矿物反应面积的动力学
-5. 真实矿物学相变追踪
-6. 逐子段 aperture 场
-   当前仍是“每个 fracture segment 一个 aperture”
-7. 直接导出的粒子浓度历史
-   当前浓度可由模型公式重构，但默认没有逐粒子浓度输出文件
+1. `UpdateReactiveConcentration()`
+2. `EvaluateReactiveStep()`
+3. 基于 `Nb/Nt` 的经验 aperture 更新
+4. chemistry input 文件驱动的旧工作流
 
-## 12. 如何理解不同 chemistry case
-
-当前 chemistry case 的差异，本质上体现在两个核心量：
-
-- `C0`
-- `k_decay`
-
-因为当前小步近似下，几何响应强度大体与：
-
-```text
-C0 * k_decay
-```
-
-成比例。
-
-因此：
-
-- 增大 `C0`
-  会增强每个粒子的反应物库存
-
-- 增大 `k_decay`
-  会加快反应物随停留时间的消耗
-
-二者共同决定：
-
-- 初始反应强度
-- 反应持续时间
-- 下游几何更新还能剩多少“化学驱动力”
-
-## 13. 总结
-
-当前代码中的 chemistry 模块，是一个面向 DFN 粒子输运框架设计的、模块化的一阶反应-几何耦合模块。
-
-它的最大特点是：
-
-- 保持了粒子法输运主框架
-- 用质量守恒把浓度变化和几何变化连接起来
-- 支持通过输入文件快速切换不同 chemistry case
-
-如果后续希望它更接近真实地球化学模型，最自然的下一步扩展方向是：
-
-1. 输出并分析逐粒子浓度历史
-2. 引入平衡浓度 `C_eq`
-3. 将反应速率改写为 `dC/dt = -k(C-C_eq)` 一类形式
-4. 进一步加入更真实的矿物反应速率律
+因此，阅读当前代码时，应优先以 `ComputeParticleSegmentMineralVolumeChange()` 和 `AccumulateParticleMineralVolumeChange()` 为主线理解 chemistry 模块。
