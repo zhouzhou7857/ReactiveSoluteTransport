@@ -1,0 +1,3 @@
+benchmark_gsf10_ap1mm_t1e05_domain.txt
+benchmark_gsf10_ap1mm_t1e05_sim.txt
+benchmark_gsf10_ap1mm_t1e05_dfn_n100.txt

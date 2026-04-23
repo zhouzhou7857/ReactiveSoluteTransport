@@ -47,11 +47,13 @@ SEGMENT_COUNTS = [1, 5, 10, 50, 100]
 RHO = 1.0e3
 G = 9.8
 MU = 1.0e-3
-D_EFFECTIVE = 1.0e-9
 
-A2 = 2.50122e-6
-K2 = 2.72730e-5
-VREF = 1.0e-3
+CHEMISTRY_BY_TRAVEL_TIME = {
+    1.0e2: {"A2": 1.25061420e-08, "K2": 1.59497791e-04, "L": 0.0, "VREF": 5.0e-06},
+    1.0e3: {"A2": 1.25061420e-09, "K2": 3.43627573e-04, "L": 0.0, "VREF": 5.0e-07},
+    1.0e4: {"A2": 1.25061420e-10, "K2": 7.40323164e-04, "L": 0.0, "VREF": 5.0e-08},
+    1.0e5: {"A2": 1.25061420e-11, "K2": 1.59497791e-03, "L": 0.0, "VREF": 5.0e-09},
+}
 
 
 def ensure_dirs() -> None:
@@ -94,13 +96,7 @@ def write_domain_file(label: str, travel_time: float) -> str:
 
 
 def chemistry_coefficients(travel_time: float) -> dict[str, float]:
-    return {"A2": A2, "K2": K2, "L": 0.0, "VREF": VREF}
-
-
-def effective_diffusion_height_factor(travel_time: float, aperture_height: float = APERTURE) -> float:
-    if aperture_height <= 0.0:
-        return 0.0
-    return math.sqrt(D_EFFECTIVE * travel_time) / aperture_height
+    return dict(CHEMISTRY_BY_TRAVEL_TIME[travel_time])
 
 
 def write_simulation_file(label: str, travel_time: float) -> str:
@@ -197,9 +193,7 @@ def run_case(case_label: str, file_names_path: Path, case_output_dir: Path, chem
         "RST_DELTA_V_L": f"{chemistry['L']:.12e}",
         "RST_DELTA_V_VREF": f"{chemistry['VREF']:.12e}",
         "RST_FRACTURE_THICKNESS": f"{THICKNESS:.12e}",
-        "RST_USE_EFFECTIVE_DIFFUSION_HEIGHT_FACTOR": "1",
-        "RST_EFFECTIVE_DIFFUSION_COEFFICIENT": f"{D_EFFECTIVE:.12e}",
-        "RST_EFFECTIVE_DIFFUSION_TIME": f"{travel_time:.12e}",
+        "RST_USE_EFFECTIVE_DIFFUSION_HEIGHT_FACTOR": "0",
         "RST_USE_VP_WIDTH_CORRECTION": "0",
     }
     completed = subprocess.run(
@@ -225,7 +219,7 @@ def analytic_reference(travel_time: float) -> tuple[float, float, float, float]:
     reynolds = RHO * velocity * APERTURE / MU
     damkohler = chemistry["K2"] * travel_time
     flow_rate = velocity * APERTURE * THICKNESS
-    dissolved_volume = effective_diffusion_height_factor(travel_time) * (flow_rate / chemistry["VREF"]) * chemistry["A2"] * (
+    dissolved_volume = (flow_rate / chemistry["VREF"]) * chemistry["A2"] * (
         GLOBAL_INJECTION_TIME
         - (1.0 - math.exp(-chemistry["K2"] * GLOBAL_INJECTION_TIME)) / chemistry["K2"]
     )
@@ -262,7 +256,7 @@ def main() -> None:
                     "delta_v_k2_s_inv": chemistry["K2"],
                     "delta_v_linear_m3_per_s": chemistry["L"],
                     "vref_m3": chemistry["VREF"],
-                    "effective_diffusion_height_factor": effective_diffusion_height_factor(travel_time),
+                    "effective_diffusion_height_factor": 1.0,
                     "domain_file": domain_name,
                     "simulation_file": sim_name,
                     "dfn_file": dfn_name,

@@ -1696,7 +1696,8 @@ src/Input_Output/Parameters.o: ../src/Input_Output/Parameters.cpp \
  /home/zhouw/softs/boost/py37/gcc95/1.76.0/include/boost/numeric/ublas/vector.hpp \
  /home/zhouw/softs/boost/py37/gcc95/1.76.0/include/boost/numeric/ublas/matrix_expression.hpp \
  /home/zhouw/softs/boost/py37/gcc95/1.76.0/include/boost/numeric/ublas/detail/matrix_assign.hpp \
- /home/zhouw/softs/boost/py37/gcc95/1.76.0/include/boost/numeric/ublas/matrix.hpp
+ /home/zhouw/softs/boost/py37/gcc95/1.76.0/include/boost/numeric/ublas/matrix.hpp \
+ ../src/Input_Output/../Chemistry/Chemistry.h
 
 ../src/Input_Output/Parameters.h:
 
@@ -5093,3 +5094,5 @@ src/Input_Output/Parameters.o: ../src/Input_Output/Parameters.cpp \
 /home/zhouw/softs/boost/py37/gcc95/1.76.0/include/boost/numeric/ublas/detail/matrix_assign.hpp:
 
 /home/zhouw/softs/boost/py37/gcc95/1.76.0/include/boost/numeric/ublas/matrix.hpp:
+
+../src/Input_Output/../Chemistry/Chemistry.h:

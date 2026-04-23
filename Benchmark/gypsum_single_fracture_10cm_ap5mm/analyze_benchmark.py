@@ -11,6 +11,11 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 
+AXIS_LABEL_FONTSIZE = 14
+TICK_LABEL_FONTSIZE = 12
+LEGEND_FONTSIZE = 12
+LEGEND_TITLE_FONTSIZE = 12
+
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 BENCH_DIR = REPO_ROOT / "Benchmark" / "gypsum_single_fracture_10cm_ap5mm"
@@ -26,23 +31,66 @@ THICKNESS = 0.1
 RHO = 1.0e3
 MU = 1.0e-3
 GLOBAL_INJECTION_TIME = 1.0e5
-PROFILE_TIMES = [0.0, 1.0e4, 5.0e4, 1.0e5]
+PROFILE_TIMES = [1.0e3, 1.0e4, 5.0e4, 1.0e5]
 COMBINED_TIMES = [1.0e2, 1.0e3, 1.0e4]
-D_EFFECTIVE = 1.0e-9
+APERTURE_PROFILE_YLIM_MM = (4.97, 5.53)
+GYPSUM_INTRINSIC_RATE_MOL_PER_M2_PER_S = 4.0e-5
+GYPSUM_MOLAR_VOLUME_M3_PER_MOL = 7.4e-5
+CHEMISTRY_BY_TRAVEL_TIME = {
+    1.0e2: {"A2": 1.25061420e-08, "K2": 1.59497791e-04, "L": 0.0, "VREF": 5.0e-06},
+    1.0e3: {"A2": 1.25061420e-09, "K2": 3.43627573e-04, "L": 0.0, "VREF": 5.0e-07},
+    1.0e4: {"A2": 1.25061420e-10, "K2": 7.40323164e-04, "L": 0.0, "VREF": 5.0e-08},
+    1.0e5: {"A2": 1.25061420e-11, "K2": 1.59497791e-03, "L": 0.0, "VREF": 5.0e-09},
+}
 
-A2 = 2.50122e-6
-K2 = 2.72730e-5
-VREF = 1.0e-3
+plt.rcParams.update({
+    "axes.labelsize": AXIS_LABEL_FONTSIZE,
+    "xtick.labelsize": TICK_LABEL_FONTSIZE,
+    "ytick.labelsize": TICK_LABEL_FONTSIZE,
+    "legend.fontsize": LEGEND_FONTSIZE,
+    "legend.title_fontsize": LEGEND_TITLE_FONTSIZE,
+})
+
+
+def vp_figure_style() -> dict[str, str]:
+    return {
+        "font.family": "serif",
+        "mathtext.fontset": "stix",
+    }
+
+
+def sci_text(value: float) -> str:
+    if value == 0.0:
+        return "0"
+    exponent = int(np.floor(np.log10(abs(value))))
+    coeff = value / (10 ** exponent)
+    if abs(coeff - round(coeff)) < 1e-12:
+        coeff_text = f"{int(round(coeff))}"
+    else:
+        coeff_text = f"{coeff:.1f}"
+    if coeff_text == "1":
+        return rf"10^{{{exponent}}}"
+    return rf"{coeff_text}\times10^{{{exponent}}}"
 
 
 def chemistry_coefficients(travel_time: float) -> dict[str, float]:
-    return {"A2": A2, "K2": K2, "L": 0.0, "VREF": VREF}
+    return dict(CHEMISTRY_BY_TRAVEL_TIME[travel_time])
 
 
-def effective_diffusion_height_factor(travel_time: float, aperture_height: float = APERTURE0) -> float:
-    if aperture_height <= 0.0:
-        return 0.0
-    return math.sqrt(D_EFFECTIVE * travel_time) / aperture_height
+def intrinsic_aperture_change_m() -> float:
+    # Code-consistent equivalent aperture increase under a constant intrinsic
+    # surface rate. With the current geometry map delta_b = deltaV/(L*h*2),
+    # a two-wall dissolution volume 2*L*h*r*Vm*T corresponds to:
+    # delta_b_intrinsic = r * Vm * T
+    return (
+        GYPSUM_INTRINSIC_RATE_MOL_PER_M2_PER_S
+        * GYPSUM_MOLAR_VOLUME_M3_PER_MOL
+        * GLOBAL_INJECTION_TIME
+    )
+
+
+def intrinsic_dissolved_volume_m3() -> float:
+    return 2.0 * LENGTH * THICKNESS * intrinsic_aperture_change_m()
 
 
 def load_aperture_delta(path: Path) -> np.ndarray:
@@ -84,15 +132,13 @@ def compute_case_metrics(row: dict[str, str]) -> dict[str, float | str]:
     lengths = np.sqrt((final[:, 2] - final[:, 0]) ** 2 + (final[:, 3] - final[:, 1]) ** 2)
     delta_b = final[:, 6]
     dissolved_volume = float(np.sum(2.0 * delta_b * lengths * THICKNESS))
+    max_delta_aperture_m = float(np.max(delta_b))
     travel_time = float(row["travel_time_s"])
     velocity = float(row["velocity_m_per_s"])
     chemistry = chemistry_coefficients(travel_time)
-    reference_volume = effective_diffusion_height_factor(travel_time) * (velocity * APERTURE0 * THICKNESS / chemistry["VREF"]) * chemistry["A2"] * (
-        GLOBAL_INJECTION_TIME
-        - (1.0 - math.exp(-chemistry["K2"] * GLOBAL_INJECTION_TIME)) / chemistry["K2"]
-    )
     rate = dissolved_volume / travel_time
-    relative_error = (dissolved_volume - reference_volume) / reference_volume if reference_volume else math.nan
+    intrinsic_delta_b = intrinsic_aperture_change_m()
+    relative_error = (max_delta_aperture_m - intrinsic_delta_b) / intrinsic_delta_b if intrinsic_delta_b else math.nan
     final_velocity = float(np.mean(np.abs(final[:, 5])))
     return {
         "case": row["case"],
@@ -105,10 +151,13 @@ def compute_case_metrics(row: dict[str, str]) -> dict[str, float | str]:
         "delta_v_a2_m3": chemistry["A2"],
         "delta_v_k2_s_inv": chemistry["K2"],
         "vref_m3": chemistry["VREF"],
-        "effective_diffusion_height_factor": effective_diffusion_height_factor(travel_time),
-        "reference_dissolved_volume_m3": reference_volume,
+        "effective_diffusion_height_factor": 1.0,
         "dissolved_volume_m3": dissolved_volume,
         "avg_dissolution_rate_m3_per_s": rate,
+        "max_delta_aperture_m": max_delta_aperture_m,
+        "max_delta_aperture_mm": max_delta_aperture_m * 1.0e3,
+        "intrinsic_aperture_change_m": intrinsic_delta_b,
+        "intrinsic_aperture_change_mm": intrinsic_delta_b * 1.0e3,
         "relative_error": relative_error,
     }
 
@@ -125,15 +174,16 @@ def plot_reaction_law() -> None:
     FIG_DIR.mkdir(parents=True, exist_ok=True)
     t = np.logspace(1, 5, 400)
     fig, ax = plt.subplots(figsize=(7.5, 4.8))
-    chemistry = chemistry_coefficients(1.0e2)
-    y = chemistry["A2"] * (1.0 - np.exp(-chemistry["K2"] * t))
-    ax.plot(t, y * 1e6, color="#b13a1b", lw=2.2, label=r"$\Delta V_{ref}(t)=A_2(1-e^{-k_2 t})$")
-    for tt in [1e2, 1e3, 1e4, 1e5]:
-        ax.axvline(tt, color="#4a5568", lw=0.9, ls="--")
+    colors = {1.0e2: "#9b2226", 1.0e3: "#ca6702", 1.0e4: "#005f73", 1.0e5: "#0a9396"}
+    for tt in [1.0e2, 1.0e3, 1.0e4, 1.0e5]:
+        chemistry = chemistry_coefficients(tt)
+        y = chemistry["A2"] * (1.0 - np.exp(-chemistry["K2"] * t))
+        ax.plot(t, y * 1e6, color=colors[tt], lw=2.0, label=fr"$t_{{cross}}={sci_text(tt)}$ s")
+        ax.axvline(tt, color=colors[tt], lw=0.8, ls="--", alpha=0.7)
     ax.set_xscale("log")
     ax.set_xlabel("Residence Time [s]")
     ax.set_ylabel(r"Reference $\Delta V$ [$10^{-6}$ m$^3$]")
-    ax.set_title("Pure Gypsum Fast2-Only Mineral Volume Law")
+    ax.set_title("Pure Gypsum Fast2-Only Mineral Volume Laws")
     ax.grid(True, which="both", alpha=0.25)
     ax.legend(frameon=False)
     fig.tight_layout()
@@ -149,7 +199,7 @@ def plot_re_da_map(rows: list[dict[str, float | str]]) -> None:
     for tt in sorted(unique):
         re_value, da_value = unique[tt]
         ax.scatter(re_value, da_value, s=70, color="#1f4e79")
-        ax.text(re_value * 1.08, da_value * 1.06, f"t={tt:.0e} s", fontsize=9)
+        ax.text(re_value * 1.08, da_value * 1.06, rf"$t={sci_text(tt)}$ s", fontsize=9)
     ax.set_xscale("log")
     ax.set_yscale("log")
     ax.set_xlabel("Re")
@@ -173,13 +223,11 @@ def plot_vs_segments(rows: list[dict[str, float | str]]) -> None:
         data = sorted(grouped[tt], key=lambda item: int(item["segments"]))
         x = [int(item["segments"]) for item in data]
         y = [float(item["dissolved_volume_m3"]) * 1e6 for item in data]
-        ref_value = float(data[0]["reference_dissolved_volume_m3"]) * 1e6
-        ax.plot(x, y, marker="o", lw=1.8, color=colors[tt], label=f"t={tt:.0e} s")
-        ax.hlines(ref_value, x[0], x[-1], colors=colors[tt], linestyles="dashed", lw=1.0)
+        ax.plot(x, y, marker="o", lw=1.8, color=colors[tt], label=rf"$t={sci_text(tt)}$ s")
     ax.set_xscale("log")
     ax.set_xlabel("Number Of Fracture Segments")
     ax.set_ylabel(r"Dissolved Gypsum Volume [$10^{-6}$ m$^3$]")
-    ax.set_title("Model Dissolved Volume vs Segment Discretization")
+    ax.set_title("Dissolved Volume vs Segment Discretization")
     ax.grid(True, which="both", alpha=0.25)
     ax.legend(frameon=False)
     fig.tight_layout()
@@ -191,12 +239,12 @@ def plot_vs_segments(rows: list[dict[str, float | str]]) -> None:
         data = sorted(grouped[tt], key=lambda item: int(item["segments"]))
         x = [int(item["segments"]) for item in data]
         y = [100.0 * float(item["relative_error"]) for item in data]
-        ax.plot(x, y, marker="o", lw=1.8, color=colors[tt], label=f"t={tt:.0e} s")
+        ax.plot(x, y, marker="o", lw=1.8, color=colors[tt], label=rf"$t={sci_text(tt)}$ s")
     ax.axhline(0.0, color="#222222", lw=0.9)
     ax.set_xscale("log")
     ax.set_xlabel("Number Of Fracture Segments")
-    ax.set_ylabel("Relative Error [%]")
-    ax.set_title("Error Relative To Analytical Plug-Flow Reference")
+    ax.set_ylabel("Relative Error In Max Aperture [%]")
+    ax.set_title("Error Relative To Intrinsic-Reactivity Aperture Change")
     ax.grid(True, which="both", alpha=0.25)
     ax.legend(frameon=False)
     fig.tight_layout()
@@ -216,7 +264,7 @@ def plot_vs_segments(rows: list[dict[str, float | str]]) -> None:
     fig, ax = plt.subplots(figsize=(7.0, 4.8))
     im = ax.imshow(z, cmap="magma_r", aspect="auto")
     ax.set_xticks(range(len(segments)), [str(seg) for seg in segments])
-    ax.set_yticks(range(len(travel_times)), [f"{tt:.0e}" for tt in travel_times])
+    ax.set_yticks(range(len(travel_times)), [f"${sci_text(tt)}$" for tt in travel_times])
     ax.set_xlabel("Segments")
     ax.set_ylabel("Crossing Time [s]")
     ax.set_title("Absolute Error Heatmap Relative To n=100 [%]")
@@ -297,36 +345,112 @@ def plot_aperture_profile_t1e5() -> None:
     plt.close(fig)
 
 
-def plot_aperture_evolution_t1e04_n100() -> None:
-    raw_dir = RESULTS_DIR / "cases" / "t1e04_n100" / "raw_output"
-    fig, ax = plt.subplots(figsize=(8.2, 5.0))
-    colors = ["#6c757d", "#9b2226", "#ca6702", "#0a9396"]
-    for t_value, color in zip(PROFILE_TIMES, colors):
-        _, data = load_snapshot_nearest(raw_dir, t_value)
-        x_left = (data[:, 0] + 0.05) * 100.0
-        x_right = (data[:, 2] + 0.05) * 100.0
-        aperture_mm = data[:, 4] * 1e3
-        order = np.argsort(x_left)
-        x_left = x_left[order]
-        x_right = x_right[order]
-        aperture_mm = aperture_mm[order]
-        x_step = np.empty(2 * len(aperture_mm))
-        y_step = np.empty(2 * len(aperture_mm))
-        x_step[0::2] = x_left
-        x_step[1::2] = x_right
-        y_step[0::2] = aperture_mm
-        y_step[1::2] = aperture_mm
-        label = "t = 0 s" if t_value == 0 else f"t = {t_value:.0e} s"
-        ax.plot(x_step, y_step, lw=1.8, color=color, label=label)
-    ax.axhline(APERTURE0 * 1e3, color="#666666", lw=1.0, ls="--")
-    ax.set_xlim(0.0, 10.0)
-    ax.set_xlabel("Position along fracture [cm]")
-    ax.set_ylabel("Aperture [mm]")
-    ax.set_title(r"Aperture-profile evolution for $t_{cross}=10^4$ s, $n=100$")
-    ax.grid(True, axis="y", alpha=0.25)
-    ax.legend(frameon=False, ncol=2)
+def plot_aperture_evolution_n100(travel_time: float) -> None:
+    with plt.rc_context(vp_figure_style()):
+        case_label = f"t{travel_time:.0e}_n100".replace("+", "")
+        raw_dir = RESULTS_DIR / "cases" / case_label / "raw_output"
+        velocity = LENGTH / travel_time
+        fig, ax = plt.subplots(figsize=(8.2, 5.0))
+        colors = ["#9b2226", "#ca6702", "#005f73", "#0a9396"]
+        for t_value, color in zip(PROFILE_TIMES, colors):
+            _, data = load_snapshot_nearest(raw_dir, t_value)
+            x_left = (data[:, 0] + 0.05) * 100.0
+            x_right = (data[:, 2] + 0.05) * 100.0
+            aperture_mm = data[:, 4] * 1e3
+            order = np.argsort(x_left)
+            x_left = x_left[order]
+            x_right = x_right[order]
+            aperture_mm = aperture_mm[order]
+            x_step = np.empty(2 * len(aperture_mm))
+            y_step = np.empty(2 * len(aperture_mm))
+            x_step[0::2] = x_left
+            x_step[1::2] = x_right
+            y_step[0::2] = aperture_mm
+            y_step[1::2] = aperture_mm
+            label = rf"$t={sci_text(t_value)}$ s"
+            ax.plot(x_step, y_step, lw=1.8, color=color, label=label)
+        ax.axhline(APERTURE0 * 1e3, color="#666666", lw=1.0, ls="--")
+        ax.set_xlim(0.0, 10.0)
+        ax.set_ylim(*APERTURE_PROFILE_YLIM_MM)
+        ax.set_xlabel("Position along fracture (cm)")
+        ax.set_ylabel("Aperture (mm)")
+        ax.set_title(fr"Aperture-profile evolution for $u={sci_text(velocity)}$ m/s, $n=100$")
+        ax.grid(True, axis="y", alpha=0.25)
+        ax.legend(frameon=False, ncol=1)
+        fig.tight_layout()
+        fig.savefig(FIG_DIR / f"fig_aperture_evolution_t{travel_time:.0e}_n100.png".replace("+", ""), dpi=220)
+        plt.close(fig)
+
+
+def plot_aperture_profiles_t1e5_all_velocities() -> None:
+    with plt.rc_context(vp_figure_style()):
+        fig, ax = plt.subplots(figsize=(8.4, 5.0))
+        colors = ["#9b2226", "#ca6702", "#005f73", "#0a9396"]
+        for travel_time, color in zip([1.0e2, 1.0e3, 1.0e4, 1.0e5], colors):
+            case_label = f"t{travel_time:.0e}_n100".replace("+", "")
+            raw_dir = RESULTS_DIR / "cases" / case_label / "raw_output"
+            _, data = load_snapshot_nearest(raw_dir, 1.0e5)
+            x_left = (data[:, 0] + 0.05) * 100.0
+            x_right = (data[:, 2] + 0.05) * 100.0
+            aperture_mm = data[:, 4] * 1e3
+            order = np.argsort(x_left)
+            x_left = x_left[order]
+            x_right = x_right[order]
+            aperture_mm = aperture_mm[order]
+            x_step = np.empty(2 * len(aperture_mm))
+            y_step = np.empty(2 * len(aperture_mm))
+            x_step[0::2] = x_left
+            x_step[1::2] = x_right
+            y_step[0::2] = aperture_mm
+            y_step[1::2] = aperture_mm
+            velocity = LENGTH / travel_time
+            ax.plot(x_step, y_step, lw=1.9, color=color, label=rf"$u={sci_text(velocity)}$ m/s")
+        ax.axhline(APERTURE0 * 1e3, color="#666666", lw=1.0, ls="--")
+        ax.set_xlim(0.0, 10.0)
+        ax.set_ylim(*APERTURE_PROFILE_YLIM_MM)
+        ax.set_xlabel("Position along fracture (cm)")
+        ax.set_ylabel("Aperture (mm)")
+        ax.set_title(r"Aperture profiles at $t=10^5$ s for different flow velocities, $n=100$")
+        ax.grid(True, axis="y", alpha=0.25)
+        ax.legend(frameon=False)
+        fig.tight_layout()
+        fig.savefig(FIG_DIR / "fig_aperture_profiles_t1e5_all_velocities_n100.png", dpi=220)
+        plt.close(fig)
+
+
+def plot_dissolved_volume_vs_velocity_with_intrinsic_diff(rows: list[dict[str, float | str]]) -> None:
+    rows_n100 = sorted(
+        [row for row in rows if int(row["segments"]) == 100],
+        key=lambda item: float(item["velocity_m_per_s"]),
+        reverse=True,
+    )
+    def sci_label(value: float) -> str:
+        exp = int(np.floor(np.log10(abs(value)))) if value != 0.0 else 0
+        coeff = value / (10 ** exp) if value != 0.0 else 0.0
+        coeff_text = f"{coeff:.0f}" if abs(coeff - round(coeff)) < 1e-12 else f"{coeff:.1f}"
+        return rf"${coeff_text}\times10^{{{exp}}}$"
+
+    labels = [sci_label(float(row["velocity_m_per_s"])) for row in rows_n100]
+    x = np.arange(len(rows_n100), dtype=float)
+    dissolved = np.array([float(row["dissolved_volume_m3"]) for row in rows_n100])
+    intrinsic_volume = intrinsic_dissolved_volume_m3()
+    diff_percent = np.abs(100.0 * (dissolved - intrinsic_volume) / intrinsic_volume) if intrinsic_volume else np.zeros_like(dissolved)
+
+    fig, ax1 = plt.subplots(figsize=(8.2, 4.8))
+    ax2 = ax1.twinx()
+    ax1.bar(x, dissolved, width=0.58, color="#e0b84f", alpha=0.72)
+    ax2.plot(x, diff_percent, color="#1f4e79", marker="o", lw=2.0)
+    ax2.axhline(0.0, color="#444444", lw=0.9, ls="--")
+
+    ax1.set_xticks(x, labels)
+    ax1.set_xlabel("Flow velocity [m/s]")
+    ax1.set_ylabel("Dissolved volume [m$^3$]")
+    ax2.set_ylabel("Absolute difference from intrinsic dissolved volume [%]")
+    ax1.set_title("Dissolved volume at different flow velocities")
+    ax1.grid(True, axis="y", alpha=0.25)
+
     fig.tight_layout()
-    fig.savefig(FIG_DIR / "fig_aperture_evolution_t1e04_n100.png", dpi=220)
+    fig.savefig(FIG_DIR / "fig_dissolved_volume_vs_velocity_intrinsic_diff.png", dpi=220)
     plt.close(fig)
 
 
@@ -370,13 +494,13 @@ def plot_combined_evolution_figure() -> None:
             x_step[1::2] = x_right
             y_step[0::2] = aperture_mm
             y_step[1::2] = aperture_mm
-            label = "0" if t_value == 0 else f"{t_value:.0e}"
+            label = f"${sci_text(t_value)}$"
             ax.plot(x_step, y_step, lw=1.5, color=color, label=label)
         ax.axhline(APERTURE0 * 1e3, color="#666666", lw=0.9, ls="--")
         ax.set_xlim(0.0, 10.0)
         ax.grid(True, axis="y", alpha=0.22)
         ax.set_ylabel("Aperture [mm]")
-        ax.set_title(f"t_cross = {crossing_time:.0e} s, n = 100", fontsize=10)
+        ax.set_title(rf"$t_{{cross}}={sci_text(crossing_time)}$ s, $n=100$", fontsize=10)
         if row_index == len(COMBINED_TIMES) - 1:
             ax.set_xlabel("Position along fracture [cm]")
         if row_index == 0:
@@ -386,7 +510,7 @@ def plot_combined_evolution_figure() -> None:
     for crossing_time, color in volume_colors.items():
         case_label = f"t{crossing_time:.0e}_n100".replace("+", "")
         t_values, dissolved_values = compute_time_series(case_label)
-        ax_right.plot(t_values, dissolved_values, lw=2.0, color=color, label=f"t_cross={crossing_time:.0e} s")
+        ax_right.plot(t_values, dissolved_values, lw=2.0, color=color, label=rf"$t_{{cross}}={sci_text(crossing_time)}$ s")
     ax_right.set_xlabel("Time [s]")
     ax_right.set_ylabel("Total dissolved volume [m$^3$]")
     ax_right.set_title("Total dissolved-volume evolution")
@@ -417,8 +541,9 @@ def write_notes(rows: list[dict[str, float | str]]) -> None:
         "- one centered horizontal fracture spanning the full domain length;",
         "- out-of-plane thickness `10 cm`;",
         "- chemistry kept as pure gypsum using only the `fast2` term;",
-        "- all crossing-time cases share one gypsum-only volume law with `A2 = 2.50122e-6`, `k2 = 2.72730e-5`, and `Vref = 1e-3 m^3`;",
-        "- an effective diffusion-height factor `m = sqrt(D * t_cross) / b` is applied with `D = 1e-9 m^2/s` and `b` approximated by the initial aperture in the analytical reference plots;",
+        "- each crossing-time case uses its own gypsum-only `fast2` law fitted for the corresponding particle volume `Vp`, with `Vref = Vp`;",
+        "- no additional effective diffusion-height factor is applied in this result set;",
+        "- `relative_error` is defined from the maximum simulated aperture increase relative to the code-consistent intrinsic gypsum aperture increase using `r = 4e-5 mol/m^2/s` and `Vm = 7.4e-5 m^3/mol`;",
         "- crossing times `100 s`, `1000 s`, `1e4 s`, `1e5 s`;",
         "- segment counts `n = 1, 5, 10, 50, 100`.",
         "",
@@ -445,8 +570,9 @@ def write_notes(rows: list[dict[str, float | str]]) -> None:
         "- 一条居中水平裂缝贯穿整个域；",
         "- out-of-plane thickness 为 `10 cm`；",
         "- chemistry 仍然只保留纯 gypsum 的 `fast2` 项；",
-        "- 所有 crossing time 都共用同一条 gypsum-only 体积公式，`A2 = 2.50122e-6`、`k2 = 2.72730e-5`，并统一 `Vref = 1e-3 m^3`；",
-        "- 另外加入有效扩散高度因子 `m = sqrt(D * t_cross) / b`，其中 `D = 1e-9 m^2/s`，分析参考曲线中用初始 aperture 近似 `b`；",
+        "- 每个 crossing time 都使用其对应 `Vp` 下重新拟合的 gypsum-only `fast2` 公式，并取 `Vref = Vp`；",
+        "- 这一版结果不再加入额外的有效扩散高度因子；",
+        "- `relative_error` 现在定义为最大 aperture 增量相对于 code-consistent intrinsic gypsum aperture 增量的误差，其中 `r = 4e-5 mol/m^2/s`、`Vm = 7.4e-5 m^3/mol`；",
         "- 穿越时间为 `100 s`、`1000 s`、`1e4 s`、`1e5 s`；",
         "- segment 数为 `n = 1, 5, 10, 50, 100`。",
         "",
@@ -486,7 +612,10 @@ def main() -> None:
     plot_vs_segments(rows)
     plot_custom_t1e5(rows)
     plot_aperture_profile_t1e5()
-    plot_aperture_evolution_t1e04_n100()
+    for travel_time in [1.0e2, 1.0e3, 1.0e4, 1.0e5]:
+        plot_aperture_evolution_n100(travel_time)
+    plot_aperture_profiles_t1e5_all_velocities()
+    plot_dissolved_volume_vs_velocity_with_intrinsic_diff(rows)
     plot_combined_evolution_figure()
     write_notes(rows)
     copy_results_snapshot()
