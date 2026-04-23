@@ -88,6 +88,9 @@ void Parameters::read_param(){
 		if (!(fichier2 >> fracture_out_of_plane_thickness)){
 			fracture_out_of_plane_thickness = DEFAULT_FRACTURE_OUT_OF_PLANE_THICKNESS;
 		}
+		if (!(fichier2 >> simulation_mode)){
+			simulation_mode = 2;
+		}
 	}
 	else{
 		cout << "WARNING in Parameters (Parameters.cpp) : unknown file2" << endl;

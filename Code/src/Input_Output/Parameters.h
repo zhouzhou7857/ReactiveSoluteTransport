@@ -36,6 +36,7 @@ public:
 	double reaction_dt;	// fixed reaction update time step used for transport/aperture updates
 	double mineral_volume_reference_water_volume;	// PHREEQC reference water volume Vref
 	double fracture_out_of_plane_thickness;	// thickness used in volume-to-aperture conversion
+	int simulation_mode;	// 1 = precheck only, 2 = full simulation
 	//int num_simu_start;	// number of the starting simulation
 	std::string code_path;
 	std::string file_names_path;

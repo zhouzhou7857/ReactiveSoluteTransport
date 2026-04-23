@@ -88,6 +88,7 @@ public:
 	bool finite_matrix_displacement(Particle&);
 	bool infinite_matrix_displacement_step(Particle&,double,std::map<int,double>&,std::map<int,double>&);
 	bool finite_matrix_displacement_step(Particle&,double,std::map<int,double>&,std::map<int,double>&);
+	void WriteInitialDiagnosticsOnly();
 	bool particle_displacement(Particle&);
 	bool particle_displacement_step(Particle&,double,std::map<int,double>&,std::map<int,double>&);
 	bool Particles_Transport(std::map<int,double>&,int option_injection=0);

@@ -18,6 +18,173 @@ using namespace std;
 
 static const double VELOCITY_APERTURE_ZERO_THRESHOLD = 1e-10;
 
+static double ParticleInjectionTimeShare(const NumericalParam& num_param,int nb_part_tot);
+
+struct InitialTransportDiagnostics{
+	bool valid;
+	int active_mesh_count;
+	int inlet_mesh_count;
+	double active_total_length;
+	double active_total_volume;
+	double inlet_total_length;
+	double inlet_total_volume;
+	double min_velocity;
+	double max_velocity;
+	double length_weighted_mean_velocity;
+	double inlet_flux_total;
+	double particle_time_share;
+	double global_particle_volume;
+	double min_inlet_particle_volume;
+	double max_inlet_particle_volume;
+	double estimated_network_residence_time;
+	double estimated_inlet_residence_time;
+	double estimated_domain_crossing_time;
+
+	InitialTransportDiagnostics():
+		valid(false),
+		active_mesh_count(0),
+		inlet_mesh_count(0),
+		active_total_length(0.0),
+		active_total_volume(0.0),
+		inlet_total_length(0.0),
+		inlet_total_volume(0.0),
+		min_velocity(0.0),
+		max_velocity(0.0),
+		length_weighted_mean_velocity(0.0),
+		inlet_flux_total(0.0),
+		particle_time_share(0.0),
+		global_particle_volume(0.0),
+		min_inlet_particle_volume(0.0),
+		max_inlet_particle_volume(0.0),
+		estimated_network_residence_time(0.0),
+		estimated_inlet_residence_time(0.0),
+		estimated_domain_crossing_time(0.0){}
+};
+
+static bool MeshTouchesInputBoundary(const FractureMesh& mesh,Domain& domain){
+	pointcpp<double> p1(mesh.p_ori.p);
+	pointcpp<double> p2(mesh.p_tar.p);
+	return domain.on_input_limit(p1) || domain.on_input_limit(p2);
+}
+
+static double MeshLengthFromEndpoints(const FractureMesh& mesh){
+	double dx = mesh.p_tar.p.x()-mesh.p_ori.p.x();
+	double dy = mesh.p_tar.p.y()-mesh.p_ori.p.y();
+	return std::sqrt(dx*dx+dy*dy);
+}
+
+static InitialTransportDiagnostics EvaluateInitialTransportDiagnostics(const NetworkMeshes& net_mesh,
+                                                                      Domain& domain,
+                                                                      const NumericalParam& num_param,
+                                                                      int nb_part_tot)
+{
+	InitialTransportDiagnostics diag;
+	diag.particle_time_share = ParticleInjectionTimeShare(num_param,nb_part_tot);
+	bool first_velocity = true;
+	double length_velocity_sum = 0.0;
+	double active_length_for_velocity = 0.0;
+	bool first_inlet_particle_volume = true;
+	for (size_t i=0;i<net_mesh.meshes.size();i++){
+		const FractureMesh& mesh = net_mesh.meshes[i];
+		if (mesh.aperture<=0.0){
+			continue;
+		}
+		double length = MeshLengthFromEndpoints(mesh);
+		if (!std::isfinite(length) || length<=0.0){
+			continue;
+		}
+		double abs_velocity = std::fabs(mesh.velocity);
+		double mesh_volume = length*mesh.aperture*FRACTURE_OUT_OF_PLANE_THICKNESS;
+		diag.active_mesh_count++;
+		diag.active_total_length += length;
+		diag.active_total_volume += mesh_volume;
+		if (std::isfinite(abs_velocity)){
+			length_velocity_sum += length*abs_velocity;
+			active_length_for_velocity += length;
+			if (first_velocity){
+				diag.min_velocity = abs_velocity;
+				diag.max_velocity = abs_velocity;
+				first_velocity = false;
+			}
+			else{
+				if (abs_velocity<diag.min_velocity){diag.min_velocity = abs_velocity;}
+				if (abs_velocity>diag.max_velocity){diag.max_velocity = abs_velocity;}
+			}
+		}
+		if (!MeshTouchesInputBoundary(mesh,domain)){
+			continue;
+		}
+		diag.inlet_mesh_count++;
+		diag.inlet_total_length += length;
+		diag.inlet_total_volume += mesh_volume;
+		if (!std::isfinite(abs_velocity) || abs_velocity<0.0){
+			continue;
+		}
+		double inlet_flux = abs_velocity*mesh.aperture*FRACTURE_OUT_OF_PLANE_THICKNESS;
+		diag.inlet_flux_total += inlet_flux;
+		double particle_volume = inlet_flux*diag.particle_time_share;
+		if (first_inlet_particle_volume){
+			diag.min_inlet_particle_volume = particle_volume;
+			diag.max_inlet_particle_volume = particle_volume;
+			first_inlet_particle_volume = false;
+		}
+		else{
+			if (particle_volume<diag.min_inlet_particle_volume){diag.min_inlet_particle_volume = particle_volume;}
+			if (particle_volume>diag.max_inlet_particle_volume){diag.max_inlet_particle_volume = particle_volume;}
+		}
+	}
+	if (active_length_for_velocity>0.0){
+		diag.length_weighted_mean_velocity = length_velocity_sum/active_length_for_velocity;
+	}
+	if (diag.inlet_flux_total>0.0){
+		diag.global_particle_volume = diag.inlet_flux_total*diag.particle_time_share;
+		diag.estimated_network_residence_time = diag.active_total_volume/diag.inlet_flux_total;
+		diag.estimated_inlet_residence_time = diag.inlet_total_volume/diag.inlet_flux_total;
+	}
+	if (diag.length_weighted_mean_velocity>0.0){
+		diag.estimated_domain_crossing_time = domain.domain_size_x()/diag.length_weighted_mean_velocity;
+	}
+	diag.valid = (diag.active_mesh_count>0);
+	return diag;
+}
+
+static void WriteInitialTransportDiagnostics(const InitialTransportDiagnostics& diag,
+                                             const std::string& output_path,
+                                             int nb_part_tot,double t_injection)
+{
+	std::string file_name = output_path + "/Output/initial_transport_diagnostics.txt";
+	std::ofstream output(file_name.c_str(),std::ofstream::out);
+	if (!output.is_open()){
+		cout << "WARNING in WriteInitialTransportDiagnostics (Transport.cpp): cannot open file "
+		     << file_name << endl;
+		return;
+	}
+	output << std::scientific << std::setprecision(12);
+	output << "initial_transport_diagnostics" << endl;
+	output << "nb_part " << nb_part_tot << endl;
+	output << "t_injection " << t_injection << endl;
+	output << "particle_time_share " << diag.particle_time_share << endl;
+	output << "fracture_volume " << diag.active_total_volume << endl;
+	output << "particle_volume " << diag.global_particle_volume << endl;
+	output << "estimated_particle_residence_time " << diag.estimated_network_residence_time << endl;
+	output.close();
+}
+
+static void PrintInitialTransportDiagnostics(const InitialTransportDiagnostics& diag,
+                                             const std::string& output_path,
+                                             int nb_part_tot,double t_injection)
+{
+	cout << "Initial transport diagnostics:" << endl;
+	cout << "  nb_part = " << nb_part_tot
+	     << ", t_injection = " << t_injection
+	     << ", particle_time_share = " << diag.particle_time_share << endl;
+	cout << "  fracture_volume = " << diag.active_total_volume
+	     << ", particle_volume = " << diag.global_particle_volume << endl;
+	cout << "  estimated_particle_residence_time = "
+	     << diag.estimated_network_residence_time << " s" << endl;
+	cout << "  diagnostics file = " << output_path + "/Output/initial_transport_diagnostics.txt" << endl;
+}
+
 // Modified by Wenyu on 2026/1/12; check if a mesh has connected meshes at a given node
 static bool HasConnectedMeshAtNode(const NetworkMeshes& net_mesh,int mesh_index,int node_index){
 	FractureMesh mesh = net_mesh.return_mesh(mesh_index);
@@ -528,6 +695,14 @@ Transport::Transport(RngStream_a rng_tracker_,NetworkMeshes net_mesh_,Domain dom
 	net_mesh_modified.last_t_update.assign(net_mesh_modified.meshes.size(), 0.0);// added by Wenyu on 2025/12/30
 
 };
+
+void Transport::WriteInitialDiagnosticsOnly(){
+	int nb_part = num_param.nb_part;
+	InitialTransportDiagnostics initial_diag =
+		EvaluateInitialTransportDiagnostics(net_mesh_modified,domain,num_param,nb_part);
+	WriteInitialTransportDiagnostics(initial_diag,param_full.code_path,nb_part,num_param.t_injection);
+	PrintInitialTransportDiagnostics(initial_diag,param_full.code_path,nb_part,num_param.t_injection);
+}
 
 // injection of particle on the left border of the domain
 vector<Particle> Transport::Particles_Injection(int option_injection){
@@ -1128,6 +1303,7 @@ bool Transport::Particles_Transport(map<int,double> & arrival_times,int option_i
 	// 0. Variables
 	int nb_part=num_param.nb_part;
 	double particle_time_share = ParticleInjectionTimeShare(num_param,nb_part);
+	WriteInitialDiagnosticsOnly();
 	// 1. Particles initialization and injection on the left border
 	vector<Particle> part_vect = Particles_Injection(option_injection);
 	// 2. Particle displacement

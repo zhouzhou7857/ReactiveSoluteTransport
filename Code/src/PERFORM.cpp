@@ -143,6 +143,7 @@ int main(int argc, char **argv) {
 	cout << "p_lim = " << param.proba_transfer << endl;
 	cout << "option matrix = " << param.simu_option << endl;
 	cout << "DFN file = " << param.file_name_DFN << endl;
+	cout << "simulation mode = " << param.simulation_mode << endl;
 	cout << "Chemistry mode = " << chemistry_mode << endl;
 	cout << "Active chemistry coupling: particle-age cumulative DeltaV law" << endl;
 	cout << "Chemistry DeltaV(t) = A1*(1-exp(-k1*t)) + A2*(1-exp(-k2*t)) + L*t" << endl;
@@ -280,6 +281,12 @@ int main(int argc, char **argv) {
 	cout << "2. Transport process computation - Particle displacement" << endl;
 	RngStream_a rng_tracker;
 	Transport transport(rng_tracker,net_mesh,domain,param);
+	if (param.simulation_mode==1){
+		cout << "Precheck mode enabled: writing initial transport diagnostics and exiting before transport." << endl;
+		transport.WriteInitialDiagnosticsOnly();
+		cout << "CPU Time = " << (clock()-t_begin_total)/CLOCKS_PER_SEC << endl;
+		return 0;
+	}
 	if (option!=0&&net_mesh.meshes.size()>0){
 		map<int,double> arrival_times;
 		if (transport.Particles_Transport(arrival_times,option_injection)){

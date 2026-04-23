@@ -10,3 +10,4 @@
 % reaction time step [s] - time step to recalculate the flow field and update the aperture (Attention: should not above number of particles; adjust by the efficiency and accuracy)
 % Vref [m^3] - PHREEQC reference water volume used in the scaling V_particle / Vref
 % fracture thickness [m] - out-of-plane thickness used in delta_b = delta_V / (L * thickness * 2)
+% simulation mode - 1 = precheck only (write initial diagnostics and exit), 2 = normal simulation
