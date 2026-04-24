@@ -214,13 +214,17 @@ double ComputeParticleSegmentMineralVolumeChange(double t_particle_start,double 
 		double particle_representative_volume,double aperture_height)
 {
 	// DFN-PT-V4 segment chemistry contribution:
-	// DeltaV_particle[t_start,t_end]
-	//   = (DeltaV_ref(t_end) - DeltaV_ref(t_start)) * (V_particle / Vref)
+	// DeltaV_particle[t_start,t_end] is already fitted from a PHREEQC run whose
+	// water volume matches the injected particle parcel volume for the current
+	// case. Do not apply an additional V_particle/Vref scaling here, otherwise
+	// the parcel-volume effect is counted twice.
+	(void)particle_representative_volume;
+	(void)aperture_height;
 	double t_start = std::max(0.0,t_particle_start);
 	double t_end = std::max(t_start,t_particle_end);
 	double cumulative_delta_v =
 		GetCumulativeMineralVolumeChange(t_end)-GetCumulativeMineralVolumeChange(t_start);
-	return cumulative_delta_v*ComputeParticleVolumeScalingFactor(particle_representative_volume,aperture_height);
+	return cumulative_delta_v;
 }
 
 double ComputeApertureChangeFromMineralVolume(double mineral_volume_change,double segment_length)
