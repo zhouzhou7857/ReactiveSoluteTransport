@@ -11,10 +11,13 @@ The current V5-final branch is mainly tuned for gypsum precipitation in supersat
 
 ## Core Chemistry Mechanism (Simple)
 
-This version uses one shared reference reaction curve, then scales it for each particle by representative injected volume.
+This version uses one shared reference reaction curve, then scales it for each particle by the representative injected volume.
 
 1. Build a reference cumulative curve from PHREEQC: `F_ref(t)`.
-2. For a transport step from `t_start` to `t_end`, compute:
+We used an empirical equation (Rosenberg et al, 2011) that was fitted by a two-stage ational curve : P(t)=P∞​[1−w(1+τ10​t​)−1/9−(1−w)(1+τ2​t​)−1])
+In PHREEQC, V_ref is set as the total volume of injection fluid. Surface reaction area is set as the surface area of fracture.
+
+3. For a transport step from `t_start` to `t_end`, compute:
 
 ```text
 DeltaV_ref = F_ref(t_end) - F_ref(t_start)
@@ -33,11 +36,12 @@ For gypsum precipitation, `DeltaV` is negative (mineral accumulates in fracture 
 ## Main Workflow
 
 1. Read domain/simulation/DFN inputs.
-2. Build DFN and solve flow.
-3. Run particle transport.
-4. Couple chemistry volume change to aperture update.
-5. Recompute flow after geometry evolution.
-6. Export BTC, particle snapshots, and DFN evolution.
+2. Build DFN and solve flow. (Pre-processes)
+3. Run PHREEQC model, get the cumulative volume function.
+4. Run particle transport.
+5. Couple chemistry volume change to aperture update.
+6. Recompute flow after geometry evolution.
+7. Export BTC, particle snapshots, and DFN evolution.
 
 ## Latest Benchmark Result Folder
 
