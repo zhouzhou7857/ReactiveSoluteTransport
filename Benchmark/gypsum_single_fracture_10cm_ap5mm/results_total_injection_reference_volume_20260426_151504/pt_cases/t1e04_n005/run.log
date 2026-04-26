@@ -1,0 +1,657 @@
+0. Parameters
+fract_aperture generation = file
+nb part = 10000
+p_lim = 0.05
+option matrix = 0
+DFN file = benchmark_gypsum_single_fracture_10cm_ap5mm_total_injection_reference_volume_20260426_151504_dfn_n5.txt
+simulation mode = 2
+Chemistry mode = custom_delta_v
+Active chemistry coupling: particle-age cumulative DeltaV law
+Chemistry DeltaV(t) = A1*(1-exp(-k1*t)) + A2*(1-exp(-k2*t)) + L*t
+Chemistry parameters: A1=0 k1=0 A2=5.5622e-07 k2=0.0001 L=1e-10 Vref=0.0005 thickness=0.1 eff_diff_height_factor=0 D_eff=0 t_eff=0 vp_width_correction=0 min_aperture=1e-12 debug=0
+Deprecated inactive chemistry parameters retained for compatibility: C0=500 decay=0.005 stoich=1 molar_volume=7.4e-05
+Domain bounds: min(-0.05,-0.05), max(0.05,0.05)
+1. Fracture network generation
+DFN meshes before backbone: 5, left-border meshes: 1, right-border meshes: 1, meshes inside domain: 5
+DFN extents: min(-0.05,0), max(0.05,0)
+DFN vs domain x-gap: left 0, right 0
+Fluid flow computation in the fracture network
+DFN meshes after backbone: 5, left-border meshes: 1, right-border meshes: 1, meshes inside domain: 5
+DFN extents: min(-0.05,0), max(0.05,0)
+DFN vs domain x-gap: left 0, right 0
+Timing: initial connectivity+flow = 0.000229893 s
+2. Transport process computation - Particle displacement
+Initial transport diagnostics:
+  nb_part = 10000, t_injection = 100000, particle_time_share = 10.001
+  fracture_volume = 5e-05, particle_volume = 5.0005e-08
+  estimated_particle_residence_time = 10000 s
+  diagnostics file = ./../../Output/initial_transport_diagnostics.txt
+Continuous injection enabled: t_injection=100000, dt_inject=10.001
+Initial inlet allocation (mesh_index -> count):
+0 -> 10000
+Timing step 100/1001 t=10000: total_step=0.000356833 s, min_aperture=0.00500059 mesh_index=4
+Timing step 200/1001 t=20000: total_step=0.000300977 s, min_aperture=0.00500672 mesh_index=4
+Timing step 300/1001 t=30000: total_step=0.00027769 s, min_aperture=0.00501286 mesh_index=4
+Timing step 400/1001 t=40000: total_step=0.000266092 s, min_aperture=0.00501902 mesh_index=4
+Timing step 500/1001 t=50000: total_step=0.000268731 s, min_aperture=0.00502518 mesh_index=4
+Timing step 600/1001 t=60000: total_step=0.000291015 s, min_aperture=0.00503135 mesh_index=4
+Timing step 700/1001 t=70000: total_step=0.000280358 s, min_aperture=0.00503753 mesh_index=4
+Timing step 800/1001 t=80000: total_step=0.000271656 s, min_aperture=0.00504373 mesh_index=4
+Timing step 900/1001 t=90000: total_step=0.000265992 s, min_aperture=0.00504993 mesh_index=4
+Timing step 1001/1001 t=100100: total_step=0.000212075 s, min_aperture=0.00505621 mesh_index=4
+Final inlet allocation (mesh_index -> count):
+0 -> 10000
+Timing total for all steps: 0.221925 s
+3. Result post-processing and writting
+Diagnostics: arrived=9030 total=10000 not_arrived=970 mean_t=55027.7 min_t=9993.41 max_t=100058
+Diagnostics sample arrival: particle=0 t=9993.41
+Diagnostics sample arrival: particle=1 t=10003.3
+Diagnostics sample arrival: particle=2 t=10013.3
+Diagnostics sample arrival: particle=3 t=10023.3
+Diagnostics sample arrival: particle=4 t=10033.3
+Diagnostics sample travel time at t=0:
+Diagnostics sample travel time at t=1000:
+particle=0 travel_time=1000 mesh_index=0
+particle=1 travel_time=989.999 mesh_index=0
+particle=2 travel_time=979.998 mesh_index=0
+particle=3 travel_time=969.997 mesh_index=0
+particle=4 travel_time=959.996 mesh_index=0
+Diagnostics sample travel time at t=2000:
+particle=0 travel_time=2000 mesh_index=0
+particle=1 travel_time=1990 mesh_index=0
+particle=2 travel_time=1980 mesh_index=0
+particle=3 travel_time=1970 mesh_index=0
+particle=4 travel_time=1960 mesh_index=0
+Diagnostics sample travel time at t=3000:
+particle=0 travel_time=3000 mesh_index=1
+particle=1 travel_time=2990 mesh_index=1
+particle=2 travel_time=2980 mesh_index=1
+particle=3 travel_time=2970 mesh_index=1
+particle=4 travel_time=2960 mesh_index=1
+Diagnostics sample travel time at t=4000:
+particle=0 travel_time=4000 mesh_index=2
+particle=1 travel_time=3990 mesh_index=1
+particle=2 travel_time=3980 mesh_index=1
+particle=3 travel_time=3970 mesh_index=1
+particle=4 travel_time=3960 mesh_index=1
+Diagnostics sample travel time at t=5000:
+particle=0 travel_time=5000 mesh_index=2
+particle=1 travel_time=4990 mesh_index=2
+particle=2 travel_time=4980 mesh_index=2
+particle=3 travel_time=4970 mesh_index=2
+particle=4 travel_time=4960 mesh_index=2
+Diagnostics sample travel time at t=6000:
+particle=0 travel_time=6000 mesh_index=3
+particle=1 travel_time=5990 mesh_index=2
+particle=2 travel_time=5980 mesh_index=2
+particle=3 travel_time=5970 mesh_index=2
+particle=4 travel_time=5960 mesh_index=2
+Diagnostics sample travel time at t=7000:
+particle=0 travel_time=7000 mesh_index=3
+particle=1 travel_time=6990 mesh_index=3
+particle=2 travel_time=6980 mesh_index=3
+particle=3 travel_time=6970 mesh_index=3
+particle=4 travel_time=6960 mesh_index=3
+Diagnostics sample travel time at t=8000:
+particle=0 travel_time=8000 mesh_index=4
+particle=1 travel_time=7990 mesh_index=3
+particle=2 travel_time=7980 mesh_index=3
+particle=3 travel_time=7970 mesh_index=3
+particle=4 travel_time=7960 mesh_index=3
+Diagnostics sample travel time at t=9000:
+particle=0 travel_time=9000 mesh_index=4
+particle=1 travel_time=8990 mesh_index=4
+particle=2 travel_time=8980 mesh_index=4
+particle=3 travel_time=8970 mesh_index=4
+particle=4 travel_time=8960 mesh_index=4
+Diagnostics sample travel time at t=10000:
+particle=1 travel_time=9990 mesh_index=4
+particle=2 travel_time=9980 mesh_index=4
+particle=3 travel_time=9970 mesh_index=4
+particle=4 travel_time=9960 mesh_index=4
+particle=5 travel_time=9949.99 mesh_index=4
+Diagnostics sample travel time at t=11000:
+particle=100 travel_time=9999.9 mesh_index=4
+particle=101 travel_time=9989.9 mesh_index=4
+particle=102 travel_time=9979.9 mesh_index=4
+particle=103 travel_time=9969.9 mesh_index=4
+particle=104 travel_time=9959.9 mesh_index=4
+Diagnostics sample travel time at t=12000:
+particle=200 travel_time=9999.8 mesh_index=4
+particle=201 travel_time=9989.8 mesh_index=4
+particle=202 travel_time=9979.8 mesh_index=4
+particle=203 travel_time=9969.8 mesh_index=4
+particle=204 travel_time=9959.8 mesh_index=4
+Diagnostics sample travel time at t=13000:
+particle=300 travel_time=9999.7 mesh_index=4
+particle=301 travel_time=9989.7 mesh_index=4
+particle=302 travel_time=9979.7 mesh_index=4
+particle=303 travel_time=9969.7 mesh_index=4
+particle=304 travel_time=9959.7 mesh_index=4
+Diagnostics sample travel time at t=14000:
+particle=400 travel_time=9999.6 mesh_index=4
+particle=401 travel_time=9989.6 mesh_index=4
+particle=402 travel_time=9979.6 mesh_index=4
+particle=403 travel_time=9969.6 mesh_index=4
+particle=404 travel_time=9959.6 mesh_index=4
+Diagnostics sample travel time at t=15000:
+particle=500 travel_time=9999.5 mesh_index=4
+particle=501 travel_time=9989.5 mesh_index=4
+particle=502 travel_time=9979.5 mesh_index=4
+particle=503 travel_time=9969.5 mesh_index=4
+particle=504 travel_time=9959.5 mesh_index=4
+Diagnostics sample travel time at t=16000:
+particle=600 travel_time=9999.4 mesh_index=4
+particle=601 travel_time=9989.4 mesh_index=4
+particle=602 travel_time=9979.4 mesh_index=4
+particle=603 travel_time=9969.4 mesh_index=4
+particle=604 travel_time=9959.4 mesh_index=4
+Diagnostics sample travel time at t=17000:
+particle=700 travel_time=9999.3 mesh_index=4
+particle=701 travel_time=9989.3 mesh_index=4
+particle=702 travel_time=9979.3 mesh_index=4
+particle=703 travel_time=9969.3 mesh_index=4
+particle=704 travel_time=9959.3 mesh_index=4
+Diagnostics sample travel time at t=18000:
+particle=800 travel_time=9999.2 mesh_index=4
+particle=801 travel_time=9989.2 mesh_index=4
+particle=802 travel_time=9979.2 mesh_index=4
+particle=803 travel_time=9969.2 mesh_index=4
+particle=804 travel_time=9959.2 mesh_index=4
+Diagnostics sample travel time at t=19000:
+particle=900 travel_time=9999.1 mesh_index=4
+particle=901 travel_time=9989.1 mesh_index=4
+particle=902 travel_time=9979.1 mesh_index=4
+particle=903 travel_time=9969.1 mesh_index=4
+particle=904 travel_time=9959.1 mesh_index=4
+Diagnostics sample travel time at t=20000:
+particle=1000 travel_time=9999 mesh_index=4
+particle=1001 travel_time=9989 mesh_index=4
+particle=1002 travel_time=9979 mesh_index=4
+particle=1003 travel_time=9969 mesh_index=4
+particle=1004 travel_time=9959 mesh_index=4
+Diagnostics sample travel time at t=21000:
+particle=1100 travel_time=9998.9 mesh_index=4
+particle=1101 travel_time=9988.9 mesh_index=4
+particle=1102 travel_time=9978.9 mesh_index=4
+particle=1103 travel_time=9968.9 mesh_index=4
+particle=1104 travel_time=9958.9 mesh_index=4
+Diagnostics sample travel time at t=22000:
+particle=1200 travel_time=9998.8 mesh_index=4
+particle=1201 travel_time=9988.8 mesh_index=4
+particle=1202 travel_time=9978.8 mesh_index=4
+particle=1203 travel_time=9968.8 mesh_index=4
+particle=1204 travel_time=9958.8 mesh_index=4
+Diagnostics sample travel time at t=23000:
+particle=1300 travel_time=9998.7 mesh_index=4
+particle=1301 travel_time=9988.7 mesh_index=4
+particle=1302 travel_time=9978.7 mesh_index=4
+particle=1303 travel_time=9968.7 mesh_index=4
+particle=1304 travel_time=9958.7 mesh_index=4
+Diagnostics sample travel time at t=24000:
+particle=1400 travel_time=9998.6 mesh_index=4
+particle=1401 travel_time=9988.6 mesh_index=4
+particle=1402 travel_time=9978.6 mesh_index=4
+particle=1403 travel_time=9968.6 mesh_index=4
+particle=1404 travel_time=9958.6 mesh_index=4
+Diagnostics sample travel time at t=25000:
+particle=1500 travel_time=9998.5 mesh_index=4
+particle=1501 travel_time=9988.5 mesh_index=4
+particle=1502 travel_time=9978.5 mesh_index=4
+particle=1503 travel_time=9968.5 mesh_index=4
+particle=1504 travel_time=9958.5 mesh_index=4
+Diagnostics sample travel time at t=26000:
+particle=1600 travel_time=9998.4 mesh_index=4
+particle=1601 travel_time=9988.4 mesh_index=4
+particle=1602 travel_time=9978.4 mesh_index=4
+particle=1603 travel_time=9968.4 mesh_index=4
+particle=1604 travel_time=9958.4 mesh_index=4
+Diagnostics sample travel time at t=27000:
+particle=1700 travel_time=9998.3 mesh_index=4
+particle=1701 travel_time=9988.3 mesh_index=4
+particle=1702 travel_time=9978.3 mesh_index=4
+particle=1703 travel_time=9968.3 mesh_index=4
+particle=1704 travel_time=9958.3 mesh_index=4
+Diagnostics sample travel time at t=28000:
+particle=1800 travel_time=9998.2 mesh_index=4
+particle=1801 travel_time=9988.2 mesh_index=4
+particle=1802 travel_time=9978.2 mesh_index=4
+particle=1803 travel_time=9968.2 mesh_index=4
+particle=1804 travel_time=9958.2 mesh_index=4
+Diagnostics sample travel time at t=29000:
+particle=1900 travel_time=9998.1 mesh_index=4
+particle=1901 travel_time=9988.1 mesh_index=4
+particle=1902 travel_time=9978.1 mesh_index=4
+particle=1903 travel_time=9968.1 mesh_index=4
+particle=1904 travel_time=9958.1 mesh_index=4
+Diagnostics sample travel time at t=30000:
+particle=2000 travel_time=9998 mesh_index=4
+particle=2001 travel_time=9988 mesh_index=4
+particle=2002 travel_time=9978 mesh_index=4
+particle=2003 travel_time=9968 mesh_index=4
+particle=2004 travel_time=9958 mesh_index=4
+Diagnostics sample travel time at t=31000:
+particle=2100 travel_time=9997.9 mesh_index=4
+particle=2101 travel_time=9987.9 mesh_index=4
+particle=2102 travel_time=9977.9 mesh_index=4
+particle=2103 travel_time=9967.9 mesh_index=4
+particle=2104 travel_time=9957.9 mesh_index=4
+Diagnostics sample travel time at t=32000:
+particle=2200 travel_time=9997.8 mesh_index=4
+particle=2201 travel_time=9987.8 mesh_index=4
+particle=2202 travel_time=9977.8 mesh_index=4
+particle=2203 travel_time=9967.8 mesh_index=4
+particle=2204 travel_time=9957.8 mesh_index=4
+Diagnostics sample travel time at t=33000:
+particle=2300 travel_time=9997.7 mesh_index=4
+particle=2301 travel_time=9987.7 mesh_index=4
+particle=2302 travel_time=9977.7 mesh_index=4
+particle=2303 travel_time=9967.7 mesh_index=4
+particle=2304 travel_time=9957.7 mesh_index=4
+Diagnostics sample travel time at t=34000:
+particle=2400 travel_time=9997.6 mesh_index=4
+particle=2401 travel_time=9987.6 mesh_index=4
+particle=2402 travel_time=9977.6 mesh_index=4
+particle=2403 travel_time=9967.6 mesh_index=4
+particle=2404 travel_time=9957.6 mesh_index=4
+Diagnostics sample travel time at t=35000:
+particle=2500 travel_time=9997.5 mesh_index=4
+particle=2501 travel_time=9987.5 mesh_index=4
+particle=2502 travel_time=9977.5 mesh_index=4
+particle=2503 travel_time=9967.5 mesh_index=4
+particle=2504 travel_time=9957.5 mesh_index=4
+Diagnostics sample travel time at t=36000:
+particle=2600 travel_time=9997.4 mesh_index=4
+particle=2601 travel_time=9987.4 mesh_index=4
+particle=2602 travel_time=9977.4 mesh_index=4
+particle=2603 travel_time=9967.4 mesh_index=4
+particle=2604 travel_time=9957.4 mesh_index=4
+Diagnostics sample travel time at t=37000:
+particle=2700 travel_time=9997.3 mesh_index=4
+particle=2701 travel_time=9987.3 mesh_index=4
+particle=2702 travel_time=9977.3 mesh_index=4
+particle=2703 travel_time=9967.3 mesh_index=4
+particle=2704 travel_time=9957.3 mesh_index=4
+Diagnostics sample travel time at t=38000:
+particle=2800 travel_time=9997.2 mesh_index=4
+particle=2801 travel_time=9987.2 mesh_index=4
+particle=2802 travel_time=9977.2 mesh_index=4
+particle=2803 travel_time=9967.2 mesh_index=4
+particle=2804 travel_time=9957.2 mesh_index=4
+Diagnostics sample travel time at t=39000:
+particle=2900 travel_time=9997.1 mesh_index=4
+particle=2901 travel_time=9987.1 mesh_index=4
+particle=2902 travel_time=9977.1 mesh_index=4
+particle=2903 travel_time=9967.1 mesh_index=4
+particle=2904 travel_time=9957.1 mesh_index=4
+Diagnostics sample travel time at t=40000:
+particle=3000 travel_time=9997 mesh_index=4
+particle=3001 travel_time=9987 mesh_index=4
+particle=3002 travel_time=9977 mesh_index=4
+particle=3003 travel_time=9967 mesh_index=4
+particle=3004 travel_time=9957 mesh_index=4
+Diagnostics sample travel time at t=41000:
+particle=3100 travel_time=9996.9 mesh_index=4
+particle=3101 travel_time=9986.9 mesh_index=4
+particle=3102 travel_time=9976.9 mesh_index=4
+particle=3103 travel_time=9966.9 mesh_index=4
+particle=3104 travel_time=9956.9 mesh_index=4
+Diagnostics sample travel time at t=42000:
+particle=3200 travel_time=9996.8 mesh_index=4
+particle=3201 travel_time=9986.8 mesh_index=4
+particle=3202 travel_time=9976.8 mesh_index=4
+particle=3203 travel_time=9966.8 mesh_index=4
+particle=3204 travel_time=9956.8 mesh_index=4
+Diagnostics sample travel time at t=43000:
+particle=3300 travel_time=9996.7 mesh_index=4
+particle=3301 travel_time=9986.7 mesh_index=4
+particle=3302 travel_time=9976.7 mesh_index=4
+particle=3303 travel_time=9966.7 mesh_index=4
+particle=3304 travel_time=9956.7 mesh_index=4
+Diagnostics sample travel time at t=44000:
+particle=3400 travel_time=9996.6 mesh_index=4
+particle=3401 travel_time=9986.6 mesh_index=4
+particle=3402 travel_time=9976.6 mesh_index=4
+particle=3403 travel_time=9966.6 mesh_index=4
+particle=3404 travel_time=9956.6 mesh_index=4
+Diagnostics sample travel time at t=45000:
+particle=3500 travel_time=9996.5 mesh_index=4
+particle=3501 travel_time=9986.5 mesh_index=4
+particle=3502 travel_time=9976.5 mesh_index=4
+particle=3503 travel_time=9966.5 mesh_index=4
+particle=3504 travel_time=9956.5 mesh_index=4
+Diagnostics sample travel time at t=46000:
+particle=3600 travel_time=9996.4 mesh_index=4
+particle=3601 travel_time=9986.4 mesh_index=4
+particle=3602 travel_time=9976.4 mesh_index=4
+particle=3603 travel_time=9966.4 mesh_index=4
+particle=3604 travel_time=9956.4 mesh_index=4
+Diagnostics sample travel time at t=47000:
+particle=3710 travel_time=9896.29 mesh_index=4
+particle=3711 travel_time=9886.29 mesh_index=4
+particle=3712 travel_time=9876.29 mesh_index=4
+particle=3713 travel_time=9866.29 mesh_index=4
+particle=3714 travel_time=9856.29 mesh_index=4
+Diagnostics sample travel time at t=48000:
+particle=3810 travel_time=9896.19 mesh_index=4
+particle=3811 travel_time=9886.19 mesh_index=4
+particle=3812 travel_time=9876.19 mesh_index=4
+particle=3813 travel_time=9866.19 mesh_index=4
+particle=3814 travel_time=9856.19 mesh_index=4
+Diagnostics sample travel time at t=49000:
+particle=3910 travel_time=9896.09 mesh_index=4
+particle=3911 travel_time=9886.09 mesh_index=4
+particle=3912 travel_time=9876.09 mesh_index=4
+particle=3913 travel_time=9866.09 mesh_index=4
+particle=3914 travel_time=9856.09 mesh_index=4
+Diagnostics sample travel time at t=50000:
+particle=4010 travel_time=9895.99 mesh_index=4
+particle=4011 travel_time=9885.99 mesh_index=4
+particle=4012 travel_time=9875.99 mesh_index=4
+particle=4013 travel_time=9865.99 mesh_index=4
+particle=4014 travel_time=9855.99 mesh_index=4
+Diagnostics sample travel time at t=51000:
+particle=4110 travel_time=9895.89 mesh_index=4
+particle=4111 travel_time=9885.89 mesh_index=4
+particle=4112 travel_time=9875.89 mesh_index=4
+particle=4113 travel_time=9865.89 mesh_index=4
+particle=4114 travel_time=9855.89 mesh_index=4
+Diagnostics sample travel time at t=52000:
+particle=4210 travel_time=9895.79 mesh_index=4
+particle=4211 travel_time=9885.79 mesh_index=4
+particle=4212 travel_time=9875.79 mesh_index=4
+particle=4213 travel_time=9865.79 mesh_index=4
+particle=4214 travel_time=9855.79 mesh_index=4
+Diagnostics sample travel time at t=53000:
+particle=4310 travel_time=9895.69 mesh_index=4
+particle=4311 travel_time=9885.69 mesh_index=4
+particle=4312 travel_time=9875.69 mesh_index=4
+particle=4313 travel_time=9865.69 mesh_index=4
+particle=4314 travel_time=9855.69 mesh_index=4
+Diagnostics sample travel time at t=54000:
+particle=4410 travel_time=9895.59 mesh_index=4
+particle=4411 travel_time=9885.59 mesh_index=4
+particle=4412 travel_time=9875.59 mesh_index=4
+particle=4413 travel_time=9865.59 mesh_index=4
+particle=4414 travel_time=9855.59 mesh_index=4
+Diagnostics sample travel time at t=55000:
+particle=4510 travel_time=9895.49 mesh_index=4
+particle=4511 travel_time=9885.49 mesh_index=4
+particle=4512 travel_time=9875.49 mesh_index=4
+particle=4513 travel_time=9865.49 mesh_index=4
+particle=4514 travel_time=9855.49 mesh_index=4
+Diagnostics sample travel time at t=56000:
+particle=4610 travel_time=9895.39 mesh_index=4
+particle=4611 travel_time=9885.39 mesh_index=4
+particle=4612 travel_time=9875.39 mesh_index=4
+particle=4613 travel_time=9865.39 mesh_index=4
+particle=4614 travel_time=9855.39 mesh_index=4
+Diagnostics sample travel time at t=57000:
+particle=4710 travel_time=9895.29 mesh_index=4
+particle=4711 travel_time=9885.29 mesh_index=4
+particle=4712 travel_time=9875.29 mesh_index=4
+particle=4713 travel_time=9865.29 mesh_index=4
+particle=4714 travel_time=9855.29 mesh_index=4
+Diagnostics sample travel time at t=58000:
+particle=4810 travel_time=9895.19 mesh_index=4
+particle=4811 travel_time=9885.19 mesh_index=4
+particle=4812 travel_time=9875.19 mesh_index=4
+particle=4813 travel_time=9865.19 mesh_index=4
+particle=4814 travel_time=9855.19 mesh_index=4
+Diagnostics sample travel time at t=59000:
+particle=4910 travel_time=9895.09 mesh_index=4
+particle=4911 travel_time=9885.09 mesh_index=4
+particle=4912 travel_time=9875.09 mesh_index=4
+particle=4913 travel_time=9865.09 mesh_index=4
+particle=4914 travel_time=9855.09 mesh_index=4
+Diagnostics sample travel time at t=60000:
+particle=5010 travel_time=9894.99 mesh_index=4
+particle=5011 travel_time=9884.99 mesh_index=4
+particle=5012 travel_time=9874.99 mesh_index=4
+particle=5013 travel_time=9864.99 mesh_index=4
+particle=5014 travel_time=9854.99 mesh_index=4
+Diagnostics sample travel time at t=61000:
+particle=5110 travel_time=9894.89 mesh_index=4
+particle=5111 travel_time=9884.89 mesh_index=4
+particle=5112 travel_time=9874.89 mesh_index=4
+particle=5113 travel_time=9864.89 mesh_index=4
+particle=5114 travel_time=9854.89 mesh_index=4
+Diagnostics sample travel time at t=62000:
+particle=5210 travel_time=9894.79 mesh_index=4
+particle=5211 travel_time=9884.79 mesh_index=4
+particle=5212 travel_time=9874.79 mesh_index=4
+particle=5213 travel_time=9864.79 mesh_index=4
+particle=5214 travel_time=9854.79 mesh_index=4
+Diagnostics sample travel time at t=63000:
+particle=5310 travel_time=9894.69 mesh_index=4
+particle=5311 travel_time=9884.69 mesh_index=4
+particle=5312 travel_time=9874.69 mesh_index=4
+particle=5313 travel_time=9864.69 mesh_index=4
+particle=5314 travel_time=9854.69 mesh_index=4
+Diagnostics sample travel time at t=64000:
+particle=5410 travel_time=9894.59 mesh_index=4
+particle=5411 travel_time=9884.59 mesh_index=4
+particle=5412 travel_time=9874.59 mesh_index=4
+particle=5413 travel_time=9864.59 mesh_index=4
+particle=5414 travel_time=9854.59 mesh_index=4
+Diagnostics sample travel time at t=65000:
+particle=5510 travel_time=9894.49 mesh_index=4
+particle=5511 travel_time=9884.49 mesh_index=4
+particle=5512 travel_time=9874.49 mesh_index=4
+particle=5513 travel_time=9864.49 mesh_index=4
+particle=5514 travel_time=9854.49 mesh_index=4
+Diagnostics sample travel time at t=66000:
+particle=5610 travel_time=9894.39 mesh_index=4
+particle=5611 travel_time=9884.39 mesh_index=4
+particle=5612 travel_time=9874.39 mesh_index=4
+particle=5613 travel_time=9864.39 mesh_index=4
+particle=5614 travel_time=9854.39 mesh_index=4
+Diagnostics sample travel time at t=67000:
+particle=5710 travel_time=9894.29 mesh_index=4
+particle=5711 travel_time=9884.29 mesh_index=4
+particle=5712 travel_time=9874.29 mesh_index=4
+particle=5713 travel_time=9864.29 mesh_index=4
+particle=5714 travel_time=9854.29 mesh_index=4
+Diagnostics sample travel time at t=68000:
+particle=5810 travel_time=9894.19 mesh_index=4
+particle=5811 travel_time=9884.19 mesh_index=4
+particle=5812 travel_time=9874.19 mesh_index=4
+particle=5813 travel_time=9864.19 mesh_index=4
+particle=5814 travel_time=9854.19 mesh_index=4
+Diagnostics sample travel time at t=69000:
+particle=5910 travel_time=9894.09 mesh_index=4
+particle=5911 travel_time=9884.09 mesh_index=4
+particle=5912 travel_time=9874.09 mesh_index=4
+particle=5913 travel_time=9864.09 mesh_index=4
+particle=5914 travel_time=9854.09 mesh_index=4
+Diagnostics sample travel time at t=70000:
+particle=6010 travel_time=9893.99 mesh_index=4
+particle=6011 travel_time=9883.99 mesh_index=4
+particle=6012 travel_time=9873.99 mesh_index=4
+particle=6013 travel_time=9863.99 mesh_index=4
+particle=6014 travel_time=9853.99 mesh_index=4
+Diagnostics sample travel time at t=71000:
+particle=6110 travel_time=9893.89 mesh_index=4
+particle=6111 travel_time=9883.89 mesh_index=4
+particle=6112 travel_time=9873.89 mesh_index=4
+particle=6113 travel_time=9863.89 mesh_index=4
+particle=6114 travel_time=9853.89 mesh_index=4
+Diagnostics sample travel time at t=72000:
+particle=6210 travel_time=9893.79 mesh_index=4
+particle=6211 travel_time=9883.79 mesh_index=4
+particle=6212 travel_time=9873.79 mesh_index=4
+particle=6213 travel_time=9863.79 mesh_index=4
+particle=6214 travel_time=9853.79 mesh_index=4
+Diagnostics sample travel time at t=73000:
+particle=6310 travel_time=9893.69 mesh_index=4
+particle=6311 travel_time=9883.69 mesh_index=4
+particle=6312 travel_time=9873.69 mesh_index=4
+particle=6313 travel_time=9863.69 mesh_index=4
+particle=6314 travel_time=9853.69 mesh_index=4
+Diagnostics sample travel time at t=74000:
+particle=6410 travel_time=9893.59 mesh_index=4
+particle=6411 travel_time=9883.59 mesh_index=4
+particle=6412 travel_time=9873.59 mesh_index=4
+particle=6413 travel_time=9863.59 mesh_index=4
+particle=6414 travel_time=9853.59 mesh_index=4
+Diagnostics sample travel time at t=75000:
+particle=6510 travel_time=9893.49 mesh_index=4
+particle=6511 travel_time=9883.49 mesh_index=4
+particle=6512 travel_time=9873.49 mesh_index=4
+particle=6513 travel_time=9863.49 mesh_index=4
+particle=6514 travel_time=9853.49 mesh_index=4
+Diagnostics sample travel time at t=76000:
+particle=6610 travel_time=9893.39 mesh_index=4
+particle=6611 travel_time=9883.39 mesh_index=4
+particle=6612 travel_time=9873.39 mesh_index=4
+particle=6613 travel_time=9863.39 mesh_index=4
+particle=6614 travel_time=9853.39 mesh_index=4
+Diagnostics sample travel time at t=77000:
+particle=6710 travel_time=9893.29 mesh_index=4
+particle=6711 travel_time=9883.29 mesh_index=4
+particle=6712 travel_time=9873.29 mesh_index=4
+particle=6713 travel_time=9863.29 mesh_index=4
+particle=6714 travel_time=9853.29 mesh_index=4
+Diagnostics sample travel time at t=78000:
+particle=6810 travel_time=9893.19 mesh_index=4
+particle=6811 travel_time=9883.19 mesh_index=4
+particle=6812 travel_time=9873.19 mesh_index=4
+particle=6813 travel_time=9863.19 mesh_index=4
+particle=6814 travel_time=9853.19 mesh_index=4
+Diagnostics sample travel time at t=79000:
+particle=6910 travel_time=9893.09 mesh_index=4
+particle=6911 travel_time=9883.09 mesh_index=4
+particle=6912 travel_time=9873.09 mesh_index=4
+particle=6913 travel_time=9863.09 mesh_index=4
+particle=6914 travel_time=9853.09 mesh_index=4
+Diagnostics sample travel time at t=80000:
+particle=7010 travel_time=9892.99 mesh_index=4
+particle=7011 travel_time=9882.99 mesh_index=4
+particle=7012 travel_time=9872.99 mesh_index=4
+particle=7013 travel_time=9862.99 mesh_index=4
+particle=7014 travel_time=9852.99 mesh_index=4
+Diagnostics sample travel time at t=81000:
+particle=7110 travel_time=9892.89 mesh_index=4
+particle=7111 travel_time=9882.89 mesh_index=4
+particle=7112 travel_time=9872.89 mesh_index=4
+particle=7113 travel_time=9862.89 mesh_index=4
+particle=7114 travel_time=9852.89 mesh_index=4
+Diagnostics sample travel time at t=82000:
+particle=7210 travel_time=9892.79 mesh_index=4
+particle=7211 travel_time=9882.79 mesh_index=4
+particle=7212 travel_time=9872.79 mesh_index=4
+particle=7213 travel_time=9862.79 mesh_index=4
+particle=7214 travel_time=9852.79 mesh_index=4
+Diagnostics sample travel time at t=83000:
+particle=7310 travel_time=9892.69 mesh_index=4
+particle=7311 travel_time=9882.69 mesh_index=4
+particle=7312 travel_time=9872.69 mesh_index=4
+particle=7313 travel_time=9862.69 mesh_index=4
+particle=7314 travel_time=9852.69 mesh_index=4
+Diagnostics sample travel time at t=84000:
+particle=7410 travel_time=9892.59 mesh_index=4
+particle=7411 travel_time=9882.59 mesh_index=4
+particle=7412 travel_time=9872.59 mesh_index=4
+particle=7413 travel_time=9862.59 mesh_index=4
+particle=7414 travel_time=9852.59 mesh_index=4
+Diagnostics sample travel time at t=85000:
+particle=7520 travel_time=9792.48 mesh_index=4
+particle=7521 travel_time=9782.48 mesh_index=4
+particle=7522 travel_time=9772.48 mesh_index=4
+particle=7523 travel_time=9762.48 mesh_index=4
+particle=7524 travel_time=9752.48 mesh_index=4
+Diagnostics sample travel time at t=86000:
+particle=7620 travel_time=9792.38 mesh_index=4
+particle=7621 travel_time=9782.38 mesh_index=4
+particle=7622 travel_time=9772.38 mesh_index=4
+particle=7623 travel_time=9762.38 mesh_index=4
+particle=7624 travel_time=9752.38 mesh_index=4
+Diagnostics sample travel time at t=87000:
+particle=7720 travel_time=9792.28 mesh_index=4
+particle=7721 travel_time=9782.28 mesh_index=4
+particle=7722 travel_time=9772.28 mesh_index=4
+particle=7723 travel_time=9762.28 mesh_index=4
+particle=7724 travel_time=9752.28 mesh_index=4
+Diagnostics sample travel time at t=88000:
+particle=7820 travel_time=9792.18 mesh_index=4
+particle=7821 travel_time=9782.18 mesh_index=4
+particle=7822 travel_time=9772.18 mesh_index=4
+particle=7823 travel_time=9762.18 mesh_index=4
+particle=7824 travel_time=9752.18 mesh_index=4
+Diagnostics sample travel time at t=89000:
+particle=7920 travel_time=9792.08 mesh_index=4
+particle=7921 travel_time=9782.08 mesh_index=4
+particle=7922 travel_time=9772.08 mesh_index=4
+particle=7923 travel_time=9762.08 mesh_index=4
+particle=7924 travel_time=9752.08 mesh_index=4
+Diagnostics sample travel time at t=90000:
+particle=8020 travel_time=9791.98 mesh_index=4
+particle=8021 travel_time=9781.98 mesh_index=4
+particle=8022 travel_time=9771.98 mesh_index=4
+particle=8023 travel_time=9761.98 mesh_index=4
+particle=8024 travel_time=9751.98 mesh_index=4
+Diagnostics sample travel time at t=91000:
+particle=8120 travel_time=9791.88 mesh_index=4
+particle=8121 travel_time=9781.88 mesh_index=4
+particle=8122 travel_time=9771.88 mesh_index=4
+particle=8123 travel_time=9761.88 mesh_index=4
+particle=8124 travel_time=9751.88 mesh_index=4
+Diagnostics sample travel time at t=92000:
+particle=8220 travel_time=9791.78 mesh_index=4
+particle=8221 travel_time=9781.78 mesh_index=4
+particle=8222 travel_time=9771.78 mesh_index=4
+particle=8223 travel_time=9761.78 mesh_index=4
+particle=8224 travel_time=9751.78 mesh_index=4
+Diagnostics sample travel time at t=93000:
+particle=8320 travel_time=9791.68 mesh_index=4
+particle=8321 travel_time=9781.68 mesh_index=4
+particle=8322 travel_time=9771.68 mesh_index=4
+particle=8323 travel_time=9761.68 mesh_index=4
+particle=8324 travel_time=9751.68 mesh_index=4
+Diagnostics sample travel time at t=94000:
+particle=8420 travel_time=9791.58 mesh_index=4
+particle=8421 travel_time=9781.58 mesh_index=4
+particle=8422 travel_time=9771.58 mesh_index=4
+particle=8423 travel_time=9761.58 mesh_index=4
+particle=8424 travel_time=9751.58 mesh_index=4
+Diagnostics sample travel time at t=95000:
+particle=8520 travel_time=9791.48 mesh_index=4
+particle=8521 travel_time=9781.48 mesh_index=4
+particle=8522 travel_time=9771.48 mesh_index=4
+particle=8523 travel_time=9761.48 mesh_index=4
+particle=8524 travel_time=9751.48 mesh_index=4
+Diagnostics sample travel time at t=96000:
+particle=8620 travel_time=9791.38 mesh_index=4
+particle=8621 travel_time=9781.38 mesh_index=4
+particle=8622 travel_time=9771.38 mesh_index=4
+particle=8623 travel_time=9761.38 mesh_index=4
+particle=8624 travel_time=9751.38 mesh_index=4
+Diagnostics sample travel time at t=97000:
+particle=8720 travel_time=9791.28 mesh_index=4
+particle=8721 travel_time=9781.28 mesh_index=4
+particle=8722 travel_time=9771.28 mesh_index=4
+particle=8723 travel_time=9761.28 mesh_index=4
+particle=8724 travel_time=9751.28 mesh_index=4
+Diagnostics sample travel time at t=98000:
+particle=8820 travel_time=9791.18 mesh_index=4
+particle=8821 travel_time=9781.18 mesh_index=4
+particle=8822 travel_time=9771.18 mesh_index=4
+particle=8823 travel_time=9761.18 mesh_index=4
+particle=8824 travel_time=9751.18 mesh_index=4
+Diagnostics sample travel time at t=99000:
+particle=8920 travel_time=9791.08 mesh_index=4
+particle=8921 travel_time=9781.08 mesh_index=4
+particle=8922 travel_time=9771.08 mesh_index=4
+particle=8923 travel_time=9761.08 mesh_index=4
+particle=8924 travel_time=9751.08 mesh_index=4
+Diagnostics sample travel time at t=100000:
+particle=9020 travel_time=9790.98 mesh_index=4
+particle=9021 travel_time=9780.98 mesh_index=4
+particle=9022 travel_time=9770.98 mesh_index=4
+particle=9023 travel_time=9760.98 mesh_index=4
+particle=9024 travel_time=9750.98 mesh_index=4
+Timing: results output = 0.103219 s
+CPU Time = 0
+
+
+[stderr]

@@ -1,0 +1,156 @@
+   Input file: /home/zhouw/Documents/Codes/ReactiveSoluteTransport/Benchmark/gypsum_single_fracture_10cm_ap5mm/results_total_injection_reference_volume_precipitation_20260426_173943/phreeqc/tt_1e02/tt_1e02.pqi
+  Output file: /home/zhouw/Documents/Codes/ReactiveSoluteTransport/Benchmark/gypsum_single_fracture_10cm_ap5mm/results_total_injection_reference_volume_precipitation_20260426_173943/phreeqc/tt_1e02/tt_1e02.pqo
+Database file: /home/zhouw/Documents/Codes/phreeqc-3.8.6-17100/database/phreeqc.dat
+
+------------------
+Reading data base.
+------------------
+
+	SOLUTION_MASTER_SPECIES
+	SOLUTION_SPECIES
+	PHASES
+	GAS_BINARY_PARAMETERS
+	EXCHANGE_MASTER_SPECIES
+	EXCHANGE_SPECIES
+	SURFACE_MASTER_SPECIES
+	SURFACE_SPECIES
+	MEAN_GAMMAS
+	RATES
+	END
+------------------------------------
+Reading input data for simulation 1.
+------------------------------------
+
+	TITLE Kinetic gypsum precipitation from supersaturated water for t_cross=1.000000e+02 s
+	SOLUTION 1 Supersaturated Ca-SO4 water
+	    temp    25.0
+	    units   mmol/kgw
+	    pH      7.0 charge
+	    Ca      3.000000000000e+01
+	    S(6)    3.000000000000e+01
+	    water  5.000000000000e+01
+	RATES
+	Gypsum
+	start
+	  10 si = SI("Gypsum")
+	  20 IF si <= 0 THEN SAVE 0 : END
+	  30 area = PARM(1)
+	  40 k = PARM(2)
+	  50 n = PARM(3)
+	  60 omega = SR("Gypsum")
+	  70 rate = -k * area * (omega - 1)^n
+	  80 moles = rate * TIME
+	  90 SAVE moles
+	end
+	KINETICS 1
+	Gypsum
+	    m      0.0
+	    m0     0.0
+	    parms  2.000000000000e-02  1.000000000000e-07  1.000000000000e+00
+	    tol    1e-8
+	    steps  1 1 1 2 3 2 10 10 20 30 20 100 100 200 300 200 1000 1000 2000 3000 2000 10000 10000 20000 30000 20000
+	    cvode  true
+	INCREMENTAL_REACTIONS true
+	SELECTED_OUTPUT
+	    file                tt_1e02.sel
+	    reset               false
+	    totals              Ca S(6)
+	    kinetics            Gypsum
+	    saturation_indices  Gypsum
+	USER_PUNCH
+	    headings Time_s pH SI_Gypsum SR_Gypsum V_Precip_cm3 DV_ref_m3
+	start
+	  10 PUNCH TOTAL_TIME
+	  20 PUNCH -LA("H+")
+	  30 PUNCH SI("Gypsum")
+	  40 PUNCH SR("Gypsum")
+	  50 v_precip = KIN("Gypsum") * 73.9
+	  60 PUNCH v_precip
+	  70 PUNCH -v_precip * 1e-6
+	end
+	END
+-----
+TITLE
+-----
+
+ Kinetic gypsum precipitation from supersaturated water for t_cross=1.000000e+02 s
+
+-------------------------------------------
+Beginning of initial solution calculations.
+-------------------------------------------
+
+Initial solution 1.	Supersaturated Ca-SO4 water
+
+-----------------------------Solution composition------------------------------
+
+	Elements           Molality       Moles
+
+	Ca                3.000e-02   1.500e+00
+	S(6)              3.000e-02   1.500e+00
+
+----------------------------Description of solution----------------------------
+
+                                       pH  =   7.092      Charge balance
+                                       pe  =   4.000    
+      Specific Conductance (µS/cm,  25°C)  = 4446
+                          Density (g/cm³)  =   1.00092
+                               Volume (L)  =  50.15789
+                        Viscosity (mPa s)  =   0.90373
+                        Activity of water  =   0.999
+                 Ionic strength (mol/kgw)  =   7.635e-02
+                       Mass of water (kg)  =   5.000e+01
+                 Total alkalinity (eq/kg)  =   2.081e-16
+                         Temperature (°C)  =  25.00
+                  Electrical balance (eq)  =   1.223e-09
+ Percent error, 100*(Cat-|An|)/(Cat+|An|)  =   0.00
+                               Iterations  =   5
+                                  Total H  = 5.550622e+03
+                                  Total O  = 2.781311e+03
+
+----------------------------Distribution of species----------------------------
+
+                                               Log       Log       Log    mole V
+   Species          Molality    Activity  Molality  Activity     Gamma   cm³/mol
+
+   OH-             1.600e-07   1.251e-07    -6.796    -6.903    -0.107     -3.79
+   H+              9.668e-08   8.087e-08    -7.015    -7.092    -0.078      0.00
+   H2O             5.551e+01   9.992e-01     1.744    -0.000     0.000     18.07
+Ca            3.000e-02
+   Ca+2            1.909e-02   8.046e-03    -1.719    -2.094    -0.375    -17.51
+   CaSO4           1.091e-02   1.111e-02    -1.962    -1.954     0.008      7.50
+   CaOH+           2.071e-08   1.650e-08    -7.684    -7.783    -0.099     (0)  
+   CaHSO4+         7.410e-09   5.903e-09    -8.130    -8.229    -0.099     (0)  
+H(0)          9.098e-26
+   H2              4.549e-26   4.630e-26   -25.342   -25.334     0.008     28.61
+O(0)          0.000e+00
+   O2              0.000e+00   0.000e+00   -41.719   -41.712     0.008     30.40
+S(6)          3.000e-02
+   SO4-2           1.909e-02   7.762e-03    -1.719    -2.110    -0.391     23.29
+   CaSO4           1.091e-02   1.111e-02    -1.962    -1.954     0.008      7.50
+   HSO4-           7.660e-08   6.102e-08    -7.116    -7.215    -0.099     40.50
+   CaHSO4+         7.410e-09   5.903e-09    -8.130    -8.229    -0.099     (0)  
+
+------------------------------Saturation indices-------------------------------
+
+  Phase               SI** log IAP   log K(298 K,   1 atm)
+
+  Anhydrite         0.07     -4.20   -4.28  CaSO4
+  Gypsum            0.38     -4.21   -4.58  CaSO4:2H2O
+  H2(g)           -22.23    -25.33   -3.10  H2
+  H2O(g)           -1.50     -0.00    1.50  H2O
+  O2(g)           -38.82    -41.71   -2.89  O2
+
+**For a gas, SI = log10(fugacity). Fugacity = pressure * phi / 1 atm.
+  For ideal gases, phi = 1.
+
+-----------------------------------------
+Beginning of batch-reaction calculations.
+-----------------------------------------
+
+Reaction step 1.
+
+ERROR: Illegal command in line: 
+ERROR:  in BASIC line
+ 10  si = SI("Gypsum")
+ERROR: Fatal Basic error in rate Gypsum.
+Stopping.

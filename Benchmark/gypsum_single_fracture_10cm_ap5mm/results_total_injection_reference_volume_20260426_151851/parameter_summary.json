@@ -1,0 +1,81 @@
+{
+  "run_tag": "benchmark_gypsum_single_fracture_10cm_ap5mm_total_injection_reference_volume_20260426_151851",
+  "nb_part": 10000,
+  "segment_counts": [
+    1,
+    5,
+    10,
+    50,
+    100
+  ],
+  "travel_time_cases": [
+    {
+      "travel_time_s": 100.0,
+      "velocity_m_per_s": 0.001,
+      "q_in_m3_per_s": 5.000000000000001e-07,
+      "injection_duration_s": 100000.0,
+      "vref_m3": 0.05000000000000001,
+      "water_kg": 50.00000000000001,
+      "reactive_area_m2": 0.020000000000000004,
+      "reactive_area_cm2": 200.00000000000003,
+      "gypsum_volume_m3": 0.05000000000000001,
+      "gypsum_moles": 676.5899864682004,
+      "particle_time_share_s": 10.001000100010002,
+      "nominal_particle_volume_m3": 5.0005000500050015e-06,
+      "nominal_sum_particle_volume_m3": 0.050005000500050016,
+      "nominal_sum_particle_ratio": 1.000100010001,
+      "nominal_sum_particle_relative_error": 0.00010001000100012812
+    },
+    {
+      "travel_time_s": 1000.0,
+      "velocity_m_per_s": 0.0001,
+      "q_in_m3_per_s": 5.000000000000001e-08,
+      "injection_duration_s": 100000.0,
+      "vref_m3": 0.005000000000000001,
+      "water_kg": 5.000000000000001,
+      "reactive_area_m2": 0.020000000000000004,
+      "reactive_area_cm2": 200.00000000000003,
+      "gypsum_volume_m3": 0.005000000000000001,
+      "gypsum_moles": 67.65899864682005,
+      "particle_time_share_s": 10.001000100010002,
+      "nominal_particle_volume_m3": 5.000500050005002e-07,
+      "nominal_sum_particle_volume_m3": 0.005000500050005002,
+      "nominal_sum_particle_ratio": 1.000100010001,
+      "nominal_sum_particle_relative_error": 0.00010001000100012812
+    },
+    {
+      "travel_time_s": 10000.0,
+      "velocity_m_per_s": 1e-05,
+      "q_in_m3_per_s": 5.000000000000001e-09,
+      "injection_duration_s": 100000.0,
+      "vref_m3": 0.0005000000000000001,
+      "water_kg": 0.5000000000000001,
+      "reactive_area_m2": 0.020000000000000004,
+      "reactive_area_cm2": 200.00000000000003,
+      "gypsum_volume_m3": 0.0005000000000000001,
+      "gypsum_moles": 6.765899864682005,
+      "particle_time_share_s": 10.001000100010002,
+      "nominal_particle_volume_m3": 5.000500050005002e-08,
+      "nominal_sum_particle_volume_m3": 0.0005000500050005002,
+      "nominal_sum_particle_ratio": 1.000100010001,
+      "nominal_sum_particle_relative_error": 0.00010001000100008474
+    },
+    {
+      "travel_time_s": 100000.0,
+      "velocity_m_per_s": 1e-06,
+      "q_in_m3_per_s": 5e-10,
+      "injection_duration_s": 100000.0,
+      "vref_m3": 5e-05,
+      "water_kg": 0.05,
+      "reactive_area_m2": 0.020000000000000004,
+      "reactive_area_cm2": 200.00000000000003,
+      "gypsum_volume_m3": 5e-05,
+      "gypsum_moles": 0.6765899864682003,
+      "particle_time_share_s": 10.001000100010002,
+      "nominal_particle_volume_m3": 5.000500050005001e-09,
+      "nominal_sum_particle_volume_m3": 5.000500050005001e-05,
+      "nominal_sum_particle_ratio": 1.000100010001,
+      "nominal_sum_particle_relative_error": 0.00010001000100008477
+    }
+  ]
+}

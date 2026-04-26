@@ -21,11 +21,17 @@ RUN_TAG = os.environ.get(
 RUN_ROOT = REPO_ROOT / "Output" / RUN_TAG / "rtm_runs"
 OUTPUT_ROOT = REPO_ROOT / "Output" / RUN_TAG / "figures"
 
-CASES = [
+ALL_CASES = [
     ("p9_a1p5", 9, 1.5),
     ("p12_a2p0", 12, 2.0),
     ("p16_a2p5", 16, 2.5),
 ]
+case_filter = [name.strip() for name in os.environ.get("RST_CASES", "").split(",") if name.strip()]
+if case_filter:
+    case_lookup = {name: (name, p, a) for name, p, a in ALL_CASES}
+    CASES = [case_lookup[name] for name in case_filter]
+else:
+    CASES = ALL_CASES
 
 COORD_DECIMALS = 8
 

@@ -1,0 +1,2279 @@
+   Input file: /home/zhouw/Documents/Codes/ReactiveSoluteTransport/Benchmark/gypsum_single_fracture_10cm_ap5mm/results_total_injection_reference_volume_20260426_151851/phreeqc/tt_1e03/tt_1e03.pqi
+  Output file: /home/zhouw/Documents/Codes/ReactiveSoluteTransport/Benchmark/gypsum_single_fracture_10cm_ap5mm/results_total_injection_reference_volume_20260426_151851/phreeqc/tt_1e03/tt_1e03.pqo
+Database file: /home/zhouw/Documents/Codes/phreeqc-3.8.6-17100/database/phreeqc.dat
+
+------------------
+Reading data base.
+------------------
+
+	SOLUTION_MASTER_SPECIES
+	SOLUTION_SPECIES
+	PHASES
+	GAS_BINARY_PARAMETERS
+	EXCHANGE_MASTER_SPECIES
+	EXCHANGE_SPECIES
+	SURFACE_MASTER_SPECIES
+	SURFACE_SPECIES
+	MEAN_GAMMAS
+	RATES
+	END
+------------------------------------
+Reading input data for simulation 1.
+------------------------------------
+
+	TITLE Total-injection reference gypsum kinetics for t_cross=1.000000e+03 s
+	SOLUTION 1 Pure water
+	    temp    25.0
+	    pH      7.0
+	    pe      4.0
+	    water  5.000000000000e+00
+	RATES
+	Gypsum
+	start
+	  10 omega = SR("Gypsum")
+	  20 IF (M <= 0 AND omega <= 1) THEN GOTO 100
+	  30 area = PARM(2)
+	  40 rate = PARM(1) * area * (1 - omega)
+	  50 moles = rate * TIME
+	  60 IF (moles > 0 AND moles > M) THEN moles = M
+	  70 GOTO 200
+	  100 moles = 0
+	  200 SAVE moles
+	end
+	KINETICS 1
+	Gypsum
+	    parms  4.000000000000e-05  2.000000000000e-02
+	    m0     6.765899864682e+01
+	    m      6.765899864682e+01
+	    tol    1e-8
+	    steps  1 1 1 2 3 2 10 10 20 30 20 100 100 200 300 200 1000 1000 2000 3000 2000 10000 10000 20000 30000 20000
+	    step_divide 1e-6
+	    bad_step_max 50000
+	    runge_kutta 6
+	INCREMENTAL_REACTIONS true
+	SELECTED_OUTPUT
+	    file                tt_1e03.sel
+	    reset               false
+	    totals              Ca S(6)
+	    kinetics            Gypsum
+	    saturation_indices  Gypsum
+	USER_PUNCH
+	    headings Time_s pH SI_Gypsum V_Gyp_cm3 DV_Gyp_cm3
+	start
+	  10 PUNCH TOTAL_TIME
+	  20 PUNCH -LA("H+")
+	  30 PUNCH SI("Gypsum")
+	  40 v_gyp = KIN("Gypsum") * 73.9
+	  50 PUNCH v_gyp
+	  60 PUNCH 5.000000000000e+03 - v_gyp
+	end
+	END
+-----
+TITLE
+-----
+
+ Total-injection reference gypsum kinetics for t_cross=1.000000e+03 s
+
+-------------------------------------------
+Beginning of initial solution calculations.
+-------------------------------------------
+
+Initial solution 1.	Pure water
+
+-----------------------------Solution composition------------------------------
+
+	Elements           Molality       Moles
+
+	Pure water     
+
+----------------------------Description of solution----------------------------
+
+                                       pH  =   7.000    
+                                       pe  =   4.000    
+      Specific Conductance (µS/cm,  25°C)  = 0
+                          Density (g/cm³)  =   0.99704
+                               Volume (L)  =   5.01483
+                        Viscosity (mPa s)  =   0.89002
+                        Activity of water  =   1.000
+                 Ionic strength (mol/kgw)  =   1.006e-07
+                       Mass of water (kg)  =   5.000e+00
+                 Total alkalinity (eq/kg)  =   1.216e-09
+                         Temperature (°C)  =  25.00
+                  Electrical balance (eq)  =  -6.082e-09
+ Percent error, 100*(Cat-|An|)/(Cat+|An|)  =  -0.60
+                               Iterations  =   2
+                                  Total H  = 5.550622e+02
+                                  Total O  = 2.775311e+02
+
+----------------------------Distribution of species----------------------------
+
+                                               Log       Log       Log    mole V
+   Species          Molality    Activity  Molality  Activity     Gamma   cm³/mol
+
+   OH-             1.013e-07   1.012e-07    -6.995    -6.995    -0.000     -4.14
+   H+              1.000e-07   1.000e-07    -7.000    -7.000    -0.000      0.00
+   H2O             5.551e+01   1.000e+00     1.744    -0.000     0.000     18.07
+H(0)          1.416e-25
+   H2              7.079e-26   7.079e-26   -25.150   -25.150     0.000     28.61
+O(0)          0.000e+00
+   O2              0.000e+00   0.000e+00   -42.080   -42.080     0.000     30.40
+
+------------------------------Saturation indices-------------------------------
+
+  Phase               SI** log IAP   log K(298 K,   1 atm)
+
+  H2(g)           -22.05    -25.15   -3.10  H2
+  H2O(g)           -1.50     -0.00    1.50  H2O
+  O2(g)           -39.19    -42.08   -2.89  O2
+
+**For a gas, SI = log10(fugacity). Fugacity = pressure * phi / 1 atm.
+  For ideal gases, phi = 1.
+
+-----------------------------------------
+Beginning of batch-reaction calculations.
+-----------------------------------------
+
+Reaction step 1.
+
+Using solution 1.	Pure water
+Using kinetics 1.	
+
+Kinetics 1.	
+
+	Time step: 1 seconds  (Incremented time: 1 seconds)
+
+	Rate name       Delta Moles Total Moles   Reactant        Coefficient
+
+	Gypsum           -8.000e-07   6.766e+01   Gypsum                    1
+
+-----------------------------Solution composition------------------------------
+
+	Elements           Molality       Moles
+
+	Ca                1.600e-07   8.000e-07
+	S                 1.600e-07   8.000e-07
+
+----------------------------Description of solution----------------------------
+
+                                       pH  =   7.000      Charge balance
+                                       pe  =  -1.671      Adjusted to redox equilibrium
+      Specific Conductance (µS/cm,  25°C)  = 0
+                          Density (g/cm³)  =   0.99704
+                               Volume (L)  =   5.01483
+                        Viscosity (mPa s)  =   0.89003
+                        Activity of water  =   1.000
+                 Ionic strength (mol/kgw)  =   7.407e-07
+                       Mass of water (kg)  =   5.000e+00
+                 Total alkalinity (eq/kg)  =   1.216e-09
+                         Temperature (°C)  =  25.00
+                  Electrical balance (eq)  =  -6.082e-09
+ Percent error, 100*(Cat-|An|)/(Cat+|An|)  =  -0.14
+                               Iterations  =  60
+                                  Total H  = 5.550622e+02
+                                  Total O  = 2.775311e+02
+
+----------------------------Distribution of species----------------------------
+
+                                               Log       Log       Log    mole V
+   Species          Molality    Activity  Molality  Activity     Gamma   cm³/mol
+
+   OH-             1.013e-07   1.012e-07    -6.994    -6.995    -0.000     -4.14
+   H+              1.001e-07   1.000e-07    -7.000    -7.000    -0.000      0.00
+   H2O             5.551e+01   1.000e+00     1.744    -0.000     0.000     18.07
+Ca            1.600e-07
+   Ca+2            1.600e-07   1.594e-07    -6.796    -6.798    -0.002    -18.25
+   CaSO4           4.515e-12   4.515e-12   -11.345   -11.345     0.000      7.50
+   CaOH+           2.647e-13   2.645e-13   -12.577   -12.578    -0.000     (0)  
+   CaHSO4+         2.971e-18   2.968e-18   -17.527   -17.528    -0.000     (0)  
+H(0)          3.116e-14
+   H2              1.558e-14   1.558e-14   -13.807   -13.807     0.000     28.61
+O(0)          0.000e+00
+   O2              0.000e+00   0.000e+00   -64.765   -64.765     0.000     30.40
+S(-2)         3.130e-23
+   HS-             1.671e-23   1.669e-23   -22.777   -22.778    -0.000     20.57
+   H2S             1.459e-23   1.459e-23   -22.836   -22.836     0.000     36.27
+   S-2             2.024e-29   2.016e-29   -28.694   -28.696    -0.002     (0)  
+   (H2S)2          0.000e+00   0.000e+00   -46.950   -46.950     0.000     30.09
+S(6)          1.600e-07
+   SO4-2           1.600e-07   1.593e-07    -6.796    -6.798    -0.002     14.40
+   CaSO4           4.515e-12   4.515e-12   -11.345   -11.345     0.000      7.50
+   HSO4-           1.551e-12   1.549e-12   -11.809   -11.810    -0.000     40.25
+   CaHSO4+         2.971e-18   2.968e-18   -17.527   -17.528    -0.000     (0)  
+
+------------------------------Saturation indices-------------------------------
+
+  Phase               SI** log IAP   log K(298 K,   1 atm)
+
+  Anhydrite        -9.32    -13.60   -4.28  CaSO4
+  Gypsum           -9.01    -13.60   -4.58  CaSO4:2H2O
+  H2(g)           -10.71    -13.81   -3.10  H2
+  H2O(g)           -1.50     -0.00    1.50  H2O
+  H2S(g)          -21.84    -29.78   -7.94  H2S
+  O2(g)           -61.87    -64.77   -2.89  O2
+  Sulfur          -17.06    -12.18    4.88  S
+
+**For a gas, SI = log10(fugacity). Fugacity = pressure * phi / 1 atm.
+  For ideal gases, phi = 1.
+
+Reaction step 2.
+
+Using solution 1.	Pure water
+Using kinetics 1.	
+
+Kinetics 1.	
+
+	Time step: 1 seconds  (Incremented time: 2 seconds)
+
+	Rate name       Delta Moles Total Moles   Reactant        Coefficient
+
+	Gypsum           -8.000e-07   6.766e+01   Gypsum                    1
+
+-----------------------------Solution composition------------------------------
+
+	Elements           Molality       Moles
+
+	Ca                3.200e-07   1.600e-06
+	S                 3.200e-07   1.600e-06
+
+----------------------------Description of solution----------------------------
+
+                                       pH  =   7.000      Charge balance
+                                       pe  =  -1.358      Adjusted to redox equilibrium
+      Specific Conductance (µS/cm,  25°C)  = 0
+                          Density (g/cm³)  =   0.99704
+                               Volume (L)  =   5.01483
+                        Viscosity (mPa s)  =   0.89004
+                        Activity of water  =   1.000
+                 Ionic strength (mol/kgw)  =   1.381e-06
+                       Mass of water (kg)  =   5.000e+00
+                 Total alkalinity (eq/kg)  =   1.216e-09
+                         Temperature (°C)  =  25.00
+                  Electrical balance (eq)  =  -6.082e-09
+ Percent error, 100*(Cat-|An|)/(Cat+|An|)  =  -0.08
+                               Iterations  =  44
+                                  Total H  = 5.550622e+02
+                                  Total O  = 2.775311e+02
+
+----------------------------Distribution of species----------------------------
+
+                                               Log       Log       Log    mole V
+   Species          Molality    Activity  Molality  Activity     Gamma   cm³/mol
+
+   OH-             1.014e-07   1.012e-07    -6.994    -6.995    -0.001     -4.14
+   H+              1.001e-07   1.000e-07    -6.999    -7.000    -0.001      0.00
+   H2O             5.551e+01   1.000e+00     1.744    -0.000     0.000     18.07
+Ca            3.200e-07
+   Ca+2            3.200e-07   3.182e-07    -6.495    -6.497    -0.002    -18.25
+   CaSO4           1.801e-11   1.801e-11   -10.745   -10.745     0.000      7.50
+   CaOH+           5.289e-13   5.281e-13   -12.277   -12.277    -0.001     (0)  
+   CaHSO4+         1.185e-17   1.184e-17   -16.926   -16.927    -0.001     (0)  
+H(0)          7.356e-15
+   H2              3.678e-15   3.678e-15   -14.434   -14.434     0.000     28.61
+O(0)          0.000e+00
+   O2              0.000e+00   0.000e+00   -63.511   -63.511     0.000     30.40
+S(-2)         1.943e-25
+   HS-             1.037e-25   1.036e-25   -24.984   -24.985    -0.001     20.57
+   H2S             9.055e-26   9.055e-26   -25.043   -25.043     0.000     36.27
+   S-2             1.258e-31   1.251e-31   -30.900   -30.903    -0.002     (0)  
+   (H2S)2          0.000e+00   0.000e+00   -51.364   -51.364     0.000     30.09
+S(6)          3.200e-07
+   SO4-2           3.200e-07   3.182e-07    -6.495    -6.497    -0.002     14.42
+   CaSO4           1.801e-11   1.801e-11   -10.745   -10.745     0.000      7.50
+   HSO4-           3.098e-12   3.094e-12   -11.509   -11.509    -0.001     40.25
+   CaHSO4+         1.185e-17   1.184e-17   -16.926   -16.927    -0.001     (0)  
+
+------------------------------Saturation indices-------------------------------
+
+  Phase               SI** log IAP   log K(298 K,   1 atm)
+
+  Anhydrite        -8.72    -12.99   -4.28  CaSO4
+  Gypsum           -8.41    -12.99   -4.58  CaSO4:2H2O
+  H2(g)           -11.33    -14.43   -3.10  H2
+  H2O(g)           -1.50     -0.00    1.50  H2O
+  H2S(g)          -24.05    -31.98   -7.94  H2S
+  O2(g)           -60.62    -63.51   -2.89  O2
+  Sulfur          -18.64    -13.76    4.88  S
+
+**For a gas, SI = log10(fugacity). Fugacity = pressure * phi / 1 atm.
+  For ideal gases, phi = 1.
+
+Reaction step 3.
+
+Using solution 1.	Pure water
+Using kinetics 1.	
+
+Kinetics 1.	
+
+	Time step: 1 seconds  (Incremented time: 3 seconds)
+
+	Rate name       Delta Moles Total Moles   Reactant        Coefficient
+
+	Gypsum           -8.000e-07   6.766e+01   Gypsum                    1
+
+-----------------------------Solution composition------------------------------
+
+	Elements           Molality       Moles
+
+	Ca                4.800e-07   2.400e-06
+	S                 4.800e-07   2.400e-06
+
+----------------------------Description of solution----------------------------
+
+                                       pH  =   7.000      Charge balance
+                                       pe  =  -1.356      Adjusted to redox equilibrium
+      Specific Conductance (µS/cm,  25°C)  = 0
+                          Density (g/cm³)  =   0.99704
+                               Volume (L)  =   5.01483
+                        Viscosity (mPa s)  =   0.89004
+                        Activity of water  =   1.000
+                 Ionic strength (mol/kgw)  =   2.021e-06
+                       Mass of water (kg)  =   5.000e+00
+                 Total alkalinity (eq/kg)  =   1.216e-09
+                         Temperature (°C)  =  25.00
+                  Electrical balance (eq)  =  -6.082e-09
+ Percent error, 100*(Cat-|An|)/(Cat+|An|)  =  -0.06
+                               Iterations  =  40
+                                  Total H  = 5.550622e+02
+                                  Total O  = 2.775311e+02
+
+----------------------------Distribution of species----------------------------
+
+                                               Log       Log       Log    mole V
+   Species          Molality    Activity  Molality  Activity     Gamma   cm³/mol
+
+   OH-             1.014e-07   1.012e-07    -6.994    -6.995    -0.001     -4.14
+   H+              1.002e-07   1.000e-07    -6.999    -7.000    -0.001      0.00
+   H2O             5.551e+01   1.000e+00     1.744    -0.000     0.000     18.07
+Ca            4.800e-07
+   Ca+2            4.800e-07   4.768e-07    -6.319    -6.322    -0.003    -18.25
+   CaSO4           4.042e-11   4.042e-11   -10.393   -10.393     0.000      7.50
+   CaOH+           7.926e-13   7.913e-13   -12.101   -12.102    -0.001     (0)  
+   CaHSO4+         2.661e-17   2.657e-17   -16.575   -16.576    -0.001     (0)  
+H(0)          7.301e-15
+   H2              3.650e-15   3.650e-15   -14.438   -14.438     0.000     28.61
+O(0)          0.000e+00
+   O2              0.000e+00   0.000e+00   -63.505   -63.505     0.000     30.40
+S(-2)         2.824e-25
+   HS-             1.508e-25   1.505e-25   -24.822   -24.822    -0.001     20.57
+   H2S             1.316e-25   1.316e-25   -24.881   -24.881     0.000     36.27
+   S-2             1.830e-31   1.818e-31   -30.737   -30.740    -0.003     (0)  
+   (H2S)2          0.000e+00   0.000e+00   -51.040   -51.040     0.000     30.09
+S(6)          4.800e-07
+   SO4-2           4.800e-07   4.768e-07    -6.319    -6.322    -0.003     14.43
+   CaSO4           4.042e-11   4.042e-11   -10.393   -10.393     0.000      7.50
+   HSO4-           4.643e-12   4.635e-12   -11.333   -11.334    -0.001     40.25
+   CaHSO4+         2.661e-17   2.657e-17   -16.575   -16.576    -0.001     (0)  
+
+------------------------------Saturation indices-------------------------------
+
+  Phase               SI** log IAP   log K(298 K,   1 atm)
+
+  Anhydrite        -8.37    -12.64   -4.28  CaSO4
+  Gypsum           -8.06    -12.64   -4.58  CaSO4:2H2O
+  H2(g)           -11.34    -14.44   -3.10  H2
+  H2O(g)           -1.50     -0.00    1.50  H2O
+  H2S(g)          -23.89    -31.82   -7.94  H2S
+  O2(g)           -60.61    -63.50   -2.89  O2
+  Sulfur          -18.48    -13.59    4.88  S
+
+**For a gas, SI = log10(fugacity). Fugacity = pressure * phi / 1 atm.
+  For ideal gases, phi = 1.
+
+Reaction step 4.
+
+Using solution 1.	Pure water
+Using kinetics 1.	
+
+Kinetics 1.	
+
+	Time step: 2 seconds  (Incremented time: 5 seconds)
+
+	Rate name       Delta Moles Total Moles   Reactant        Coefficient
+
+	Gypsum           -1.600e-06   6.766e+01   Gypsum                    1
+
+-----------------------------Solution composition------------------------------
+
+	Elements           Molality       Moles
+
+	Ca                8.000e-07   4.000e-06
+	S                 8.000e-07   4.000e-06
+
+----------------------------Description of solution----------------------------
+
+                                       pH  =   7.000      Charge balance
+                                       pe  =  10.911      Adjusted to redox equilibrium
+      Specific Conductance (µS/cm,  25°C)  = 0
+                          Density (g/cm³)  =   0.99704
+                               Volume (L)  =   5.01483
+                        Viscosity (mPa s)  =   0.89005
+                        Activity of water  =   1.000
+                 Ionic strength (mol/kgw)  =   3.300e-06
+                       Mass of water (kg)  =   5.000e+00
+                 Total alkalinity (eq/kg)  =   1.216e-09
+                         Temperature (°C)  =  25.00
+                  Electrical balance (eq)  =  -6.082e-09
+ Percent error, 100*(Cat-|An|)/(Cat+|An|)  =  -0.04
+                               Iterations  = 176
+                                  Total H  = 5.550622e+02
+                                  Total O  = 2.775311e+02
+
+----------------------------Distribution of species----------------------------
+
+                                               Log       Log       Log    mole V
+   Species          Molality    Activity  Molality  Activity     Gamma   cm³/mol
+
+   OH-             1.014e-07   1.012e-07    -6.994    -6.995    -0.001     -4.14
+   H+              1.002e-07   1.000e-07    -6.999    -7.000    -0.001      0.00
+   H2O             5.551e+01   1.000e+00     1.744    -0.000     0.000     18.07
+Ca            8.000e-07
+   Ca+2            7.999e-07   7.931e-07    -6.097    -6.101    -0.004    -18.25
+   CaSO4           1.119e-10   1.119e-10    -9.951    -9.951     0.000      7.50
+   CaOH+           1.319e-12   1.316e-12   -11.880   -11.881    -0.001     (0)  
+   CaHSO4+         7.368e-17   7.352e-17   -16.133   -16.134    -0.001     (0)  
+H(0)          2.137e-39
+   H2              1.069e-39   1.069e-39   -38.971   -38.971     0.000     28.61
+O(0)          7.301e-15
+   O2              3.651e-15   3.651e-15   -14.438   -14.438     0.000     30.40
+S(-2)         0.000e+00
+   HS-             0.000e+00   0.000e+00  -122.734  -122.735    -0.001     20.57
+   H2S             0.000e+00   0.000e+00  -122.794  -122.794     0.000     36.27
+   S-2             0.000e+00   0.000e+00  -128.650  -128.653    -0.004     (0)  
+   (H2S)2          0.000e+00   0.000e+00  -246.866  -246.866     0.000     30.09
+S(6)          8.000e-07
+   SO4-2           7.999e-07   7.931e-07    -6.097    -6.101    -0.004     14.45
+   CaSO4           1.119e-10   1.119e-10    -9.951    -9.951     0.000      7.50
+   HSO4-           7.727e-12   7.711e-12   -11.112   -11.113    -0.001     40.25
+   CaHSO4+         7.368e-17   7.352e-17   -16.133   -16.134    -0.001     (0)  
+
+------------------------------Saturation indices-------------------------------
+
+  Phase               SI** log IAP   log K(298 K,   1 atm)
+
+  Anhydrite        -7.92    -12.20   -4.28  CaSO4
+  Gypsum           -7.62    -12.20   -4.58  CaSO4:2H2O
+  H2(g)           -35.87    -38.97   -3.10  H2
+  H2O(g)           -1.50     -0.00    1.50  H2O
+  H2S(g)         -121.80   -129.74   -7.94  H2S
+  O2(g)           -11.55    -14.44   -2.89  O2
+  Sulfur          -91.85    -86.97    4.88  S
+
+**For a gas, SI = log10(fugacity). Fugacity = pressure * phi / 1 atm.
+  For ideal gases, phi = 1.
+
+Reaction step 5.
+
+Using solution 1.	Pure water
+Using kinetics 1.	
+
+Kinetics 1.	
+
+	Time step: 3 seconds  (Incremented time: 8 seconds)
+
+	Rate name       Delta Moles Total Moles   Reactant        Coefficient
+
+	Gypsum           -2.400e-06   6.766e+01   Gypsum                    1
+
+-----------------------------Solution composition------------------------------
+
+	Elements           Molality       Moles
+
+	Ca                1.280e-06   6.400e-06
+	S                 1.280e-06   6.400e-06
+
+----------------------------Description of solution----------------------------
+
+                                       pH  =   7.000      Charge balance
+                                       pe  =  -1.806      Adjusted to redox equilibrium
+      Specific Conductance (µS/cm,  25°C)  = 0
+                          Density (g/cm³)  =   0.99704
+                               Volume (L)  =   5.01483
+                        Viscosity (mPa s)  =   0.89005
+                        Activity of water  =   1.000
+                 Ionic strength (mol/kgw)  =   5.220e-06
+                       Mass of water (kg)  =   5.000e+00
+                 Total alkalinity (eq/kg)  =   1.216e-09
+                         Temperature (°C)  =  25.00
+                  Electrical balance (eq)  =  -6.082e-09
+ Percent error, 100*(Cat-|An|)/(Cat+|An|)  =  -0.02
+                               Iterations  = 136
+                                  Total H  = 5.550622e+02
+                                  Total O  = 2.775311e+02
+
+----------------------------Distribution of species----------------------------
+
+                                               Log       Log       Log    mole V
+   Species          Molality    Activity  Molality  Activity     Gamma   cm³/mol
+
+   OH-             1.015e-07   1.012e-07    -6.994    -6.995    -0.001     -4.14
+   H+              1.003e-07   1.000e-07    -6.999    -7.000    -0.001      0.00
+   H2O             5.551e+01   1.000e+00     1.744    -0.000     0.000     18.07
+Ca            1.280e-06
+   Ca+2            1.280e-06   1.266e-06    -5.893    -5.898    -0.005    -18.25
+   CaSO4           2.851e-10   2.851e-10    -9.545    -9.545     0.000      7.50
+   CaOH+           2.107e-12   2.101e-12   -11.676   -11.678    -0.001     (0)  
+   CaHSO4+         1.879e-16   1.874e-16   -15.726   -15.727    -0.001     (0)  
+H(0)          5.788e-14
+   H2              2.894e-14   2.894e-14   -13.539   -13.539     0.000     28.61
+O(0)          0.000e+00
+   O2              0.000e+00   0.000e+00   -65.303   -65.303     0.000     30.40
+S(-2)         2.964e-21
+   HS-             1.583e-21   1.579e-21   -20.800   -20.802    -0.001     20.58
+   H2S             1.381e-21   1.381e-21   -20.860   -20.860     0.000     36.27
+   S-2             1.928e-27   1.907e-27   -26.715   -26.720    -0.005     (0)  
+   (H2S)2          0.000e+00   0.000e+00   -42.998   -42.998     0.000     30.09
+S(6)          1.280e-06
+   SO4-2           1.280e-06   1.266e-06    -5.893    -5.898    -0.005     14.47
+   CaSO4           2.851e-10   2.851e-10    -9.545    -9.545     0.000      7.50
+   HSO4-           1.234e-11   1.231e-11   -10.909   -10.910    -0.001     40.25
+   CaHSO4+         1.879e-16   1.874e-16   -15.726   -15.727    -0.001     (0)  
+
+------------------------------Saturation indices-------------------------------
+
+  Phase               SI** log IAP   log K(298 K,   1 atm)
+
+  Anhydrite        -7.52    -11.80   -4.28  CaSO4
+  Gypsum           -7.21    -11.80   -4.58  CaSO4:2H2O
+  H2(g)           -10.44    -13.54   -3.10  H2
+  H2O(g)           -1.50     -0.00    1.50  H2O
+  H2S(g)          -19.87    -27.80   -7.94  H2S
+  O2(g)           -62.41    -65.30   -2.89  O2
+  Sulfur          -15.35    -10.47    4.88  S
+
+**For a gas, SI = log10(fugacity). Fugacity = pressure * phi / 1 atm.
+  For ideal gases, phi = 1.
+
+Reaction step 6.
+
+Using solution 1.	Pure water
+Using kinetics 1.	
+
+Kinetics 1.	
+
+	Time step: 2 seconds  (Incremented time: 10 seconds)
+
+	Rate name       Delta Moles Total Moles   Reactant        Coefficient
+
+	Gypsum           -1.600e-06   6.766e+01   Gypsum                    1
+
+-----------------------------Solution composition------------------------------
+
+	Elements           Molality       Moles
+
+	Ca                1.600e-06   8.000e-06
+	S                 1.600e-06   8.000e-06
+
+----------------------------Description of solution----------------------------
+
+                                       pH  =   7.000      Charge balance
+                                       pe  =  -1.880      Adjusted to redox equilibrium
+      Specific Conductance (µS/cm,  25°C)  = 0
+                          Density (g/cm³)  =   0.99704
+                               Volume (L)  =   5.01483
+                        Viscosity (mPa s)  =   0.89006
+                        Activity of water  =   1.000
+                 Ionic strength (mol/kgw)  =   6.499e-06
+                       Mass of water (kg)  =   5.000e+00
+                 Total alkalinity (eq/kg)  =   1.216e-09
+                         Temperature (°C)  =  25.00
+                  Electrical balance (eq)  =  -6.082e-09
+ Percent error, 100*(Cat-|An|)/(Cat+|An|)  =  -0.02
+                               Iterations  =  51
+                                  Total H  = 5.550622e+02
+                                  Total O  = 2.775311e+02
+
+----------------------------Distribution of species----------------------------
+
+                                               Log       Log       Log    mole V
+   Species          Molality    Activity  Molality  Activity     Gamma   cm³/mol
+
+   OH-             1.015e-07   1.012e-07    -6.993    -6.995    -0.001     -4.14
+   H+              1.003e-07   1.000e-07    -6.999    -7.000    -0.001      0.00
+   H2O             5.551e+01   1.000e+00     1.744    -0.000     0.000     18.07
+Ca            1.600e-06
+   Ca+2            1.600e-06   1.581e-06    -5.796    -5.801    -0.005    -18.25
+   CaSO4           4.443e-10   4.443e-10    -9.352    -9.352     0.000      7.50
+   CaOH+           2.631e-12   2.623e-12   -11.580   -11.581    -0.001     (0)  
+   CaHSO4+         2.929e-16   2.920e-16   -15.533   -15.535    -0.001     (0)  
+H(0)          8.129e-14
+   H2              4.064e-14   4.064e-14   -13.391   -13.391     0.000     28.61
+O(0)          0.000e+00
+   O2              0.000e+00   0.000e+00   -65.598   -65.598     0.000     30.40
+S(-2)         1.440e-20
+   HS-             7.693e-21   7.671e-21   -20.114   -20.115    -0.001     20.58
+   H2S             6.706e-21   6.706e-21   -20.174   -20.174     0.000     36.27
+   S-2             9.376e-27   9.265e-27   -26.028   -26.033    -0.005     (0)  
+   (H2S)2          0.000e+00   0.000e+00   -41.625   -41.625     0.000     30.09
+S(6)          1.600e-06
+   SO4-2           1.600e-06   1.581e-06    -5.796    -5.801    -0.005     14.48
+   CaSO4           4.443e-10   4.443e-10    -9.352    -9.352     0.000      7.50
+   HSO4-           1.541e-11   1.537e-11   -10.812   -10.813    -0.001     40.25
+   CaHSO4+         2.929e-16   2.920e-16   -15.533   -15.535    -0.001     (0)  
+
+------------------------------Saturation indices-------------------------------
+
+  Phase               SI** log IAP   log K(298 K,   1 atm)
+
+  Anhydrite        -7.32    -11.60   -4.28  CaSO4
+  Gypsum           -7.02    -11.60   -4.58  CaSO4:2H2O
+  H2(g)           -10.29    -13.39   -3.10  H2
+  H2O(g)           -1.50     -0.00    1.50  H2O
+  H2S(g)          -19.18    -27.12   -7.94  H2S
+  O2(g)           -62.71    -65.60   -2.89  O2
+  Sulfur          -14.81     -9.93    4.88  S
+
+**For a gas, SI = log10(fugacity). Fugacity = pressure * phi / 1 atm.
+  For ideal gases, phi = 1.
+
+Reaction step 7.
+
+Using solution 1.	Pure water
+Using kinetics 1.	
+
+Kinetics 1.	
+
+	Time step: 10 seconds  (Incremented time: 20 seconds)
+
+	Rate name       Delta Moles Total Moles   Reactant        Coefficient
+
+	Gypsum           -8.000e-06   6.766e+01   Gypsum                    1
+
+-----------------------------Solution composition------------------------------
+
+	Elements           Molality       Moles
+
+	Ca                3.200e-06   1.600e-05
+	S                 3.200e-06   1.600e-05
+
+----------------------------Description of solution----------------------------
+
+                                       pH  =   7.000      Charge balance
+                                       pe  =  -1.796      Adjusted to redox equilibrium
+      Specific Conductance (µS/cm,  25°C)  = 0
+                          Density (g/cm³)  =   0.99704
+                               Volume (L)  =   5.01483
+                        Viscosity (mPa s)  =   0.89007
+                        Activity of water  =   1.000
+                 Ionic strength (mol/kgw)  =   1.289e-05
+                       Mass of water (kg)  =   5.000e+00
+                 Total alkalinity (eq/kg)  =   1.216e-09
+                         Temperature (°C)  =  25.00
+                  Electrical balance (eq)  =  -6.082e-09
+ Percent error, 100*(Cat-|An|)/(Cat+|An|)  =  -0.01
+                               Iterations  = 273
+                                  Total H  = 5.550622e+02
+                                  Total O  = 2.775312e+02
+
+----------------------------Distribution of species----------------------------
+
+                                               Log       Log       Log    mole V
+   Species          Molality    Activity  Molality  Activity     Gamma   cm³/mol
+
+   OH-             1.017e-07   1.012e-07    -6.993    -6.995    -0.002     -4.13
+   H+              1.004e-07   9.999e-08    -6.998    -7.000    -0.002      0.00
+   H2O             5.551e+01   1.000e+00     1.744    -0.000     0.000     18.07
+Ca            3.200e-06
+   Ca+2            3.198e-06   3.145e-06    -5.495    -5.502    -0.007    -18.24
+   CaSO4           1.759e-09   1.759e-09    -8.755    -8.755     0.000      7.50
+   CaOH+           5.242e-12   5.220e-12   -11.281   -11.282    -0.002     (0)  
+   CaHSO4+         1.161e-15   1.156e-15   -14.935   -14.937    -0.002     (0)  
+H(0)          5.536e-14
+   H2              2.768e-14   2.768e-14   -13.558   -13.558     0.000     28.61
+O(0)          0.000e+00
+   O2              0.000e+00   0.000e+00   -65.264   -65.264     0.000     30.40
+S(-2)         6.169e-21
+   HS-             3.298e-21   3.284e-21   -20.482   -20.484    -0.002     20.58
+   H2S             2.871e-21   2.871e-21   -20.542   -20.542     0.000     36.27
+   S-2             4.034e-27   3.967e-27   -26.394   -26.402    -0.007     (0)  
+   (H2S)2          0.000e+00   0.000e+00   -42.362   -42.362     0.000     30.09
+S(6)          3.200e-06
+   SO4-2           3.198e-06   3.145e-06    -5.495    -5.502    -0.007     14.53
+   CaSO4           1.759e-09   1.759e-09    -8.755    -8.755     0.000      7.50
+   HSO4-           3.070e-11   3.057e-11   -10.513   -10.515    -0.002     40.25
+   CaHSO4+         1.161e-15   1.156e-15   -14.935   -14.937    -0.002     (0)  
+
+------------------------------Saturation indices-------------------------------
+
+  Phase               SI** log IAP   log K(298 K,   1 atm)
+
+  Anhydrite        -6.73    -11.00   -4.28  CaSO4
+  Gypsum           -6.42    -11.00   -4.58  CaSO4:2H2O
+  H2(g)           -10.46    -13.56   -3.10  H2
+  H2O(g)           -1.50     -0.00    1.50  H2O
+  H2S(g)          -19.55    -27.48   -7.94  H2S
+  O2(g)           -62.37    -65.26   -2.89  O2
+  Sulfur          -15.02    -10.13    4.88  S
+
+**For a gas, SI = log10(fugacity). Fugacity = pressure * phi / 1 atm.
+  For ideal gases, phi = 1.
+
+Reaction step 8.
+
+Using solution 1.	Pure water
+Using kinetics 1.	
+
+Kinetics 1.	
+
+	Time step: 10 seconds  (Incremented time: 30 seconds)
+
+	Rate name       Delta Moles Total Moles   Reactant        Coefficient
+
+	Gypsum           -8.000e-06   6.766e+01   Gypsum                    1
+
+-----------------------------Solution composition------------------------------
+
+	Elements           Molality       Moles
+
+	Ca                4.800e-06   2.400e-05
+	S                 4.800e-06   2.400e-05
+
+----------------------------Description of solution----------------------------
+
+                                       pH  =   7.000      Charge balance
+                                       pe  =  11.038      Adjusted to redox equilibrium
+      Specific Conductance (µS/cm,  25°C)  = 1
+                          Density (g/cm³)  =   0.99704
+                               Volume (L)  =   5.01483
+                        Viscosity (mPa s)  =   0.89009
+                        Activity of water  =   1.000
+                 Ionic strength (mol/kgw)  =   1.929e-05
+                       Mass of water (kg)  =   5.000e+00
+                 Total alkalinity (eq/kg)  =   1.216e-09
+                         Temperature (°C)  =  25.00
+                  Electrical balance (eq)  =  -6.082e-09
+ Percent error, 100*(Cat-|An|)/(Cat+|An|)  =  -0.01
+                               Iterations  = 272
+                                  Total H  = 5.550623e+02
+                                  Total O  = 2.775312e+02
+
+----------------------------Distribution of species----------------------------
+
+                                               Log       Log       Log    mole V
+   Species          Molality    Activity  Molality  Activity     Gamma   cm³/mol
+
+   OH-             1.018e-07   1.012e-07    -6.992    -6.995    -0.002     -4.13
+   H+              1.005e-07   9.999e-08    -6.998    -7.000    -0.002      0.00
+   H2O             5.551e+01   1.000e+00     1.744    -0.000     0.000     18.07
+Ca            4.800e-06
+   Ca+2            4.796e-06   4.699e-06    -5.319    -5.328    -0.009    -18.24
+   CaSO4           3.926e-09   3.926e-09    -8.406    -8.406     0.000      7.50
+   CaOH+           7.839e-12   7.799e-12   -11.106   -11.108    -0.002     (0)  
+   CaHSO4+         2.594e-15   2.580e-15   -14.586   -14.588    -0.002     (0)  
+H(0)          1.190e-39
+   H2              5.951e-40   5.951e-40   -39.225   -39.225     0.000     28.61
+O(0)          2.354e-14
+   O2              1.177e-14   1.177e-14   -13.929   -13.929     0.000     30.40
+S(-2)         0.000e+00
+   HS-             0.000e+00   0.000e+00  -122.978  -122.980    -0.002     20.58
+   H2S             0.000e+00   0.000e+00  -123.038  -123.038     0.000     36.27
+   S-2             0.000e+00   0.000e+00  -128.889  -128.898    -0.009     (0)  
+   (H2S)2          0.000e+00   0.000e+00  -247.354  -247.354     0.000     30.09
+S(6)          4.800e-06
+   SO4-2           4.796e-06   4.699e-06    -5.319    -5.328    -0.009     14.56
+   CaSO4           3.926e-09   3.926e-09    -8.406    -8.406     0.000      7.50
+   HSO4-           4.591e-11   4.568e-11   -10.338   -10.340    -0.002     40.25
+   CaHSO4+         2.594e-15   2.580e-15   -14.586   -14.588    -0.002     (0)  
+
+------------------------------Saturation indices-------------------------------
+
+  Phase               SI** log IAP   log K(298 K,   1 atm)
+
+  Anhydrite        -6.38    -10.66   -4.28  CaSO4
+  Gypsum           -6.07    -10.66   -4.58  CaSO4:2H2O
+  H2(g)           -36.12    -39.23   -3.10  H2
+  H2O(g)           -1.50     -0.00    1.50  H2O
+  H2S(g)         -122.04   -129.98   -7.94  H2S
+  O2(g)           -11.04    -13.93   -2.89  O2
+  Sulfur          -91.84    -86.96    4.88  S
+
+**For a gas, SI = log10(fugacity). Fugacity = pressure * phi / 1 atm.
+  For ideal gases, phi = 1.
+
+Reaction step 9.
+
+Using solution 1.	Pure water
+Using kinetics 1.	
+
+Kinetics 1.	
+
+	Time step: 20 seconds  (Incremented time: 50 seconds)
+
+	Rate name       Delta Moles Total Moles   Reactant        Coefficient
+
+	Gypsum           -1.600e-05   6.766e+01   Gypsum                    1
+
+-----------------------------Solution composition------------------------------
+
+	Elements           Molality       Moles
+
+	Ca                8.000e-06   4.000e-05
+	S                 8.000e-06   4.000e-05
+
+----------------------------Description of solution----------------------------
+
+                                       pH  =   7.000      Charge balance
+                                       pe  =  11.095      Adjusted to redox equilibrium
+      Specific Conductance (µS/cm,  25°C)  = 2
+                          Density (g/cm³)  =   0.99704
+                               Volume (L)  =   5.01483
+                        Viscosity (mPa s)  =   0.89011
+                        Activity of water  =   1.000
+                 Ionic strength (mol/kgw)  =   3.206e-05
+                       Mass of water (kg)  =   5.000e+00
+                 Total alkalinity (eq/kg)  =   1.216e-09
+                         Temperature (°C)  =  25.00
+                  Electrical balance (eq)  =  -6.082e-09
+ Percent error, 100*(Cat-|An|)/(Cat+|An|)  =  -0.00
+                               Iterations  = 425
+                                  Total H  = 5.550623e+02
+                                  Total O  = 2.775313e+02
+
+----------------------------Distribution of species----------------------------
+
+                                               Log       Log       Log    mole V
+   Species          Molality    Activity  Molality  Activity     Gamma   cm³/mol
+
+   OH-             1.019e-07   1.012e-07    -6.992    -6.995    -0.003     -4.13
+   H+              1.006e-07   9.998e-08    -6.997    -7.000    -0.003      0.00
+   H2O             5.551e+01   1.000e+00     1.744    -0.000     0.000     18.07
+Ca            8.000e-06
+   Ca+2            7.989e-06   7.782e-06    -5.097    -5.109    -0.011    -18.23
+   CaSO4           1.077e-08   1.077e-08    -7.968    -7.968     0.000      7.50
+   CaOH+           1.300e-11   1.292e-11   -10.886   -10.889    -0.003     (0)  
+   CaHSO4+         7.123e-15   7.076e-15   -14.147   -14.150    -0.003     (0)  
+H(0)          9.132e-40
+   H2              4.566e-40   4.566e-40   -39.340   -39.340     0.000     28.61
+O(0)          3.999e-14
+   O2              2.000e-14   2.000e-14   -13.699   -13.699     0.000     30.40
+S(-2)         0.000e+00
+   HS-             0.000e+00   0.000e+00  -123.218  -123.221    -0.003     20.58
+   H2S             0.000e+00   0.000e+00  -123.279  -123.279     0.000     36.27
+   S-2             0.000e+00   0.000e+00  -129.127  -129.139    -0.011     (0)  
+   (H2S)2          0.000e+00   0.000e+00  -247.837  -247.837     0.000     30.09
+S(6)          8.000e-06
+   SO4-2           7.989e-06   7.781e-06    -5.097    -5.109    -0.011     14.61
+   CaSO4           1.077e-08   1.077e-08    -7.968    -7.968     0.000      7.50
+   HSO4-           7.614e-11   7.564e-11   -10.118   -10.121    -0.003     40.25
+   CaHSO4+         7.123e-15   7.076e-15   -14.147   -14.150    -0.003     (0)  
+
+------------------------------Saturation indices-------------------------------
+
+  Phase               SI** log IAP   log K(298 K,   1 atm)
+
+  Anhydrite        -5.94    -10.22   -4.28  CaSO4
+  Gypsum           -5.64    -10.22   -4.58  CaSO4:2H2O
+  H2(g)           -36.24    -39.34   -3.10  H2
+  H2O(g)           -1.50     -0.00    1.50  H2O
+  H2S(g)         -122.28   -130.22   -7.94  H2S
+  O2(g)           -10.81    -13.70   -2.89  O2
+  Sulfur          -91.97    -87.09    4.88  S
+
+**For a gas, SI = log10(fugacity). Fugacity = pressure * phi / 1 atm.
+  For ideal gases, phi = 1.
+
+Reaction step 10.
+
+Using solution 1.	Pure water
+Using kinetics 1.	
+
+Kinetics 1.	
+
+	Time step: 30 seconds  (Incremented time: 80 seconds)
+
+	Rate name       Delta Moles Total Moles   Reactant        Coefficient
+
+	Gypsum           -2.400e-05   6.766e+01   Gypsum                    1
+
+-----------------------------Solution composition------------------------------
+
+	Elements           Molality       Moles
+
+	Ca                1.280e-05   6.400e-05
+	S                 1.280e-05   6.400e-05
+
+----------------------------Description of solution----------------------------
+
+                                       pH  =   7.000      Charge balance
+                                       pe  =  11.258      Adjusted to redox equilibrium
+      Specific Conductance (µS/cm,  25°C)  = 3
+                          Density (g/cm³)  =   0.99704
+                               Volume (L)  =   5.01483
+                        Viscosity (mPa s)  =   0.89013
+                        Activity of water  =   1.000
+                 Ionic strength (mol/kgw)  =   5.119e-05
+                       Mass of water (kg)  =   5.000e+00
+                 Total alkalinity (eq/kg)  =   1.216e-09
+                         Temperature (°C)  =  25.00
+                  Electrical balance (eq)  =  -6.082e-09
+ Percent error, 100*(Cat-|An|)/(Cat+|An|)  =  -0.00
+                               Iterations  = 624
+                                  Total H  = 5.550624e+02
+                                  Total O  = 2.775315e+02
+
+----------------------------Distribution of species----------------------------
+
+                                               Log       Log       Log    mole V
+   Species          Molality    Activity  Molality  Activity     Gamma   cm³/mol
+
+   OH-             1.021e-07   1.013e-07    -6.991    -6.995    -0.004     -4.13
+   H+              1.008e-07   9.996e-08    -6.997    -7.000    -0.004      0.00
+   H2O             5.551e+01   1.000e+00     1.744    -0.000     0.000     18.07
+Ca            1.280e-05
+   Ca+2            1.277e-05   1.236e-05    -4.894    -4.908    -0.014    -18.23
+   CaSO4           2.715e-08   2.715e-08    -7.566    -7.566     0.000      7.50
+   CaOH+           2.068e-11   2.051e-11   -10.684   -10.688    -0.004     (0)  
+   CaHSO4+         1.799e-14   1.784e-14   -13.745   -13.749    -0.004     (0)  
+H(0)          4.314e-40
+   H2              2.157e-40   2.157e-40   -39.666   -39.666     0.000     28.61
+O(0)          1.792e-13
+   O2              8.961e-14   8.962e-14   -13.048   -13.048     0.000     30.40
+S(-2)         0.000e+00
+   HS-             0.000e+00   0.000e+00  -124.319  -124.323    -0.004     20.58
+   H2S             0.000e+00   0.000e+00  -124.382  -124.382     0.000     36.27
+   S-2             0.000e+00   0.000e+00  -130.226  -130.241    -0.014     (0)  
+   (H2S)2          0.000e+00   0.000e+00  -250.041  -250.041     0.000     30.09
+S(6)          1.280e-05
+   SO4-2           1.277e-05   1.236e-05    -4.894    -4.908    -0.014     14.67
+   CaSO4           2.715e-08   2.715e-08    -7.566    -7.566     0.000      7.50
+   HSO4-           1.211e-10   1.201e-10    -9.917    -9.921    -0.004     40.25
+   CaHSO4+         1.799e-14   1.784e-14   -13.745   -13.749    -0.004     (0)  
+
+------------------------------Saturation indices-------------------------------
+
+  Phase               SI** log IAP   log K(298 K,   1 atm)
+
+  Anhydrite        -5.54     -9.82   -4.28  CaSO4
+  Gypsum           -5.23     -9.82   -4.58  CaSO4:2H2O
+  H2(g)           -36.57    -39.67   -3.10  H2
+  H2O(g)           -1.50     -0.00    1.50  H2O
+  H2S(g)         -123.39   -131.32   -7.94  H2S
+  O2(g)           -10.16    -13.05   -2.89  O2
+  Sulfur          -92.75    -87.87    4.88  S
+
+**For a gas, SI = log10(fugacity). Fugacity = pressure * phi / 1 atm.
+  For ideal gases, phi = 1.
+
+Reaction step 11.
+
+Using solution 1.	Pure water
+Using kinetics 1.	
+
+Kinetics 1.	
+
+	Time step: 20 seconds  (Incremented time: 100 seconds)
+
+	Rate name       Delta Moles Total Moles   Reactant        Coefficient
+
+	Gypsum           -1.600e-05   6.766e+01   Gypsum                    1
+
+-----------------------------Solution composition------------------------------
+
+	Elements           Molality       Moles
+
+	Ca                1.600e-05   8.000e-05
+	S                 1.600e-05   8.000e-05
+
+----------------------------Description of solution----------------------------
+
+                                       pH  =   7.000      Charge balance
+                                       pe  =  11.299      Adjusted to redox equilibrium
+      Specific Conductance (µS/cm,  25°C)  = 4
+                          Density (g/cm³)  =   0.99705
+                               Volume (L)  =   5.01483
+                        Viscosity (mPa s)  =   0.89014
+                        Activity of water  =   1.000
+                 Ionic strength (mol/kgw)  =   6.393e-05
+                       Mass of water (kg)  =   5.000e+00
+                 Total alkalinity (eq/kg)  =   1.216e-09
+                         Temperature (°C)  =  25.00
+                  Electrical balance (eq)  =  -6.082e-09
+ Percent error, 100*(Cat-|An|)/(Cat+|An|)  =  -0.00
+                               Iterations  = 408
+                                  Total H  = 5.550625e+02
+                                  Total O  = 2.775316e+02
+
+----------------------------Distribution of species----------------------------
+
+                                               Log       Log       Log    mole V
+   Species          Molality    Activity  Molality  Activity     Gamma   cm³/mol
+
+   OH-             1.022e-07   1.013e-07    -6.990    -6.995    -0.004     -4.13
+   H+              1.009e-07   9.995e-08    -6.996    -7.000    -0.004      0.00
+   H2O             5.551e+01   1.000e+00     1.744    -0.000     0.000     18.07
+Ca            1.600e-05
+   Ca+2            1.596e-05   1.538e-05    -4.797    -4.813    -0.016    -18.23
+   CaSO4           4.205e-08   4.205e-08    -7.376    -7.376     0.000      7.50
+   CaOH+           2.577e-11   2.553e-11   -10.589   -10.593    -0.004     (0)  
+   CaHSO4+         2.788e-14   2.763e-14   -13.555   -13.559    -0.004     (0)  
+H(0)          3.575e-40
+   H2              1.787e-40   1.787e-40   -39.748   -39.748     0.000     28.61
+O(0)          2.610e-13
+   O2              1.305e-13   1.305e-13   -12.884   -12.884     0.000     30.40
+S(-2)         0.000e+00
+   HS-             0.000e+00   0.000e+00  -124.551  -124.555    -0.004     20.58
+   H2S             0.000e+00   0.000e+00  -124.613  -124.613     0.000     36.27
+   S-2             0.000e+00   0.000e+00  -130.456  -130.472    -0.016     (0)  
+   (H2S)2          0.000e+00   0.000e+00  -250.504  -250.504     0.000     30.09
+S(6)          1.600e-05
+   SO4-2           1.596e-05   1.538e-05    -4.797    -4.813    -0.016     14.71
+   CaSO4           4.205e-08   4.205e-08    -7.376    -7.376     0.000      7.50
+   HSO4-           1.508e-10   1.494e-10    -9.822    -9.826    -0.004     40.25
+   CaHSO4+         2.788e-14   2.763e-14   -13.555   -13.559    -0.004     (0)  
+
+------------------------------Saturation indices-------------------------------
+
+  Phase               SI** log IAP   log K(298 K,   1 atm)
+
+  Anhydrite        -5.35     -9.63   -4.28  CaSO4
+  Gypsum           -5.04     -9.63   -4.58  CaSO4:2H2O
+  H2(g)           -36.65    -39.75   -3.10  H2
+  H2O(g)           -1.50     -0.00    1.50  H2O
+  H2S(g)         -123.62   -131.55   -7.94  H2S
+  O2(g)            -9.99    -12.88   -2.89  O2
+  Sulfur          -92.90    -88.02    4.88  S
+
+**For a gas, SI = log10(fugacity). Fugacity = pressure * phi / 1 atm.
+  For ideal gases, phi = 1.
+
+Reaction step 12.
+
+Using solution 1.	Pure water
+Using kinetics 1.	
+
+Kinetics 1.	
+
+	Time step: 100 seconds  (Incremented time: 200 seconds)
+
+	Rate name       Delta Moles Total Moles   Reactant        Coefficient
+
+	Gypsum           -8.000e-05   6.766e+01   Gypsum                    1
+
+-----------------------------Solution composition------------------------------
+
+	Elements           Molality       Moles
+
+	Ca                3.200e-05   1.600e-04
+	S                 3.200e-05   1.600e-04
+
+----------------------------Description of solution----------------------------
+
+                                       pH  =   7.000      Charge balance
+                                       pe  =  11.368      Adjusted to redox equilibrium
+      Specific Conductance (µS/cm,  25°C)  = 8
+                          Density (g/cm³)  =   0.99705
+                               Volume (L)  =   5.01483
+                        Viscosity (mPa s)  =   0.89020
+                        Activity of water  =   1.000
+                 Ionic strength (mol/kgw)  =   1.275e-04
+                       Mass of water (kg)  =   5.000e+00
+                 Total alkalinity (eq/kg)  =   1.216e-09
+                         Temperature (°C)  =  25.00
+                  Electrical balance (eq)  =  -6.082e-09
+ Percent error, 100*(Cat-|An|)/(Cat+|An|)  =  -0.00
+                               Iterations  = 2112
+                                  Total H  = 5.550628e+02
+                                  Total O  = 2.775320e+02
+
+----------------------------Distribution of species----------------------------
+
+                                               Log       Log       Log    mole V
+   Species          Molality    Activity  Molality  Activity     Gamma   cm³/mol
+
+   OH-             1.027e-07   1.013e-07    -6.989    -6.994    -0.006     -4.13
+   H+              1.012e-07   9.990e-08    -6.995    -7.000    -0.006      0.00
+   H2O             5.551e+01   1.000e+00     1.744    -0.000     0.000     18.07
+Ca            3.200e-05
+   Ca+2            3.184e-05   3.022e-05    -4.497    -4.520    -0.023    -18.21
+   CaSO4           1.624e-07   1.624e-07    -6.789    -6.789     0.000      7.50
+   CaOH+           5.087e-11   5.021e-11   -10.294   -10.299    -0.006     (0)  
+   CaHSO4+         1.081e-13   1.067e-13   -12.966   -12.972    -0.006     (0)  
+H(0)          2.592e-40
+   H2              1.296e-40   1.296e-40   -39.887   -39.887     0.000     28.61
+O(0)          4.965e-13
+   O2              2.482e-13   2.482e-13   -12.605   -12.605     0.000     30.40
+S(-2)         0.000e+00
+   HS-             0.000e+00   0.000e+00  -124.814  -124.820    -0.006     20.58
+   H2S             0.000e+00   0.000e+00  -124.879  -124.879     0.000     36.27
+   S-2             0.000e+00   0.000e+00  -130.715  -130.737    -0.023     (0)  
+   (H2S)2          0.000e+00   0.000e+00  -251.035  -251.035     0.000     30.09
+S(6)          3.200e-05
+   SO4-2           3.184e-05   3.022e-05    -4.497    -4.520    -0.023     14.84
+   CaSO4           1.624e-07   1.624e-07    -6.789    -6.789     0.000      7.50
+   HSO4-           2.974e-10   2.935e-10    -9.527    -9.532    -0.006     40.26
+   CaHSO4+         1.081e-13   1.067e-13   -12.966   -12.972    -0.006     (0)  
+
+------------------------------Saturation indices-------------------------------
+
+  Phase               SI** log IAP   log K(298 K,   1 atm)
+
+  Anhydrite        -4.76     -9.04   -4.28  CaSO4
+  Gypsum           -4.46     -9.04   -4.58  CaSO4:2H2O
+  H2(g)           -36.79    -39.89   -3.10  H2
+  H2O(g)           -1.50     -0.00    1.50  H2O
+  H2S(g)         -123.88   -131.82   -7.94  H2S
+  O2(g)            -9.71    -12.61   -2.89  O2
+  Sulfur          -93.02    -88.14    4.88  S
+
+**For a gas, SI = log10(fugacity). Fugacity = pressure * phi / 1 atm.
+  For ideal gases, phi = 1.
+
+Reaction step 13.
+
+Using solution 1.	Pure water
+Using kinetics 1.	
+
+Kinetics 1.	
+
+	Time step: 100 seconds  (Incremented time: 300 seconds)
+
+	Rate name       Delta Moles Total Moles   Reactant        Coefficient
+
+	Gypsum           -8.000e-05   6.766e+01   Gypsum                    1
+
+-----------------------------Solution composition------------------------------
+
+	Elements           Molality       Moles
+
+	Ca                4.800e-05   2.400e-04
+	S                 4.800e-05   2.400e-04
+
+----------------------------Description of solution----------------------------
+
+                                       pH  =   7.001      Charge balance
+                                       pe  =  11.390      Adjusted to redox equilibrium
+      Specific Conductance (µS/cm,  25°C)  = 12
+                          Density (g/cm³)  =   0.99705
+                               Volume (L)  =   5.01484
+                        Viscosity (mPa s)  =   0.89024
+                        Activity of water  =   1.000
+                 Ionic strength (mol/kgw)  =   1.907e-04
+                       Mass of water (kg)  =   5.000e+00
+                 Total alkalinity (eq/kg)  =   1.216e-09
+                         Temperature (°C)  =  25.00
+                  Electrical balance (eq)  =  -6.082e-09
+ Percent error, 100*(Cat-|An|)/(Cat+|An|)  =  -0.00
+                               Iterations  = 2112
+                                  Total H  = 5.550631e+02
+                                  Total O  = 2.775325e+02
+
+----------------------------Distribution of species----------------------------
+
+                                               Log       Log       Log    mole V
+   Species          Molality    Activity  Molality  Activity     Gamma   cm³/mol
+
+   OH-             1.030e-07   1.014e-07    -6.987    -6.994    -0.007     -4.13
+   H+              1.014e-07   9.985e-08    -6.994    -7.001    -0.007      0.00
+   H2O             5.551e+01   1.000e+00     1.744    -0.000     0.000     18.07
+Ca            4.800e-05
+   Ca+2            4.764e-05   4.472e-05    -4.322    -4.350    -0.028    -18.20
+   CaSO4           3.556e-07   3.556e-07    -6.449    -6.449     0.000      7.50
+   CaOH+           7.552e-11   7.433e-11   -10.122   -10.129    -0.007     (0)  
+   CaHSO4+         2.371e-13   2.334e-13   -12.625   -12.632    -0.007     (0)  
+H(0)          2.347e-40
+   H2              1.173e-40   1.174e-40   -39.931   -39.931     0.000     28.61
+O(0)          6.054e-13
+   O2              3.027e-13   3.027e-13   -12.519   -12.519     0.000     30.40
+S(-2)         0.000e+00
+   HS-             0.000e+00   0.000e+00  -124.815  -124.822    -0.007     20.59
+   H2S             0.000e+00   0.000e+00  -124.881  -124.881     0.000     36.27
+   S-2             0.000e+00   0.000e+00  -130.712  -130.740    -0.028     (0)  
+   (H2S)2          0.000e+00   0.000e+00  -251.041  -251.041     0.000     30.09
+S(6)          4.800e-05
+   SO4-2           4.764e-05   4.471e-05    -4.322    -4.350    -0.028     14.94
+   CaSO4           3.556e-07   3.556e-07    -6.449    -6.449     0.000      7.50
+   HSO4-           4.410e-10   4.341e-10    -9.356    -9.362    -0.007     40.26
+   CaHSO4+         2.371e-13   2.334e-13   -12.625   -12.632    -0.007     (0)  
+
+------------------------------Saturation indices-------------------------------
+
+  Phase               SI** log IAP   log K(298 K,   1 atm)
+
+  Anhydrite        -4.42     -8.70   -4.28  CaSO4
+  Gypsum           -4.12     -8.70   -4.58  CaSO4:2H2O
+  H2(g)           -36.83    -39.93   -3.10  H2
+  H2O(g)           -1.50     -0.00    1.50  H2O
+  H2S(g)         -123.89   -131.82   -7.94  H2S
+  O2(g)            -9.63    -12.52   -2.89  O2
+  Sulfur          -92.98    -88.10    4.88  S
+
+**For a gas, SI = log10(fugacity). Fugacity = pressure * phi / 1 atm.
+  For ideal gases, phi = 1.
+
+Reaction step 14.
+
+Using solution 1.	Pure water
+Using kinetics 1.	
+
+Kinetics 1.	
+
+	Time step: 200 seconds  (Incremented time: 500 seconds)
+
+	Rate name       Delta Moles Total Moles   Reactant        Coefficient
+
+	Gypsum           -1.600e-04   6.766e+01   Gypsum                    1
+
+-----------------------------Solution composition------------------------------
+
+	Elements           Molality       Moles
+
+	Ca                7.999e-05   4.000e-04
+	S                 7.999e-05   4.000e-04
+
+----------------------------Description of solution----------------------------
+
+                                       pH  =   7.001      Charge balance
+                                       pe  =  11.447      Adjusted to redox equilibrium
+      Specific Conductance (µS/cm,  25°C)  = 21
+                          Density (g/cm³)  =   0.99705
+                               Volume (L)  =   5.01484
+                        Viscosity (mPa s)  =   0.89032
+                        Activity of water  =   1.000
+                 Ionic strength (mol/kgw)  =   3.163e-04
+                       Mass of water (kg)  =   5.000e+00
+                 Total alkalinity (eq/kg)  =   1.216e-09
+                         Temperature (°C)  =  25.00
+                  Electrical balance (eq)  =  -6.082e-09
+ Percent error, 100*(Cat-|An|)/(Cat+|An|)  =  -0.00
+                               Iterations  = 4248
+                                  Total H  = 5.550638e+02
+                                  Total O  = 2.775335e+02
+
+----------------------------Distribution of species----------------------------
+
+                                               Log       Log       Log    mole V
+   Species          Molality    Activity  Molality  Activity     Gamma   cm³/mol
+
+   OH-             1.036e-07   1.015e-07    -6.985    -6.994    -0.009     -4.12
+   H+              1.018e-07   9.975e-08    -6.992    -7.001    -0.009      0.00
+   H2O             5.551e+01   1.000e+00     1.744    -0.000     0.000     18.07
+Ca            7.999e-05
+   Ca+2            7.905e-05   7.289e-05    -4.102    -4.137    -0.035    -18.19
+   CaSO4           9.447e-07   9.448e-07    -6.025    -6.025     0.000      7.50
+   CaOH+           1.238e-10   1.213e-10    -9.907    -9.916    -0.009     (0)  
+   CaHSO4+         6.322e-13   6.195e-13   -12.199   -12.208    -0.009     (0)  
+H(0)          0.000e+00
+   H2              0.000e+00   0.000e+00   -40.045   -40.045     0.000     28.61
+O(0)          1.027e-12
+   O2              5.134e-13   5.134e-13   -12.290   -12.290     0.000     30.40
+S(-2)         0.000e+00
+   HS-             0.000e+00   0.000e+00  -125.060  -125.069    -0.009     20.59
+   H2S             0.000e+00   0.000e+00  -125.129  -125.129     0.000     36.27
+   S-2             0.000e+00   0.000e+00  -130.951  -130.986    -0.035     (0)  
+   (H2S)2          0.000e+00   0.000e+00  -251.536  -251.536     0.000     30.09
+S(6)          7.999e-05
+   SO4-2           7.905e-05   7.288e-05    -4.102    -4.137    -0.035     15.09
+   CaSO4           9.447e-07   9.448e-07    -6.025    -6.025     0.000      7.50
+   HSO4-           7.214e-10   7.068e-10    -9.142    -9.151    -0.009     40.26
+   CaHSO4+         6.322e-13   6.195e-13   -12.199   -12.208    -0.009     (0)  
+
+------------------------------Saturation indices-------------------------------
+
+  Phase               SI** log IAP   log K(298 K,   1 atm)
+
+  Anhydrite        -4.00     -8.27   -4.28  CaSO4
+  Gypsum           -3.69     -8.27   -4.58  CaSO4:2H2O
+  H2(g)           -36.94    -40.05   -3.10  H2
+  H2O(g)           -1.50     -0.00    1.50  H2O
+  H2S(g)         -124.13   -132.07   -7.94  H2S
+  O2(g)            -9.40    -12.29   -2.89  O2
+  Sulfur          -93.12    -88.23    4.88  S
+
+**For a gas, SI = log10(fugacity). Fugacity = pressure * phi / 1 atm.
+  For ideal gases, phi = 1.
+
+Reaction step 15.
+
+Using solution 1.	Pure water
+Using kinetics 1.	
+
+Kinetics 1.	
+
+	Time step: 300 seconds  (Incremented time: 800 seconds)
+
+	Rate name       Delta Moles Total Moles   Reactant        Coefficient
+
+	Gypsum           -2.399e-04   6.766e+01   Gypsum                    1
+
+-----------------------------Solution composition------------------------------
+
+	Elements           Molality       Moles
+
+	Ca                1.280e-04   6.399e-04
+	S                 1.280e-04   6.399e-04
+
+----------------------------Description of solution----------------------------
+
+                                       pH  =   7.002      Charge balance
+                                       pe  =  11.390      Adjusted to redox equilibrium
+      Specific Conductance (µS/cm,  25°C)  = 33
+                          Density (g/cm³)  =   0.99706
+                               Volume (L)  =   5.01485
+                        Viscosity (mPa s)  =   0.89041
+                        Activity of water  =   1.000
+                 Ionic strength (mol/kgw)  =   5.028e-04
+                       Mass of water (kg)  =   5.000e+00
+                 Total alkalinity (eq/kg)  =   1.216e-09
+                         Temperature (°C)  =  25.00
+                  Electrical balance (eq)  =  -6.082e-09
+ Percent error, 100*(Cat-|An|)/(Cat+|An|)  =  -0.00
+                               Iterations  = 6370
+                                  Total H  = 5.550647e+02
+                                  Total O  = 2.775349e+02
+
+----------------------------Distribution of species----------------------------
+
+                                               Log       Log       Log    mole V
+   Species          Molality    Activity  Molality  Activity     Gamma   cm³/mol
+
+   OH-             1.043e-07   1.016e-07    -6.982    -6.993    -0.011     -4.12
+   H+              1.021e-07   9.961e-08    -6.991    -7.002    -0.011      0.00
+   H2O             5.551e+01   1.000e+00     1.744    -0.000     0.000     18.07
+Ca            1.280e-04
+   Ca+2            1.257e-04   1.136e-04    -3.901    -3.945    -0.044    -18.17
+   CaSO4           2.293e-06   2.293e-06    -5.640    -5.640     0.000      7.50
+   CaOH+           1.941e-10   1.892e-10    -9.712    -9.723    -0.011     (0)  
+   CaHSO4+         1.540e-12   1.501e-12   -11.812   -11.824    -0.011     (0)  
+H(0)          2.327e-40
+   H2              1.163e-40   1.163e-40   -39.934   -39.934     0.000     28.61
+O(0)          6.159e-13
+   O2              3.079e-13   3.080e-13   -12.512   -12.512     0.000     30.40
+S(-2)         0.000e+00
+   HS-             0.000e+00   0.000e+00  -124.422  -124.434    -0.011     20.59
+   H2S             0.000e+00   0.000e+00  -124.494  -124.494     0.000     36.27
+   S-2             0.000e+00   0.000e+00  -130.306  -130.350    -0.044     (0)  
+   (H2S)2          0.000e+00   0.000e+00  -250.265  -250.265     0.000     30.09
+S(6)          1.280e-04
+   SO4-2           1.257e-04   1.135e-04    -3.901    -3.945    -0.044     15.26
+   CaSO4           2.293e-06   2.293e-06    -5.640    -5.640     0.000      7.50
+   HSO4-           1.128e-09   1.100e-09    -8.948    -8.959    -0.011     40.27
+   CaHSO4+         1.540e-12   1.501e-12   -11.812   -11.824    -0.011     (0)  
+
+------------------------------Saturation indices-------------------------------
+
+  Phase               SI** log IAP   log K(298 K,   1 atm)
+
+  Anhydrite        -3.61     -7.89   -4.28  CaSO4
+  Gypsum           -3.31     -7.89   -4.58  CaSO4:2H2O
+  H2(g)           -36.83    -39.93   -3.10  H2
+  H2O(g)           -1.50     -0.00    1.50  H2O
+  H2S(g)         -123.50   -131.44   -7.94  H2S
+  O2(g)            -9.62    -12.51   -2.89  O2
+  Sulfur          -92.59    -87.71    4.88  S
+
+**For a gas, SI = log10(fugacity). Fugacity = pressure * phi / 1 atm.
+  For ideal gases, phi = 1.
+
+Reaction step 16.
+
+Using solution 1.	Pure water
+Using kinetics 1.	
+
+Kinetics 1.	
+
+	Time step: 200 seconds  (Incremented time: 1000 seconds)
+
+	Rate name       Delta Moles Total Moles   Reactant        Coefficient
+
+	Gypsum           -1.599e-04   6.766e+01   Gypsum                    1
+
+-----------------------------Solution composition------------------------------
+
+	Elements           Molality       Moles
+
+	Ca                1.600e-04   7.998e-04
+	S                 1.600e-04   7.998e-04
+
+----------------------------Description of solution----------------------------
+
+                                       pH  =   7.002      Charge balance
+                                       pe  =  11.365      Adjusted to redox equilibrium
+      Specific Conductance (µS/cm,  25°C)  = 41
+                          Density (g/cm³)  =   0.99707
+                               Volume (L)  =   5.01486
+                        Viscosity (mPa s)  =   0.89047
+                        Activity of water  =   1.000
+                 Ionic strength (mol/kgw)  =   6.260e-04
+                       Mass of water (kg)  =   5.000e+00
+                 Total alkalinity (eq/kg)  =   1.216e-09
+                         Temperature (°C)  =  25.00
+                  Electrical balance (eq)  =  -6.082e-09
+ Percent error, 100*(Cat-|An|)/(Cat+|An|)  =  -0.00
+                               Iterations  = 3898
+                                  Total H  = 5.550654e+02
+                                  Total O  = 2.775359e+02
+
+----------------------------Distribution of species----------------------------
+
+                                               Log       Log       Log    mole V
+   Species          Molality    Activity  Molality  Activity     Gamma   cm³/mol
+
+   OH-             1.047e-07   1.017e-07    -6.980    -6.993    -0.012     -4.11
+   H+              1.023e-07   9.952e-08    -6.990    -7.002    -0.012      0.00
+   H2O             5.551e+01   1.000e+00     1.744    -0.000     0.000     18.07
+Ca            1.600e-04
+   Ca+2            1.565e-04   1.398e-04    -3.806    -3.854    -0.049    -18.16
+   CaSO4           3.474e-06   3.475e-06    -5.459    -5.459     0.000      7.50
+   CaOH+           2.399e-10   2.331e-10    -9.620    -9.632    -0.012     (0)  
+   CaHSO4+         2.339e-12   2.273e-12   -11.631   -11.643    -0.012     (0)  
+H(0)          2.614e-40
+   H2              1.307e-40   1.307e-40   -39.884   -39.884     0.000     28.61
+O(0)          4.879e-13
+   O2              2.440e-13   2.440e-13   -12.613   -12.613     0.000     30.40
+S(-2)         0.000e+00
+   HS-             0.000e+00   0.000e+00  -124.129  -124.141    -0.012     20.60
+   H2S             0.000e+00   0.000e+00  -124.202  -124.202     0.000     36.27
+   S-2             0.000e+00   0.000e+00  -130.008  -130.057    -0.049     (0)  
+   (H2S)2          0.000e+00   0.000e+00  -249.682  -249.682     0.000     30.09
+S(6)          1.600e-04
+   SO4-2           1.565e-04   1.398e-04    -3.806    -3.855    -0.049     15.36
+   CaSO4           3.474e-06   3.475e-06    -5.459    -5.459     0.000      7.50
+   HSO4-           1.391e-09   1.352e-09    -8.857    -8.869    -0.012     40.27
+   CaHSO4+         2.339e-12   2.273e-12   -11.631   -11.643    -0.012     (0)  
+
+------------------------------Saturation indices-------------------------------
+
+  Phase               SI** log IAP   log K(298 K,   1 atm)
+
+  Anhydrite        -3.43     -7.71   -4.28  CaSO4
+  Gypsum           -3.13     -7.71   -4.58  CaSO4:2H2O
+  H2(g)           -36.78    -39.88   -3.10  H2
+  H2O(g)           -1.50     -0.00    1.50  H2O
+  H2S(g)         -123.21   -131.14   -7.94  H2S
+  O2(g)            -9.72    -12.61   -2.89  O2
+  Sulfur          -92.35    -87.47    4.88  S
+
+**For a gas, SI = log10(fugacity). Fugacity = pressure * phi / 1 atm.
+  For ideal gases, phi = 1.
+
+Reaction step 17.
+
+Using solution 1.	Pure water
+Using kinetics 1.	
+
+Kinetics 1.	
+
+	Time step: 1000 seconds  (Incremented time: 2000 seconds)
+
+	Rate name       Delta Moles Total Moles   Reactant        Coefficient
+
+	Gypsum           -7.987e-04   6.766e+01   Gypsum                    1
+
+-----------------------------Solution composition------------------------------
+
+	Elements           Molality       Moles
+
+	Ca                3.197e-04   1.599e-03
+	S                 3.197e-04   1.599e-03
+
+----------------------------Description of solution----------------------------
+
+                                       pH  =   7.004      Charge balance
+                                       pe  =  11.599      Adjusted to redox equilibrium
+      Specific Conductance (µS/cm,  25°C)  = 81
+                          Density (g/cm³)  =   0.99709
+                               Volume (L)  =   5.01488
+                        Viscosity (mPa s)  =   0.89070
+                        Activity of water  =   1.000
+                 Ionic strength (mol/kgw)  =   1.230e-03
+                       Mass of water (kg)  =   5.000e+00
+                 Total alkalinity (eq/kg)  =   1.216e-09
+                         Temperature (°C)  =  25.00
+                  Electrical balance (eq)  =  -6.082e-09
+ Percent error, 100*(Cat-|An|)/(Cat+|An|)  =  -0.00
+                               Iterations  = 18123
+                                  Total H  = 5.550686e+02
+                                  Total O  = 2.775407e+02
+
+----------------------------Distribution of species----------------------------
+
+                                               Log       Log       Log    mole V
+   Species          Molality    Activity  Molality  Activity     Gamma   cm³/mol
+
+   OH-             1.063e-07   1.021e-07    -6.974    -6.991    -0.017     -4.10
+   H+              1.029e-07   9.909e-08    -6.988    -7.004    -0.016      0.00
+   H2O             5.551e+01   1.000e+00     1.744    -0.000     0.000     18.07
+Ca            3.197e-04
+   Ca+2            3.074e-04   2.632e-04    -3.512    -3.580    -0.067    -18.13
+   CaSO4           1.231e-05   1.231e-05    -4.910    -4.910     0.000      7.50
+   CaOH+           4.584e-10   4.408e-10    -9.339    -9.356    -0.017     (0)  
+   CaHSO4+         8.340e-12   8.018e-12   -11.079   -11.096    -0.017     (0)  
+H(0)          0.000e+00
+   H2              0.000e+00   0.000e+00   -40.356   -40.356     0.000     28.61
+O(0)          4.289e-12
+   O2              2.144e-12   2.145e-12   -11.669   -11.669     0.000     30.40
+S(-2)         0.000e+00
+   HS-             0.000e+00   0.000e+00  -125.740  -125.757    -0.017     20.61
+   H2S             0.000e+00   0.000e+00  -125.819  -125.819     0.000     36.27
+   S-2             0.000e+00   0.000e+00  -131.603  -131.671    -0.068     (0)  
+   (H2S)2          0.000e+00   0.000e+00  -252.916  -252.916     0.000     30.09
+S(6)          3.197e-04
+   SO4-2           3.074e-04   2.630e-04    -3.512    -3.580    -0.068     15.72
+   CaSO4           1.231e-05   1.231e-05    -4.910    -4.910     0.000      7.50
+   HSO4-           2.636e-09   2.534e-09    -8.579    -8.596    -0.017     40.28
+   CaHSO4+         8.340e-12   8.018e-12   -11.079   -11.096    -0.017     (0)  
+
+------------------------------Saturation indices-------------------------------
+
+  Phase               SI** log IAP   log K(298 K,   1 atm)
+
+  Anhydrite        -2.88     -7.16   -4.28  CaSO4
+  Gypsum           -2.58     -7.16   -4.58  CaSO4:2H2O
+  H2(g)           -37.25    -40.36   -3.10  H2
+  H2O(g)           -1.50     -0.00    1.50  H2O
+  H2S(g)         -124.82   -132.76   -7.94  H2S
+  O2(g)            -8.78    -11.67   -2.89  O2
+  Sulfur          -93.50    -88.61    4.88  S
+
+**For a gas, SI = log10(fugacity). Fugacity = pressure * phi / 1 atm.
+  For ideal gases, phi = 1.
+
+Reaction step 18.
+
+Using solution 1.	Pure water
+Using kinetics 1.	
+
+Kinetics 1.	
+
+	Time step: 1000 seconds  (Incremented time: 3000 seconds)
+
+	Rate name       Delta Moles Total Moles   Reactant        Coefficient
+
+	Gypsum           -7.968e-04   6.766e+01   Gypsum                    1
+
+-----------------------------Solution composition------------------------------
+
+	Elements           Molality       Moles
+
+	Ca                4.791e-04   2.395e-03
+	S                 4.791e-04   2.395e-03
+
+----------------------------Description of solution----------------------------
+
+                                       pH  =   7.006      Charge balance
+                                       pe  =  11.603      Adjusted to redox equilibrium
+      Specific Conductance (µS/cm,  25°C)  = 118
+                          Density (g/cm³)  =   0.99711
+                               Volume (L)  =   5.01491
+                        Viscosity (mPa s)  =   0.89089
+                        Activity of water  =   1.000
+                 Ionic strength (mol/kgw)  =   1.816e-03
+                       Mass of water (kg)  =   5.000e+00
+                 Total alkalinity (eq/kg)  =   1.216e-09
+                         Temperature (°C)  =  25.00
+                  Electrical balance (eq)  =  -6.082e-09
+ Percent error, 100*(Cat-|An|)/(Cat+|An|)  =  -0.00
+                               Iterations  = 16587
+                                  Total H  = 5.550717e+02
+                                  Total O  = 2.775455e+02
+
+----------------------------Distribution of species----------------------------
+
+                                               Log       Log       Log    mole V
+   Species          Molality    Activity  Molality  Activity     Gamma   cm³/mol
+
+   OH-             1.075e-07   1.025e-07    -6.968    -6.989    -0.021     -4.10
+   H+              1.032e-07   9.871e-08    -6.986    -7.006    -0.019      0.00
+   H2O             5.551e+01   1.000e+00     1.744    -0.000     0.000     18.07
+Ca            4.791e-04
+   Ca+2            4.539e-04   3.767e-04    -3.343    -3.424    -0.081    -18.10
+   CaSO4           2.520e-05   2.521e-05    -4.599    -4.598     0.000      7.50
+   CaOH+           6.640e-10   6.333e-10    -9.178    -9.198    -0.021     (0)  
+   CaHSO4+         1.715e-11   1.636e-11   -10.766   -10.786    -0.021     (0)  
+H(0)          0.000e+00
+   H2              0.000e+00   0.000e+00   -40.367   -40.367     0.000     28.61
+O(0)          4.519e-12
+   O2              2.259e-12   2.260e-12   -11.646   -11.646     0.000     30.40
+S(-2)         0.000e+00
+   HS-             0.000e+00   0.000e+00  -125.628  -125.648    -0.021     20.61
+   H2S             0.000e+00   0.000e+00  -125.713  -125.712     0.000     36.27
+   S-2             0.000e+00   0.000e+00  -131.479  -131.561    -0.081     (0)  
+   (H2S)2          0.000e+00   0.000e+00  -252.703  -252.703     0.000     30.09
+S(6)          4.791e-04
+   SO4-2           4.539e-04   3.764e-04    -3.343    -3.424    -0.081     15.98
+   CaSO4           2.520e-05   2.521e-05    -4.599    -4.598     0.000      7.50
+   HSO4-           3.787e-09   3.612e-09    -8.422    -8.442    -0.021     40.29
+   CaHSO4+         1.715e-11   1.636e-11   -10.766   -10.786    -0.021     (0)  
+
+------------------------------Saturation indices-------------------------------
+
+  Phase               SI** log IAP   log K(298 K,   1 atm)
+
+  Anhydrite        -2.57     -6.85   -4.28  CaSO4
+  Gypsum           -2.27     -6.85   -4.58  CaSO4:2H2O
+  H2(g)           -37.27    -40.37   -3.10  H2
+  H2O(g)           -1.50     -0.00    1.50  H2O
+  H2S(g)         -124.72   -132.65   -7.94  H2S
+  O2(g)            -8.75    -11.65   -2.89  O2
+  Sulfur          -93.38    -88.50    4.88  S
+
+**For a gas, SI = log10(fugacity). Fugacity = pressure * phi / 1 atm.
+  For ideal gases, phi = 1.
+
+Reaction step 19.
+
+Using solution 1.	Pure water
+Using kinetics 1.	
+
+Kinetics 1.	
+
+	Time step: 2000 seconds  (Incremented time: 5000 seconds)
+
+	Rate name       Delta Moles Total Moles   Reactant        Coefficient
+
+	Gypsum           -1.586e-03   6.766e+01   Gypsum                    1
+
+-----------------------------Solution composition------------------------------
+
+	Elements           Molality       Moles
+
+	Ca                7.962e-04   3.981e-03
+	S                 7.962e-04   3.981e-03
+
+----------------------------Description of solution----------------------------
+
+                                       pH  =   7.009      Charge balance
+                                       pe  =  11.612      Adjusted to redox equilibrium
+      Specific Conductance (µS/cm,  25°C)  = 190
+                          Density (g/cm³)  =   0.99715
+                               Volume (L)  =   5.01497
+                        Viscosity (mPa s)  =   0.89122
+                        Activity of water  =   1.000
+                 Ionic strength (mol/kgw)  =   2.944e-03
+                       Mass of water (kg)  =   5.000e+00
+                 Total alkalinity (eq/kg)  =   1.216e-09
+                         Temperature (°C)  =  25.00
+                  Electrical balance (eq)  =  -6.176e-09
+ Percent error, 100*(Cat-|An|)/(Cat+|An|)  =  -0.00
+                               Iterations  = 25664
+                                  Total H  = 5.550781e+02
+                                  Total O  = 2.775550e+02
+
+----------------------------Distribution of species----------------------------
+
+                                               Log       Log       Log    mole V
+   Species          Molality    Activity  Molality  Activity     Gamma   cm³/mol
+
+   OH-             1.096e-07   1.033e-07    -6.960    -6.986    -0.026     -4.08
+   H+              1.035e-07   9.802e-08    -6.985    -7.009    -0.024      0.00
+   H2O             5.551e+01   1.000e+00     1.744    -0.000     0.000     18.07
+Ca            7.962e-04
+   Ca+2            7.359e-04   5.830e-04    -3.133    -3.234    -0.101    -18.07
+   CaSO4           6.031e-05   6.035e-05    -4.220    -4.219     0.000      7.50
+   CaOH+           1.047e-09   9.871e-10    -8.980    -9.006    -0.026     (0)  
+   CaHSO4+         4.126e-11   3.888e-11   -10.384   -10.410    -0.026     (0)  
+H(0)          0.000e+00
+   H2              0.000e+00   0.000e+00   -40.391   -40.391     0.000     28.61
+O(0)          5.048e-12
+   O2              2.524e-12   2.526e-12   -11.598   -11.598     0.000     30.40
+S(-2)         0.000e+00
+   HS-             0.000e+00   0.000e+00  -125.532  -125.558    -0.026     20.62
+   H2S             0.000e+00   0.000e+00  -125.626  -125.625     0.000     36.27
+   S-2             0.000e+00   0.000e+00  -131.366  -131.468    -0.102     (0)  
+   (H2S)2          0.000e+00   0.000e+00  -252.529  -252.529     0.000     30.09
+S(6)          7.962e-04
+   SO4-2           7.359e-04   5.822e-04    -3.133    -3.235    -0.102     16.38
+   CaSO4           6.031e-05   6.035e-05    -4.220    -4.219     0.000      7.50
+   HSO4-           5.887e-09   5.548e-09    -8.230    -8.256    -0.026     40.30
+   CaHSO4+         4.126e-11   3.888e-11   -10.384   -10.410    -0.026     (0)  
+
+------------------------------Saturation indices-------------------------------
+
+  Phase               SI** log IAP   log K(298 K,   1 atm)
+
+  Anhydrite        -2.19     -6.47   -4.28  CaSO4
+  Gypsum           -1.89     -6.47   -4.58  CaSO4:2H2O
+  H2(g)           -37.29    -40.39   -3.10  H2
+  H2O(g)           -1.50     -0.00    1.50  H2O
+  H2S(g)         -124.63   -132.57   -7.94  H2S
+  O2(g)            -8.71    -11.60   -2.89  O2
+  Sulfur          -93.27    -88.38    4.88  S
+
+**For a gas, SI = log10(fugacity). Fugacity = pressure * phi / 1 atm.
+  For ideal gases, phi = 1.
+
+Reaction step 20.
+
+Using solution 1.	Pure water
+Using kinetics 1.	
+
+Kinetics 1.	
+
+	Time step: 3000 seconds  (Incremented time: 8000 seconds)
+
+	Rate name       Delta Moles Total Moles   Reactant        Coefficient
+
+	Gypsum           -2.352e-03   6.765e+01   Gypsum                    1
+
+-----------------------------Solution composition------------------------------
+
+	Elements           Molality       Moles
+
+	Ca                1.266e-03   6.333e-03
+	S                 1.266e-03   6.333e-03
+
+----------------------------Description of solution----------------------------
+
+                                       pH  =   7.013      Charge balance
+                                       pe  =  11.622      Adjusted to redox equilibrium
+      Specific Conductance (µS/cm,  25°C)  = 290
+                          Density (g/cm³)  =   0.99722
+                               Volume (L)  =   5.01506
+                        Viscosity (mPa s)  =   0.89164
+                        Activity of water  =   1.000
+                 Ionic strength (mol/kgw)  =   4.546e-03
+                       Mass of water (kg)  =   5.000e+00
+                 Total alkalinity (eq/kg)  =   1.216e-09
+                         Temperature (°C)  =  25.00
+                  Electrical balance (eq)  =  -6.481e-09
+ Percent error, 100*(Cat-|An|)/(Cat+|An|)  =  -0.00
+                               Iterations  = 31349
+                                  Total H  = 5.550875e+02
+                                  Total O  = 2.775691e+02
+
+----------------------------Distribution of species----------------------------
+
+                                               Log       Log       Log    mole V
+   Species          Molality    Activity  Molality  Activity     Gamma   cm³/mol
+
+   OH-             1.122e-07   1.042e-07    -6.950    -6.982    -0.032     -4.07
+   H+              1.038e-07   9.712e-08    -6.984    -7.013    -0.029      0.00
+   H2O             5.551e+01   1.000e+00     1.744    -0.000     0.000     18.07
+Ca            1.266e-03
+   Ca+2            1.137e-03   8.561e-04    -2.944    -3.067    -0.123    -18.02
+   CaSO4           1.299e-04   1.300e-04    -3.886    -3.886     0.000      7.50
+   CaOH+           1.573e-09   1.463e-09    -8.803    -8.835    -0.032     (0)  
+   CaHSO4+         8.927e-11   8.302e-11   -10.049   -10.081    -0.032     (0)  
+H(0)          0.000e+00
+   H2              0.000e+00   0.000e+00   -40.420   -40.420     0.000     28.61
+O(0)          5.758e-12
+   O2              2.879e-12   2.882e-12   -11.541   -11.540     0.000     30.40
+S(-2)         0.000e+00
+   HS-             0.000e+00   0.000e+00  -125.479  -125.511    -0.032     20.64
+   H2S             0.000e+00   0.000e+00  -125.582  -125.582     0.000     36.27
+   S-2             0.000e+00   0.000e+00  -131.292  -131.416    -0.124     (0)  
+   (H2S)2          0.000e+00   0.000e+00  -252.442  -252.441     0.000     30.09
+S(6)          1.266e-03
+   SO4-2           1.137e-03   8.542e-04    -2.944    -3.068    -0.124     16.82
+   CaSO4           1.299e-04   1.300e-04    -3.886    -3.886     0.000      7.50
+   HSO4-           8.673e-09   8.066e-09    -8.062    -8.093    -0.032     40.31
+   CaHSO4+         8.927e-11   8.302e-11   -10.049   -10.081    -0.032     (0)  
+
+------------------------------Saturation indices-------------------------------
+
+  Phase               SI** log IAP   log K(298 K,   1 atm)
+
+  Anhydrite        -1.86     -6.14   -4.28  CaSO4
+  Gypsum           -1.55     -6.14   -4.58  CaSO4:2H2O
+  H2(g)           -37.32    -40.42   -3.10  H2
+  H2O(g)           -1.50     -0.00    1.50  H2O
+  H2S(g)         -124.59   -132.52   -7.94  H2S
+  O2(g)            -8.65    -11.54   -2.89  O2
+  Sulfur          -93.19    -88.31    4.88  S
+
+**For a gas, SI = log10(fugacity). Fugacity = pressure * phi / 1 atm.
+  For ideal gases, phi = 1.
+
+Reaction step 21.
+
+Using solution 1.	Pure water
+Using kinetics 1.	
+
+Kinetics 1.	
+
+	Time step: 2000 seconds  (Incremented time: 10000 seconds)
+
+	Rate name       Delta Moles Total Moles   Reactant        Coefficient
+
+	Gypsum           -1.546e-03   6.765e+01   Gypsum                    1
+
+-----------------------------Solution composition------------------------------
+
+	Elements           Molality       Moles
+
+	Ca                1.576e-03   7.879e-03
+	S                 1.576e-03   7.879e-03
+
+----------------------------Description of solution----------------------------
+
+                                       pH  =   7.015      Charge balance
+                                       pe  =  11.621      Adjusted to redox equilibrium
+      Specific Conductance (µS/cm,  25°C)  = 354
+                          Density (g/cm³)  =   0.99726
+                               Volume (L)  =   5.01511
+                        Viscosity (mPa s)  =   0.89189
+                        Activity of water  =   1.000
+                 Ionic strength (mol/kgw)  =   5.565e-03
+                       Mass of water (kg)  =   5.000e+00
+                 Total alkalinity (eq/kg)  =   1.216e-09
+                         Temperature (°C)  =  25.00
+                  Electrical balance (eq)  =  -6.670e-09
+ Percent error, 100*(Cat-|An|)/(Cat+|An|)  =  -0.00
+                               Iterations  = 20604
+                                  Total H  = 5.550937e+02
+                                  Total O  = 2.775784e+02
+
+----------------------------Distribution of species----------------------------
+
+                                               Log       Log       Log    mole V
+   Species          Molality    Activity  Molality  Activity     Gamma   cm³/mol
+
+   OH-             1.136e-07   1.048e-07    -6.945    -6.980    -0.035     -4.06
+   H+              1.038e-07   9.660e-08    -6.984    -7.015    -0.031      0.00
+   H2O             5.551e+01   9.999e-01     1.744    -0.000     0.000     18.07
+Ca            1.576e-03
+   Ca+2            1.391e-03   1.020e-03    -2.857    -2.991    -0.135    -18.00
+   CaSO4           1.844e-04   1.847e-04    -3.734    -3.734     0.001      7.50
+   CaOH+           1.898e-09   1.753e-09    -8.722    -8.756    -0.035     (0)  
+   CaHSO4+         1.270e-10   1.172e-10    -9.896    -9.931    -0.035     (0)  
+H(0)          0.000e+00
+   H2              0.000e+00   0.000e+00   -40.424   -40.423     0.001     28.61
+O(0)          5.842e-12
+   O2              2.921e-12   2.925e-12   -11.534   -11.534     0.001     30.40
+S(-2)         0.000e+00
+   HS-             0.000e+00   0.000e+00  -125.415  -125.450    -0.035     20.64
+   H2S             0.000e+00   0.000e+00  -125.523  -125.523     0.001     36.27
+   S-2             0.000e+00   0.000e+00  -131.217  -131.353    -0.136     (0)  
+   (H2S)2          0.000e+00   0.000e+00  -252.325  -252.324     0.001     30.09
+S(6)          1.576e-03
+   SO4-2           1.391e-03   1.018e-03    -2.857    -2.992    -0.136     17.06
+   CaSO4           1.844e-04   1.847e-04    -3.734    -3.734     0.001      7.50
+   HSO4-           1.035e-08   9.558e-09    -7.985    -8.020    -0.035     40.32
+   CaHSO4+         1.270e-10   1.172e-10    -9.896    -9.931    -0.035     (0)  
+
+------------------------------Saturation indices-------------------------------
+
+  Phase               SI** log IAP   log K(298 K,   1 atm)
+
+  Anhydrite        -1.71     -5.98   -4.28  CaSO4
+  Gypsum           -1.40     -5.98   -4.58  CaSO4:2H2O
+  H2(g)           -37.32    -40.42   -3.10  H2
+  H2O(g)           -1.50     -0.00    1.50  H2O
+  H2S(g)         -124.53   -132.46   -7.94  H2S
+  O2(g)            -8.64    -11.53   -2.89  O2
+  Sulfur          -93.13    -88.25    4.88  S
+
+**For a gas, SI = log10(fugacity). Fugacity = pressure * phi / 1 atm.
+  For ideal gases, phi = 1.
+
+Reaction step 22.
+
+Using solution 1.	Pure water
+Using kinetics 1.	
+
+Kinetics 1.	
+
+	Time step: 10000 seconds  (Incremented time: 20000 seconds)
+
+	Rate name       Delta Moles Total Moles   Reactant        Coefficient
+
+	Gypsum           -7.410e-03   6.764e+01   Gypsum                    1
+
+-----------------------------Solution composition------------------------------
+
+	Elements           Molality       Moles
+
+	Ca                3.058e-03   1.529e-02
+	S                 3.058e-03   1.529e-02
+
+----------------------------Description of solution----------------------------
+
+                                       pH  =   7.024      Charge balance
+                                       pe  =  11.592      Adjusted to redox equilibrium
+      Specific Conductance (µS/cm,  25°C)  = 636
+                          Density (g/cm³)  =   0.99745
+                               Volume (L)  =   5.01540
+                        Viscosity (mPa s)  =   0.89292
+                        Activity of water  =   1.000
+                 Ionic strength (mol/kgw)  =   1.018e-02
+                       Mass of water (kg)  =   5.001e+00
+                 Total alkalinity (eq/kg)  =   1.216e-09
+                         Temperature (°C)  =  25.00
+                  Electrical balance (eq)  =  -7.487e-09
+ Percent error, 100*(Cat-|An|)/(Cat+|An|)  =  -0.00
+                               Iterations  = 98796
+                                  Total H  = 5.551233e+02
+                                  Total O  = 2.776228e+02
+
+----------------------------Distribution of species----------------------------
+
+                                               Log       Log       Log    mole V
+   Species          Molality    Activity  Molality  Activity     Gamma   cm³/mol
+
+   OH-             1.191e-07   1.071e-07    -6.924    -6.970    -0.046     -4.03
+   H+              1.035e-07   9.452e-08    -6.985    -7.024    -0.040      0.00
+   H2O             5.551e+01   9.999e-01     1.744    -0.000     0.000     18.07
+Ca            3.058e-03
+   Ca+2            2.546e-03   1.702e-03    -2.594    -2.769    -0.175    -17.92
+   CaSO4           5.114e-04   5.126e-04    -3.291    -3.290     0.001      7.50
+   CaOH+           3.316e-09   2.988e-09    -8.479    -8.525    -0.045     (0)  
+   CaHSO4+         3.534e-10   3.185e-10    -9.452    -9.497    -0.045     (0)  
+H(0)          0.000e+00
+   H2              0.000e+00   0.000e+00   -40.383   -40.382     0.001     28.61
+O(0)          4.832e-12
+   O2              2.416e-12   2.422e-12   -11.617   -11.616     0.001     30.40
+S(-2)         0.000e+00
+   HS-             0.000e+00   0.000e+00  -125.028  -125.074    -0.046     20.67
+   H2S             0.000e+00   0.000e+00  -125.158  -125.157     0.001     36.27
+   S-2             0.000e+00   0.000e+00  -130.791  -130.967    -0.177     (0)  
+   (H2S)2          0.000e+00   0.000e+00  -251.593  -251.591     0.001     30.09
+S(6)          3.058e-03
+   SO4-2           2.546e-03   1.694e-03    -2.594    -2.771    -0.177     17.92
+   CaSO4           5.114e-04   5.126e-04    -3.291    -3.290     0.001      7.50
+   HSO4-           1.727e-08   1.556e-08    -7.763    -7.808    -0.045     40.34
+   CaHSO4+         3.534e-10   3.185e-10    -9.452    -9.497    -0.045     (0)  
+
+------------------------------Saturation indices-------------------------------
+
+  Phase               SI** log IAP   log K(298 K,   1 atm)
+
+  Anhydrite        -1.26     -5.54   -4.28  CaSO4
+  Gypsum           -0.96     -5.54   -4.58  CaSO4:2H2O
+  H2(g)           -37.28    -40.38   -3.10  H2
+  H2O(g)           -1.50     -0.00    1.50  H2O
+  H2S(g)         -124.16   -132.10   -7.94  H2S
+  O2(g)            -8.72    -11.62   -2.89  O2
+  Sulfur          -92.81    -87.92    4.88  S
+
+**For a gas, SI = log10(fugacity). Fugacity = pressure * phi / 1 atm.
+  For ideal gases, phi = 1.
+
+Reaction step 23.
+
+Using solution 1.	Pure water
+Using kinetics 1.	
+
+Kinetics 1.	
+
+	Time step: 10000 seconds  (Incremented time: 30000 seconds)
+
+	Rate name       Delta Moles Total Moles   Reactant        Coefficient
+
+	Gypsum           -6.806e-03   6.764e+01   Gypsum                    1
+
+-----------------------------Solution composition------------------------------
+
+	Elements           Molality       Moles
+
+	Ca                4.418e-03   2.210e-02
+	S                 4.418e-03   2.210e-02
+
+----------------------------Description of solution----------------------------
+
+                                       pH  =   7.032      Charge balance
+                                       pe  =  11.528      Adjusted to redox equilibrium
+      Specific Conductance (µS/cm,  25°C)  = 875
+                          Density (g/cm³)  =   0.99763
+                               Volume (L)  =   5.01567
+                        Viscosity (mPa s)  =   0.89373
+                        Activity of water  =   1.000
+                 Ionic strength (mol/kgw)  =   1.417e-02
+                       Mass of water (kg)  =   5.001e+00
+                 Total alkalinity (eq/kg)  =   1.216e-09
+                         Temperature (°C)  =  25.00
+                  Electrical balance (eq)  =  -8.154e-09
+ Percent error, 100*(Cat-|An|)/(Cat+|An|)  =  -0.00
+                               Iterations  = 90738
+                                  Total H  = 5.551505e+02
+                                  Total O  = 2.776637e+02
+
+----------------------------Distribution of species----------------------------
+
+                                               Log       Log       Log    mole V
+   Species          Molality    Activity  Molality  Activity     Gamma   cm³/mol
+
+   OH-             1.231e-07   1.088e-07    -6.910    -6.963    -0.053     -4.01
+   H+              1.031e-07   9.300e-08    -6.987    -7.032    -0.045      0.00
+   H2O             5.551e+01   9.999e-01     1.744    -0.000     0.000     18.07
+Ca            4.418e-03
+   Ca+2            3.542e-03   2.231e-03    -2.451    -2.652    -0.201    -17.87
+   CaSO4           8.762e-04   8.791e-04    -3.057    -3.056     0.001      7.50
+   CaOH+           4.488e-09   3.980e-09    -8.348    -8.400    -0.052     (0)  
+   CaHSO4+         6.059e-10   5.374e-10    -9.218    -9.270    -0.052     (0)  
+H(0)          0.000e+00
+   H2              0.000e+00   0.000e+00   -40.271   -40.269     0.001     28.61
+O(0)          2.871e-12
+   O2              1.436e-12   1.440e-12   -11.843   -11.842     0.001     30.40
+S(-2)         0.000e+00
+   HS-             0.000e+00   0.000e+00  -124.459  -124.513    -0.053     20.69
+   H2S             0.000e+00   0.000e+00  -124.604  -124.603     0.001     36.27
+   S-2             0.000e+00   0.000e+00  -130.196  -130.399    -0.203     (0)  
+   (H2S)2          0.000e+00   0.000e+00  -250.485  -250.484     0.001     30.09
+S(6)          4.418e-03
+   SO4-2           3.542e-03   2.216e-03    -2.451    -2.654    -0.204     18.50
+   CaSO4           8.762e-04   8.791e-04    -3.057    -3.056     0.001      7.50
+   HSO4-           2.259e-08   2.004e-08    -7.646    -7.698    -0.052     40.36
+   CaHSO4+         6.059e-10   5.374e-10    -9.218    -9.270    -0.052     (0)  
+
+------------------------------Saturation indices-------------------------------
+
+  Phase               SI** log IAP   log K(298 K,   1 atm)
+
+  Anhydrite        -1.03     -5.31   -4.28  CaSO4
+  Gypsum           -0.72     -5.31   -4.58  CaSO4:2H2O
+  H2(g)           -37.17    -40.27   -3.10  H2
+  H2O(g)           -1.50     -0.00    1.50  H2O
+  H2S(g)         -123.61   -131.54   -7.94  H2S
+  O2(g)            -8.95    -11.84   -2.89  O2
+  Sulfur          -92.37    -87.48    4.88  S
+
+**For a gas, SI = log10(fugacity). Fugacity = pressure * phi / 1 atm.
+  For ideal gases, phi = 1.
+
+Reaction step 24.
+
+Using solution 1.	Pure water
+Using kinetics 1.	
+
+Kinetics 1.	
+
+	Time step: 20000 seconds  (Incremented time: 50000 seconds)
+
+	Rate name       Delta Moles Total Moles   Reactant        Coefficient
+
+	Gypsum           -1.172e-02   6.763e+01   Gypsum                    1
+
+-----------------------------Solution composition------------------------------
+
+	Elements           Molality       Moles
+
+	Ca                6.761e-03   3.381e-02
+	S                 6.761e-03   3.381e-02
+
+----------------------------Description of solution----------------------------
+
+                                       pH  =   7.041      Charge balance
+                                       pe  =  11.571      Adjusted to redox equilibrium
+      Specific Conductance (µS/cm,  25°C)  = 1261
+                          Density (g/cm³)  =   0.99794
+                               Volume (L)  =   5.01615
+                        Viscosity (mPa s)  =   0.89496
+                        Activity of water  =   1.000
+                 Ionic strength (mol/kgw)  =   2.067e-02
+                       Mass of water (kg)  =   5.001e+00
+                 Total alkalinity (eq/kg)  =   1.216e-09
+                         Temperature (°C)  =  25.00
+                  Electrical balance (eq)  =  -9.190e-09
+ Percent error, 100*(Cat-|An|)/(Cat+|An|)  =  -0.00
+                               Iterations  = 156240
+                                  Total H  = 5.551974e+02
+                                  Total O  = 2.777340e+02
+
+----------------------------Distribution of species----------------------------
+
+                                               Log       Log       Log    mole V
+   Species          Molality    Activity  Molality  Activity     Gamma   cm³/mol
+
+   OH-             1.287e-07   1.113e-07    -6.890    -6.953    -0.063     -3.98
+   H+              1.023e-07   9.090e-08    -6.990    -7.041    -0.051      0.00
+   H2O             5.551e+01   9.998e-01     1.744    -0.000     0.000     18.07
+Ca            6.761e-03
+   Ca+2            5.167e-03   3.016e-03    -2.287    -2.521    -0.234    -17.81
+   CaSO4           1.594e-03   1.602e-03    -2.798    -2.795     0.002      7.50
+   CaOH+           6.334e-09   5.505e-09    -8.198    -8.259    -0.061     (0)  
+   CaHSO4+         1.101e-09   9.569e-10    -8.958    -9.019    -0.061     (0)  
+H(0)          0.000e+00
+   H2              0.000e+00   0.000e+00   -40.377   -40.375     0.002     28.61
+O(0)          4.663e-12
+   O2              2.331e-12   2.343e-12   -11.632   -11.630     0.002     30.40
+S(-2)         0.000e+00
+   HS-             0.000e+00   0.000e+00  -124.753  -124.816    -0.063     20.71
+   H2S             0.000e+00   0.000e+00  -124.918  -124.915     0.002     36.27
+   S-2             0.000e+00   0.000e+00  -130.455  -130.692    -0.237     (0)  
+   (H2S)2          0.000e+00   0.000e+00  -251.111  -251.109     0.002     30.09
+S(6)          6.761e-03
+   SO4-2           5.167e-03   2.986e-03    -2.287    -2.525    -0.238     19.28
+   CaSO4           1.594e-03   1.602e-03    -2.798    -2.795     0.002      7.50
+   HSO4-           3.037e-08   2.639e-08    -7.518    -7.579    -0.061     40.38
+   CaHSO4+         1.101e-09   9.569e-10    -8.958    -9.019    -0.061     (0)  
+
+------------------------------Saturation indices-------------------------------
+
+  Phase               SI** log IAP   log K(298 K,   1 atm)
+
+  Anhydrite        -0.77     -5.05   -4.28  CaSO4
+  Gypsum           -0.46     -5.05   -4.58  CaSO4:2H2O
+  H2(g)           -37.27    -40.37   -3.10  H2
+  H2O(g)           -1.50     -0.00    1.50  H2O
+  H2S(g)         -123.92   -131.86   -7.94  H2S
+  O2(g)            -8.74    -11.63   -2.89  O2
+  Sulfur          -92.57    -87.69    4.88  S
+
+**For a gas, SI = log10(fugacity). Fugacity = pressure * phi / 1 atm.
+  For ideal gases, phi = 1.
+
+Reaction step 25.
+
+Using solution 1.	Pure water
+Using kinetics 1.	
+
+Kinetics 1.	
+
+	Time step: 30000 seconds  (Incremented time: 80000 seconds)
+
+	Rate name       Delta Moles Total Moles   Reactant        Coefficient
+
+	Gypsum           -1.328e-02   6.761e+01   Gypsum                    1
+
+-----------------------------Solution composition------------------------------
+
+	Elements           Molality       Moles
+
+	Ca                9.416e-03   4.710e-02
+	S                 9.416e-03   4.710e-02
+
+----------------------------Description of solution----------------------------
+
+                                       pH  =   7.051      Charge balance
+                                       pe  =  11.480      Adjusted to redox equilibrium
+      Specific Conductance (µS/cm,  25°C)  = 1672
+                          Density (g/cm³)  =   0.99829
+                               Volume (L)  =   5.01670
+                        Viscosity (mPa s)  =   0.89621
+                        Activity of water  =   1.000
+                 Ionic strength (mol/kgw)  =   2.767e-02
+                       Mass of water (kg)  =   5.002e+00
+                 Total alkalinity (eq/kg)  =   1.216e-09
+                         Temperature (°C)  =  25.00
+                  Electrical balance (eq)  =  -1.025e-08
+ Percent error, 100*(Cat-|An|)/(Cat+|An|)  =  -0.00
+                               Iterations  = 177114
+                                  Total H  = 5.552506e+02
+                                  Total O  = 2.778137e+02
+
+----------------------------Distribution of species----------------------------
+
+                                               Log       Log       Log    mole V
+   Species          Molality    Activity  Molality  Activity     Gamma   cm³/mol
+
+   OH-             1.340e-07   1.137e-07    -6.873    -6.944    -0.071     -3.95
+   H+              1.014e-07   8.899e-08    -6.994    -7.051    -0.057      0.00
+   H2O             5.551e+01   9.997e-01     1.744    -0.000     0.000     18.07
+Ca            9.416e-03
+   Ca+2            6.918e-03   3.785e-03    -2.160    -2.422    -0.262    -17.75
+   CaSO4           2.498e-03   2.514e-03    -2.602    -2.600     0.003      7.50
+   CaOH+           8.261e-09   7.056e-09    -8.083    -8.151    -0.069     (0)  
+   CaHSO4+         1.722e-09   1.471e-09    -8.764    -8.832    -0.069     (0)  
+H(0)          0.000e+00
+   H2              0.000e+00   0.000e+00   -40.214   -40.211     0.003     28.61
+O(0)          2.190e-12
+   O2              1.095e-12   1.102e-12   -11.961   -11.958     0.003     30.40
+S(-2)         0.000e+00
+   HS-             0.000e+00   0.000e+00  -124.002  -124.073    -0.071     20.73
+   H2S             0.000e+00   0.000e+00  -124.184  -124.182     0.003     36.27
+   S-2             0.000e+00   0.000e+00  -129.674  -129.940    -0.267     (0)  
+   (H2S)2          0.000e+00   0.000e+00  -249.644  -249.642     0.003     30.09
+S(6)          9.416e-03
+   SO4-2           6.918e-03   3.735e-03    -2.160    -2.428    -0.268     19.98
+   CaSO4           2.498e-03   2.514e-03    -2.602    -2.600     0.003      7.50
+   HSO4-           3.784e-08   3.232e-08    -7.422    -7.491    -0.069     40.40
+   CaHSO4+         1.722e-09   1.471e-09    -8.764    -8.832    -0.069     (0)  
+
+------------------------------Saturation indices-------------------------------
+
+  Phase               SI** log IAP   log K(298 K,   1 atm)
+
+  Anhydrite        -0.57     -4.85   -4.28  CaSO4
+  Gypsum           -0.27     -4.85   -4.58  CaSO4:2H2O
+  H2(g)           -37.11    -40.21   -3.10  H2
+  H2O(g)           -1.50     -0.00    1.50  H2O
+  H2S(g)         -123.19   -131.12   -7.94  H2S
+  O2(g)            -9.07    -11.96   -2.89  O2
+  Sulfur          -92.00    -87.12    4.88  S
+
+**For a gas, SI = log10(fugacity). Fugacity = pressure * phi / 1 atm.
+  For ideal gases, phi = 1.
+
+Reaction step 26.
+
+Using solution 1.	Pure water
+Using kinetics 1.	
+
+Kinetics 1.	
+
+	Time step: 20000 seconds  (Incremented time: 100000 seconds)
+
+	Rate name       Delta Moles Total Moles   Reactant        Coefficient
+
+	Gypsum           -6.514e-03   6.761e+01   Gypsum                    1
+
+-----------------------------Solution composition------------------------------
+
+	Elements           Molality       Moles
+
+	Ca                1.072e-02   5.361e-02
+	S                 1.072e-02   5.361e-02
+
+----------------------------Description of solution----------------------------
+
+                                       pH  =   7.055      Charge balance
+                                       pe  =  11.553      Adjusted to redox equilibrium
+      Specific Conductance (µS/cm,  25°C)  = 1866
+                          Density (g/cm³)  =   0.99846
+                               Volume (L)  =   5.01698
+                        Viscosity (mPa s)  =   0.89678
+                        Activity of water  =   1.000
+                 Ionic strength (mol/kgw)  =   3.101e-02
+                       Mass of water (kg)  =   5.002e+00
+                 Total alkalinity (eq/kg)  =   1.216e-09
+                         Temperature (°C)  =  25.00
+                  Electrical balance (eq)  =  -1.075e-08
+ Percent error, 100*(Cat-|An|)/(Cat+|An|)  =  -0.00
+                               Iterations  = 86844
+                                  Total H  = 5.552766e+02
+                                  Total O  = 2.778528e+02
+
+----------------------------Distribution of species----------------------------
+
+                                               Log       Log       Log    mole V
+   Species          Molality    Activity  Molality  Activity     Gamma   cm³/mol
+
+   OH-             1.363e-07   1.147e-07    -6.866    -6.940    -0.075     -3.94
+   H+              1.010e-07   8.819e-08    -6.996    -7.055    -0.059      0.00
+   H2O             5.551e+01   9.997e-01     1.744    -0.000     0.000     18.07
+Ca            1.072e-02
+   Ca+2            7.752e-03   4.129e-03    -2.111    -2.384    -0.274    -17.73
+   CaSO4           2.967e-03   2.988e-03    -2.528    -2.525     0.003      7.50
+   CaOH+           9.161e-09   7.768e-09    -8.038    -8.110    -0.072     (0)  
+   CaHSO4+         2.042e-09   1.732e-09    -8.690    -8.761    -0.072     (0)  
+H(0)          0.000e+00
+   H2              0.000e+00   0.000e+00   -40.367   -40.364     0.003     28.61
+O(0)          4.430e-12
+   O2              2.215e-12   2.231e-12   -11.655   -11.652     0.003     30.40
+S(-2)         0.000e+00
+   HS-             0.000e+00   0.000e+00  -124.577  -124.652    -0.075     20.74
+   H2S             0.000e+00   0.000e+00  -124.768  -124.765     0.003     36.27
+   S-2             0.000e+00   0.000e+00  -130.237  -130.515    -0.279     (0)  
+   (H2S)2          0.000e+00   0.000e+00  -250.811  -250.808     0.003     30.09
+S(6)          1.072e-02
+   SO4-2           7.752e-03   4.069e-03    -2.111    -2.390    -0.280     20.28
+   CaSO4           2.967e-03   2.988e-03    -2.528    -2.525     0.003      7.50
+   HSO4-           4.114e-08   3.489e-08    -7.386    -7.457    -0.072     40.41
+   CaHSO4+         2.042e-09   1.732e-09    -8.690    -8.761    -0.072     (0)  
+
+------------------------------Saturation indices-------------------------------
+
+  Phase               SI** log IAP   log K(298 K,   1 atm)
+
+  Anhydrite        -0.50     -4.77   -4.28  CaSO4
+  Gypsum           -0.19     -4.77   -4.58  CaSO4:2H2O
+  H2(g)           -37.26    -40.36   -3.10  H2
+  H2O(g)           -1.50     -0.00    1.50  H2O
+  H2S(g)         -123.77   -131.71   -7.94  H2S
+  O2(g)            -8.76    -11.65   -2.89  O2
+  Sulfur          -92.43    -87.55    4.88  S
+
+**For a gas, SI = log10(fugacity). Fugacity = pressure * phi / 1 atm.
+  For ideal gases, phi = 1.
+
+------------------
+End of simulation.
+------------------
+
+------------------------------------
+Reading input data for simulation 2.
+------------------------------------
+
+---------------------------------
+End of Run after 4.89117 Seconds.
+---------------------------------
+

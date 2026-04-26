@@ -1,0 +1,64 @@
+TITLE Total-injection reference gypsum kinetics for t_cross=1.000000e+02 s
+#------------------------------------------------------------------------------
+# New benchmark workflow:
+#   - Reference water volume V_ref equals total injected solution volume
+#   - Reactive surface area is fixed to the two-wall fracture area
+#   - One PHREEQC cumulative law F_ref(t) is shared by all PT particles
+#------------------------------------------------------------------------------
+# V_ref        = 5.000000000000e-02 m3
+# Water mass   = 5.000000000000e+01 kg
+# A_ref        = 2.000000000000e-02 m2 = 200.000000 cm2
+# Gypsum solid = 5.000000000000e-02 m3 (1:1 solid:water volume assumption)
+# Gypsum moles = 6.765899864682e+02 mol
+
+SOLUTION 1 Pure water
+    temp    25.0
+    pH      7.0
+    pe      4.0
+    -water  5.000000000000e+01
+
+RATES
+Gypsum
+-start
+  10 omega = SR("Gypsum")
+  20 IF (M <= 0 AND omega <= 1) THEN GOTO 100
+  30 area = PARM(2)
+  40 rate = PARM(1) * area * (1 - omega)
+  50 moles = rate * TIME
+  60 IF (moles > 0 AND moles > M) THEN moles = M
+  70 GOTO 200
+  100 moles = 0
+  200 SAVE moles
+-end
+
+KINETICS 1
+Gypsum
+    -parms  4.000000000000e-05  2.000000000000e-02
+    -m0     6.765899864682e+02
+    -m      6.765899864682e+02
+    -tol    1e-8
+    -steps  1 1 1 2 3 2 10 10 20 30 20 100 100 200 300 200 1000 1000 2000 3000 2000 10000 10000 20000 30000 20000
+    -step_divide 1e-6
+    -bad_step_max 50000
+    -runge_kutta 6
+
+INCREMENTAL_REACTIONS true
+
+SELECTED_OUTPUT
+    -file                tt_1e02.sel
+    -reset               false
+    -totals              Ca S(6)
+    -kinetics            Gypsum
+    -saturation_indices  Gypsum
+
+USER_PUNCH
+    -headings Time_s pH SI_Gypsum V_Gyp_cm3 DV_Gyp_cm3
+-start
+  10 PUNCH TOTAL_TIME
+  20 PUNCH -LA("H+")
+  30 PUNCH SI("Gypsum")
+  40 v_gyp = KIN("Gypsum") * 73.9
+  50 PUNCH v_gyp
+  60 PUNCH 5.000000000000e+04 - v_gyp
+-end
+END

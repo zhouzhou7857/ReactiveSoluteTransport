@@ -1,0 +1,105 @@
+
+--- STDERR ---
+Input file: /home/zhouw/Documents/Codes/ReactiveSoluteTransport/Benchmark/gypsum_single_fracture_10cm_ap5mm/results_total_injection_reference_volume_20260426_151504/phreeqc/tt_1e02/tt_1e02.pqi
+
+Output file: /home/zhouw/Documents/Codes/ReactiveSoluteTransport/Benchmark/gypsum_single_fracture_10cm_ap5mm/results_total_injection_reference_volume_20260426_151504/phreeqc/tt_1e02/tt_1e02.pqo
+
+Database file: /home/zhouw/Documents/Codes/phreeqc-3.8.6-17100/database/phreeqc.dat
+
+              █▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀█
+              ║                                            ║
+              ║             * PHREEQC-3.8.6 *              ║
+              ║                                            ║
+              ║      A hydrogeochemical transport model    ║
+              ║                                            ║
+              ║                    by                      ║
+              ║       D.L. Parkhurst and C.A.J. Appelo     ║
+              ║                                            ║
+              ║              January  7, 2025              ║
+              █▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄█
+
+
+Initializing...                                                                 
+Simulation 1. Kinetic step 17.                                                 
+Simulation 1. Kinetic step 19.                                                 
+Simulation 1. Kinetic step 20.                                                 
+Simulation 1. Kinetic step 21.                                                 
+Simulation 1. Kinetic step 21.                                                 
+Simulation 1. Kinetic step 21.                                                 
+Simulation 1. Kinetic step 22.                                                 
+Simulation 1. Kinetic step 22.                                                 
+Simulation 1. Kinetic step 22.                                                 
+Simulation 1. Kinetic step 23.                                                 
+Simulation 1. Kinetic step 23.                                                 
+Simulation 1. Kinetic step 23.                                                 
+Simulation 1. Kinetic step 23.                                                 
+Simulation 1. Kinetic step 23.                                                 
+Simulation 1. Kinetic step 24.                                                 
+Simulation 1. Kinetic step 24.                                                 
+Simulation 1. Kinetic step 24.                                                 
+Simulation 1. Kinetic step 24.                                                 
+Simulation 1. Kinetic step 24.                                                 
+Simulation 1. Kinetic step 24.                                                 
+Simulation 1. Kinetic step 24.                                                 
+Simulation 1. Kinetic step 24.                                                 
+Simulation 1. Kinetic step 24.                                                 
+Simulation 1. Kinetic step 25.                                                 
+Simulation 1. Kinetic step 25.                                                 
+Simulation 1. Kinetic step 25.                                                 
+Simulation 1. Kinetic step 25.                                                 
+Simulation 1. Kinetic step 25.                                                 
+Simulation 1. Kinetic step 25.            RK-steps: Bad   0. OK35600. Time  41%
+Simulation 1. Kinetic step 25.                                                 
+Simulation 1. Kinetic step 25.                                                 
+Simulation 1. Kinetic step 25.                                                 
+Simulation 1. Kinetic step 25.                                                 
+Simulation 1. Kinetic step 25.                                                 
+Simulation 1. Kinetic step 25.                                                 
+Simulation 1. Kinetic step 25.                                                 
+Simulation 1. Kinetic step 26.                                                 
+Simulation 1. Kinetic step 26.                                                 
+Simulation 1. Kinetic step 26.                                                 
+Simulation 1. Kinetic step 26.                                                 
+Simulation 1. Kinetic step 26.                                                 
+Simulation 1. Kinetic step 26.                                                 
+Simulation 1. Kinetic step 26.                                                 
+Simulation 1. Kinetic step 26.            RK-steps: Bad   0. OK44463. Time  33%
+Simulation 1. Kinetic step 26.            RK-steps: Bad   0. OK50724. Time  38%
+Simulation 1. Kinetic step 26.                                                 
+Simulation 1. Kinetic step 26.                                                 
+Simulation 1. Kinetic step 26.                                                 
+Simulation 1. Kinetic step 26.                                                 
+Simulation 1. Kinetic step 26.                                                 
+Simulation 1. Kinetic step 26.            RK-steps: Bad   0. OK88218. Time  67%
+Simulation 1. Kinetic step 26.                                                 
+Simulation 1. Kinetic step 26.                                                 
+Simulation 1. Kinetic step 26.                                                 
+Simulation 1. Kinetic step 26.                                                 
+Simulation 1. Kinetic step 26.                                                 
+Simulation 1. Kinetic step 26.                                                 
+Simulation 1. Kinetic step 27.                                                 
+Simulation 1. Kinetic step 27.                                                 
+Simulation 1. Kinetic step 27.                                                 
+Simulation 1. Kinetic step 27.                                                 
+Simulation 1. Kinetic step 27.                                                 
+Simulation 1. Kinetic step 27.                                                 
+Simulation 1. Kinetic step 27.                                                 
+Simulation 1. Kinetic step 27.                                                 
+Simulation 1. Kinetic step 27.                                                 
+Simulation 1. Kinetic step 27.                                                 
+Simulation 1. Kinetic step 27.                                                 
+Simulation 1. Kinetic step 27.                                                 
+Simulation 1. Kinetic step 27.                                                 
+Simulation 1. Kinetic step 27.                                                 
+Simulation 1. Kinetic step 27.                                                 
+Simulation 1. Kinetic step 27.                                                 
+Simulation 1. Kinetic step 27.           RK-steps: Bad   0. OK100659. Time  66%
+Simulation 1. Kinetic step 27.                                                 
+Simulation 1. Kinetic step 27.                                                 
+Simulation 1. Kinetic step 27.           RK-steps: Bad   0. OK119041. Time  78%
+Simulation 1. Kinetic step 27.                                                 
+Simulation 1. Kinetic step 27.                                                 
+Simulation 1. Kinetic step 27.                                                 
+Simulation 1. Kinetic step 27.                                                 
+
+End of Run after 20.5819 Seconds.

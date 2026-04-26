@@ -1,0 +1,29 @@
+
+--- STDERR ---
+Input file: /home/zhouw/Documents/Codes/ReactiveSoluteTransport/Benchmark/gypsum_single_fracture_10cm_ap5mm/results_total_injection_reference_volume_precipitation_20260426_173943/phreeqc/tt_1e02/tt_1e02.pqi
+
+Output file: /home/zhouw/Documents/Codes/ReactiveSoluteTransport/Benchmark/gypsum_single_fracture_10cm_ap5mm/results_total_injection_reference_volume_precipitation_20260426_173943/phreeqc/tt_1e02/tt_1e02.pqo
+
+Database file: /home/zhouw/Documents/Codes/phreeqc-3.8.6-17100/database/phreeqc.dat
+
+              █▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀█
+              ║                                            ║
+              ║             * PHREEQC-3.8.6 *              ║
+              ║                                            ║
+              ║      A hydrogeochemical transport model    ║
+              ║                                            ║
+              ║                    by                      ║
+              ║       D.L. Parkhurst and C.A.J. Appelo     ║
+              ║                                            ║
+              ║              January  7, 2025              ║
+              █▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄█
+
+
+Initializing...                                                                 
+ERROR: Illegal command in line: 
+
+ERROR:  in BASIC line
+ 10  si = SI("Gypsum")
+
+ERROR: Fatal Basic error in rate Gypsum.
+Stopping.

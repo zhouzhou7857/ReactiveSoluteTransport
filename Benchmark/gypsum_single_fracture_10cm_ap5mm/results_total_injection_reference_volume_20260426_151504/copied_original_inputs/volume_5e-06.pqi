@@ -1,0 +1,232 @@
+TITLE Mineral volume evolution: scaled solid volume 5.0e-06 m3, R:W=1:1
+#----------------------------------------------------------------------
+# System description:
+#   Fluid:    1 kg pure water (limited amount)
+#   Minerals: 1000 cm3 total (water/rock mass ratio ~ 0.4)
+#     Gypsum   (CaSO4:2H2O): 71 vol% = 710 cm3 = 9.61 mol (Vm=73.9 cm3/mol)
+#     Dolomite (CaMg(CO3)2): 27 vol% = 270 cm3 = 4.19 mol (Vm=64.5 cm3/mol)
+#     Sylvite  (KCl)       :  2 vol% =  20 cm3 = 0.53 mol (Vm=37.5 cm3/mol)
+#
+# Approach:
+#   - KINETICS for all three primary minerals (TST dissolution rate)
+#   - EQUILIBRIUM_PHASES for Calcite (allow secondary precipitation)
+#   - Time stepping from ~1 second to ~10 years
+#
+# Expected behavior:
+#   1. Sylvite dissolves rapidly (minutes), fully dissolves
+#   2. Gypsum dissolves moderately (hours) to equilibrium
+#   3. Dolomite dissolves very slowly (years), kinetically limited
+#   4. Calcite may precipitate from Ca(gypsum) + CO3(dolomite)
+#
+# Adjustable parameters:
+#   -water     : mass of water (kg), reduce for more limited fluid
+#   -parms     : effective rate constants (mol/s), scale with surface area
+#   -m0 / -m   : initial mineral amounts (mol)
+#----------------------------------------------------------------------
+
+SOLUTION 1  Pure water
+        temp    25.0
+        pH      7.0
+        pe      4.0
+        -water  0.005
+
+RATES
+#
+# Transition-State-Theory (TST) rate expression with fixed reactive area:
+#   rate = k_int * A_reactive * (1 - SR)
+#
+# Fixed reactive surface area:
+#   A_reactive = 200 cm2 = 0.02 m2
+# k_int values are chosen so k_int * A_reactive matches the original initial k_eff
+# SR    : saturation ratio (IAP/Ksp); SR<1 dissolution, SR>1 precipitation
+#
+
+Gypsum
+-start
+  10  omega = SR("Gypsum")
+  20  IF (M <= 0 AND omega <= 1) THEN GOTO 100
+  30  v_gyp = M * 73.9
+  40  v_dol = KIN("Dolomite") * 64.5
+  50  v_syl = KIN("Sylvite") * 37.5
+  60  v_sum = v_gyp + v_dol + v_syl
+  70  IF (v_sum <= 0) THEN area = 0 ELSE area = PARM(2) * v_gyp / v_sum
+  80  rate = PARM(1) * area * (1 - omega)
+  90  moles = rate * TIME
+  100 IF (moles > 0 AND moles > M) THEN moles = M
+  110 GOTO 200
+  100 moles = 0
+  200 SAVE moles
+-end
+
+Dolomite
+-start
+  10  omega = SR("Dolomite")
+  20  IF (M <= 0 AND omega <= 1) THEN GOTO 100
+  30  v_gyp = KIN("Gypsum") * 73.9
+  40  v_dol = M * 64.5
+  50  v_syl = KIN("Sylvite") * 37.5
+  60  v_sum = v_gyp + v_dol + v_syl
+  70  IF (v_sum <= 0) THEN area = 0 ELSE area = PARM(2) * v_dol / v_sum
+  80  rate = PARM(1) * area * (1 - omega)
+  90  moles = rate * TIME
+  100 IF (moles > 0 AND moles > M) THEN moles = M
+  110 GOTO 200
+  100 moles = 0
+  200 SAVE moles
+-end
+
+Sylvite
+-start
+  10  omega = SR("Sylvite")
+  20  IF (M <= 0 AND omega <= 1) THEN GOTO 100
+  30  v_gyp = KIN("Gypsum") * 73.9
+  40  v_dol = KIN("Dolomite") * 64.5
+  50  v_syl = M * 37.5
+  60  v_sum = v_gyp + v_dol + v_syl
+  70  IF (v_sum <= 0) THEN area = 0 ELSE area = PARM(2) * v_syl / v_sum
+  80  rate = PARM(1) * area * (1 - omega)
+  90  moles = rate * TIME
+  100 IF (moles > 0 AND moles > M) THEN moles = M
+  110 GOTO 200
+  100 moles = 0
+  200 SAVE moles
+-end
+
+KINETICS 1
+Gypsum
+        -parms  5e-5  0.000584803547643    # total reactive area scaled to 0.000584803547643 m2
+        -m0     0.04805
+        -m      0.04805
+        -tol    1e-8
+Dolomite
+        -parms  5e-10 0.000584803547643    # total reactive area scaled to 0.000584803547643 m2
+        -m0     0.02095
+        -m      0.02095
+        -tol    1e-8
+Sylvite
+        -parms  5e-2  0.000584803547643    # total reactive area scaled to 0.000584803547643 m2
+        -m0     0.00265
+        -m      0.00265
+        -tol    1e-8
+-steps       1 1 2 3 5 8 10 20 30 50 80 \
+             100 200 300 500 800 \
+             1000 2000 3000 5000 8000 \
+             1e4 2e4 3e4 5e4 8e4 \
+             1e5 2e5 3e5 5e5 8e5 \
+             1e6 2e6 3e6 5e6 8e6 \
+             1e7 2e7 3e7 5e7 8e7 \
+             1e8
+-step_divide 1e-6
+-bad_step_max 50000
+-runge_kutta 6
+
+INCREMENTAL_REACTIONS true
+
+EQUILIBRIUM_PHASES 1
+        Calcite    0.0    0.0   # secondary mineral: precipitate if supersaturated
+
+SELECTED_OUTPUT
+        -file                volume_5e-06.sel
+        -reset               false
+        -totals              Ca Mg K S(6) Cl C
+        -kinetics            Gypsum Dolomite Sylvite
+        -equilibrium         Calcite
+        -saturation_indices  Gypsum Dolomite Sylvite Calcite
+
+USER_PUNCH
+-headings  Time_s  Time_d  pH  \
+           V_Gyp_cm3  V_Dol_cm3  V_Syl_cm3  V_Cal_cm3  V_total_cm3
+-start
+  10  PUNCH TOTAL_TIME
+  20  PUNCH TOTAL_TIME / 86400
+  30  PUNCH -LA("H+")
+  40  v_gyp = KIN("Gypsum") * 73.9
+  50  v_dol = KIN("Dolomite") * 64.5
+  60  v_syl = KIN("Sylvite") * 37.5
+  70  v_cal = EQUI("Calcite") * 36.9
+  80  PUNCH v_gyp, v_dol, v_syl, v_cal
+  90  PUNCH v_gyp + v_dol + v_syl + v_cal
+-end
+
+USER_GRAPH 1 Mineral Volumes
+        -headings Time(days) Gypsum Dolomite Sylvite Calcite Total
+        -chart_title "Mineral Volume Evolution (Batch Reaction with Limited Water)"
+        -axis_titles "Time (days)" "Volume (cm3)"
+        -axis_scale x_axis 1e-5 5e3 auto auto log
+  -start
+  10 x = TOTAL_TIME / 86400
+  20 PLOT_XY x, KIN("Gypsum") * 73.9, color = Red, symbol = None
+  30 PLOT_XY x, KIN("Dolomite") * 64.5, color = Blue, symbol = None
+  40 PLOT_XY x, KIN("Sylvite") * 37.5, color = Green, symbol = None
+  50 PLOT_XY x, EQUI("Calcite") * 36.9, color = Magenta, symbol = None
+  60 PLOT_XY x, KIN("Gypsum")*73.9 + KIN("Dolomite")*64.5 + \
+     KIN("Sylvite")*37.5 + EQUI("Calcite")*36.9, \
+     color = Black, symbol = None, line_width = 2
+  -end
+
+USER_GRAPH 2 Solution Chemistry
+        -headings Time(days) Ca Mg K SO4 Cl
+        -chart_title "Solution Composition Evolution"
+        -axis_titles "Time (days)" "Concentration (mol/kgw)"
+        -axis_scale x_axis 1e-5 5e3 auto auto log
+  -start
+  10 x = TOTAL_TIME / 86400
+  20 PLOT_XY x, TOT("Ca"), color = Red, symbol = None
+  30 PLOT_XY x, TOT("Mg"), color = Blue, symbol = None
+  40 PLOT_XY x, TOT("K"), color = Green, symbol = None
+  50 PLOT_XY x, TOT("S(6)"), color = Orange, symbol = None
+  60 PLOT_XY x, TOT("Cl"), color = Cyan, symbol = None
+  -end
+
+USER_GRAPH 3 pH and Saturation Indices
+        -headings Time(days) pH SI_Gypsum SI_Dolomite SI_Sylvite SI_Calcite
+        -chart_title "pH and Mineral Saturation Indices"
+        -axis_titles "Time (days)" "SI or pH"
+        -axis_scale x_axis 1e-5 5e3 auto auto log
+  -start
+  10 x = TOTAL_TIME / 86400
+  20 PLOT_XY x, -LA("H+"), color = Black, symbol = None, line_width = 2
+  30 PLOT_XY x, SI("Gypsum"), color = Red, symbol = None
+  40 PLOT_XY x, SI("Dolomite"), color = Blue, symbol = None
+  50 PLOT_XY x, SI("Sylvite"), color = Green, symbol = None
+  60 PLOT_XY x, SI("Calcite"), color = Magenta, symbol = None
+  -end
+END
+
+#----------------------------------------------------------------------
+# Part B: Equilibrium reference calculation
+# Shows final state when all minerals reach thermodynamic equilibrium
+#----------------------------------------------------------------------
+TITLE Part B -- Equilibrium reference (comparison with kinetic result)
+
+SOLUTION 2  Pure water
+        temp    25.0
+        pH      7.0
+        pe      4.0
+        -water  1.0
+
+EQUILIBRIUM_PHASES 2
+        Gypsum     0.0   9.61
+        Dolomite   0.0   4.19
+        Sylvite    0.0   0.53
+        Calcite    0.0   0.0
+
+SELECTED_OUTPUT
+        -file                ratio_eq_w1.0.sel
+        -reset               false
+        -totals              Ca Mg K S(6) Cl C
+        -equilibrium         Gypsum Dolomite Sylvite Calcite
+        -saturation_indices  Gypsum Dolomite Sylvite Calcite
+
+USER_PUNCH
+-headings  pH  V_Gyp_cm3  V_Dol_cm3  V_Syl_cm3  V_Cal_cm3  V_total_cm3
+-start
+  10  PUNCH -LA("H+")
+  20  v_gyp = EQUI("Gypsum") * 73.9
+  30  v_dol = EQUI("Dolomite") * 64.5
+  40  v_syl = EQUI("Sylvite") * 37.5
+  50  v_cal = EQUI("Calcite") * 36.9
+  60  PUNCH v_gyp, v_dol, v_syl, v_cal
+  70  PUNCH v_gyp + v_dol + v_syl + v_cal
+-end
+END

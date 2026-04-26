@@ -1,0 +1,26 @@
+
+--- STDERR ---
+Input file: /home/zhouw/Documents/Codes/ReactiveSoluteTransport/Benchmark/gypsum_single_fracture_10cm_ap5mm/results_total_injection_reference_volume_20260426_151851/phreeqc/tt_1e04/tt_1e04.pqi
+
+Output file: /home/zhouw/Documents/Codes/ReactiveSoluteTransport/Benchmark/gypsum_single_fracture_10cm_ap5mm/results_total_injection_reference_volume_20260426_151851/phreeqc/tt_1e04/tt_1e04.pqo
+
+Database file: /home/zhouw/Documents/Codes/phreeqc-3.8.6-17100/database/phreeqc.dat
+
+              █▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀█
+              ║                                            ║
+              ║             * PHREEQC-3.8.6 *              ║
+              ║                                            ║
+              ║      A hydrogeochemical transport model    ║
+              ║                                            ║
+              ║                    by                      ║
+              ║       D.L. Parkhurst and C.A.J. Appelo     ║
+              ║                                            ║
+              ║              January  7, 2025              ║
+              █▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄█
+
+
+Initializing...                                                                 
+Simulation 1. Kinetic step 19.                                                 
+Simulation 1. Kinetic step 21.                                                 
+
+End of Run after 0.731859 Seconds.

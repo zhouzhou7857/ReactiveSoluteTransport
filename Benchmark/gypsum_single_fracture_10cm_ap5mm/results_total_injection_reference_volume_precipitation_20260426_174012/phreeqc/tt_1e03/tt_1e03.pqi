@@ -1,0 +1,69 @@
+TITLE Kinetic gypsum precipitation from supersaturated water for t_cross=1.000000e+03 s
+#------------------------------------------------------------------------------
+# New benchmark workflow:
+#   - Reference water volume V_ref equals total injected solution volume
+#   - Reactive surface area is fixed to the two-wall fracture area
+#   - One PHREEQC cumulative precipitation law F_ref(t) is shared by all PT particles
+#   - Precipitation is exported to PT as negative mineral-volume change
+#------------------------------------------------------------------------------
+# V_ref        = 5.000000000000e-03 m3
+# Water mass   = 5.000000000000e+00 kg
+# A_ref        = 2.000000000000e-02 m2 = 200.000000 cm2
+# Ca           = 30.000000 mmol/kgw
+# S(6)         = 30.000000 mmol/kgw
+# empirical precipitation law:
+#   rate = -A * (k1 * (sqrt(SR)-1)^10 + k2 * (sqrt(SR)-1)^2)
+# k1           = 1.000000000000e+00 mol/m2/s
+# k2           = 5.000000000000e-07 mol/m2/s
+
+SOLUTION 1 Supersaturated Ca-SO4 water
+    temp    25.0
+    units   mmol/kgw
+    pH      7.0 charge
+    Ca      3.000000000000e+01
+    S(6)    3.000000000000e+01
+    -water  5.000000000000e+00
+
+RATES
+Gypsum
+-start
+  10 omega = SR("Gypsum")
+  20 IF omega <= 1 THEN SAVE 0 : END
+  30 A = PARM(1)
+  40 k1 = PARM(2)
+  50 k2 = PARM(3)
+  60 x = SQRT(omega) - 1
+  70 rate = -A * (k1 * x^10 + k2 * x^2)
+  80 SAVE rate * TIME
+-end
+
+KINETICS 1
+Gypsum
+    -m      0.0
+    -m0     0.0
+    -parms  2.000000000000e-02  1.000000000000e+00  5.000000000000e-07
+    -tol    1e-8
+    -steps  1 1 1 2 3 2 10 10 20 30 20 100 100 200 300 200 1000 1000 2000 3000 2000 10000 10000 20000 30000 20000
+    -cvode  true
+
+INCREMENTAL_REACTIONS true
+
+SELECTED_OUTPUT
+    -file                tt_1e03.sel
+    -reset               false
+    -totals              Ca S(6)
+    -kinetics            Gypsum
+    -saturation_indices  Gypsum
+
+USER_PUNCH
+    -headings Time_s pH SI_Gypsum SR_Gypsum V_Precip_cm3 DV_ref_m3
+-start
+  10 PUNCH TOTAL_TIME
+  20 PUNCH -LA("H+")
+  30 PUNCH SI("Gypsum")
+  40 PUNCH SR("Gypsum")
+  50 v_precip = KIN("Gypsum") * 73.9
+  60 PUNCH v_precip
+  70 PUNCH -v_precip * 1e-6
+-end
+END

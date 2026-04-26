@@ -27,8 +27,14 @@ PHREEQC_DB = PHREEQC_ROOT / "database" / "phreeqc.dat"
 PHREEQC_TEMPLATE = PHREEQC_ROOT / "gypsum" / "volume_5e-06.pqi"
 
 DOMAIN_NAME = "song_selected_10cm_dp5000Pa_domain.txt"
-SIM_NORMAL_NAME = "song_selected_10cm_rtm_vp5e-6_np1e5_tinj5000.txt"
-SIM_PRECHECK_NAME = "song_selected_10cm_rtm_vp5e-6_np1e5_tinj5000_precheck_autogen.txt"
+SIM_NORMAL_NAME = os.environ.get(
+    "RST_SIM_NORMAL_NAME",
+    "song_selected_10cm_rtm_vp5e-6_np1e5_tinj5000.txt",
+)
+SIM_PRECHECK_NAME = os.environ.get(
+    "RST_SIM_PRECHECK_NAME",
+    "song_selected_10cm_rtm_vp5e-6_np1e5_tinj5000_precheck_autogen.txt",
+)
 
 RUN_TAG = os.environ.get(
     "RST_RUN_TAG",
@@ -37,11 +43,16 @@ RUN_TAG = os.environ.get(
 RUN_ROOT = OUTPUT_DIR / RUN_TAG
 USE_VP_WIDTH_CORRECTION = os.environ.get("RST_USE_VP_WIDTH_CORRECTION", "0")
 
-CASES = {
+ALL_CASES = {
     "p9_a1p5": "song_selected_10cm/p9_a1p5/p9_a1p5_raw_filemode.txt",
     "p12_a2p0": "song_selected_10cm/p12_a2p0/p12_a2p0_raw_filemode.txt",
     "p16_a2p5": "song_selected_10cm/p16_a2p5/p16_a2p5_raw_filemode.txt",
 }
+case_filter = [name.strip() for name in os.environ.get("RST_CASES", "").split(",") if name.strip()]
+if case_filter:
+    CASES = {name: ALL_CASES[name] for name in case_filter}
+else:
+    CASES = ALL_CASES
 
 REF_SOLID_VOLUME_M3 = 5.0e-6
 REF_GYPSUM_MOL = 0.04805
