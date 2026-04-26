@@ -1,0 +1,3 @@
+# time=80900
+x1 y1 x2 y2 aperture velocity
+-0.05 0 0.05 0 0.00495567 9.82351e-05

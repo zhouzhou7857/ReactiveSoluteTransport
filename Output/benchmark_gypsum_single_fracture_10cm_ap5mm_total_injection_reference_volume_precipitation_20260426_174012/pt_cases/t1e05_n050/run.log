@@ -1,0 +1,113 @@
+0. Parameters
+fract_aperture generation = file
+nb part = 10000
+p_lim = 0.05
+option matrix = 0
+DFN file = benchmark_gypsum_single_fracture_10cm_ap5mm_total_injection_reference_volume_precipitation_20260426_174012_dfn_n50.txt
+simulation mode = 2
+Chemistry mode = rational_precipitation
+Active chemistry coupling: particle-age cumulative DeltaV law
+Chemistry DeltaV(t) = Pinf*(1-w*(1+a10*t)^(-1/9)-(1-w)*(1+a2*t)^(-1))
+Chemistry parameters: A1=2.02192e-05 k1=0.00214128 A2=2.50122e-06 k2=2.7273e-05 L=2.48263e-16 rational_pinf=-6.11978e-08 rational_w=0.973718 rational_a10=0.525474 rational_a2=1.66998e-27 Vref=5e-05 thickness=0.1 eff_diff_height_factor=0 D_eff=0 t_eff=0 vp_width_correction=0 min_aperture=1e-12 debug=0
+Deprecated inactive chemistry parameters retained for compatibility: C0=500 decay=0.005 stoich=1 molar_volume=7.4e-05
+Domain bounds: min(-0.05,-0.05), max(0.05,0.05)
+1. Fracture network generation
+DFN meshes before backbone: 50, left-border meshes: 1, right-border meshes: 1, meshes inside domain: 50
+DFN extents: min(-0.05,0), max(0.05,0)
+DFN vs domain x-gap: left 0, right 0
+Fluid flow computation in the fracture network
+DFN meshes after backbone: 50, left-border meshes: 1, right-border meshes: 1, meshes inside domain: 50
+DFN extents: min(-0.05,0), max(0.05,0)
+DFN vs domain x-gap: left 0, right 0
+Timing: initial connectivity+flow = 0.00114298 s
+2. Transport process computation - Particle displacement
+Initial transport diagnostics:
+  nb_part = 10000, t_injection = 100000, particle_time_share = 10.001
+  fracture_volume = 5e-05, particle_volume = 5.0005e-09
+  estimated_particle_residence_time = 100000 s
+  diagnostics file = ./../../Output/initial_transport_diagnostics.txt
+Continuous injection enabled: t_injection=100000, dt_inject=10.001
+Initial inlet allocation (mesh_index -> count):
+0 -> 10000
+Timing step 10/101 t=10000: total_step=0.000720585 s, min_aperture=0.00499284 mesh_index=0
+Timing step 20/101 t=20000: total_step=0.00131907 s, min_aperture=0.00498482 mesh_index=0
+Timing step 30/101 t=30000: total_step=0.00190787 s, min_aperture=0.0049768 mesh_index=0
+Timing step 40/101 t=40000: total_step=0.00204024 s, min_aperture=0.00496878 mesh_index=0
+Timing step 50/101 t=50000: total_step=0.00238961 s, min_aperture=0.00496077 mesh_index=0
+Timing step 60/101 t=60000: total_step=0.00283103 s, min_aperture=0.00495276 mesh_index=0
+Timing step 70/101 t=70000: total_step=0.00351165 s, min_aperture=0.00494475 mesh_index=0
+Timing step 80/101 t=80000: total_step=0.00392561 s, min_aperture=0.00493674 mesh_index=0
+Timing step 90/101 t=90000: total_step=0.00438565 s, min_aperture=0.00492874 mesh_index=0
+Timing step 101/101 t=101000: total_step=0.00435656 s, min_aperture=0.00491994 mesh_index=0
+Final inlet allocation (mesh_index -> count):
+0 -> 10000
+Timing total for all steps: 0.232009 s
+3. Result post-processing and writting
+Diagnostics: arrived=1 total=10000 not_arrived=9999 mean_t=100057 min_t=100057 max_t=100057
+Diagnostics sample arrival: particle=0 t=100057
+Diagnostics sample travel time at t=0:
+Diagnostics sample travel time at t=10000:
+particle=0 travel_time=10000 mesh_index=4
+particle=1 travel_time=9990 mesh_index=4
+particle=2 travel_time=9980 mesh_index=4
+particle=3 travel_time=9970 mesh_index=4
+particle=4 travel_time=9960 mesh_index=4
+Diagnostics sample travel time at t=20000:
+particle=0 travel_time=20000 mesh_index=9
+particle=1 travel_time=19990 mesh_index=9
+particle=2 travel_time=19980 mesh_index=9
+particle=3 travel_time=19970 mesh_index=9
+particle=4 travel_time=19960 mesh_index=9
+Diagnostics sample travel time at t=30000:
+particle=0 travel_time=30000 mesh_index=14
+particle=1 travel_time=29990 mesh_index=14
+particle=2 travel_time=29980 mesh_index=14
+particle=3 travel_time=29970 mesh_index=14
+particle=4 travel_time=29960 mesh_index=14
+Diagnostics sample travel time at t=40000:
+particle=0 travel_time=40000 mesh_index=19
+particle=1 travel_time=39990 mesh_index=19
+particle=2 travel_time=39980 mesh_index=19
+particle=3 travel_time=39970 mesh_index=19
+particle=4 travel_time=39960 mesh_index=19
+Diagnostics sample travel time at t=50000:
+particle=0 travel_time=50000 mesh_index=24
+particle=1 travel_time=49990 mesh_index=24
+particle=2 travel_time=49980 mesh_index=24
+particle=3 travel_time=49970 mesh_index=24
+particle=4 travel_time=49960 mesh_index=24
+Diagnostics sample travel time at t=60000:
+particle=0 travel_time=60000 mesh_index=29
+particle=1 travel_time=59990 mesh_index=29
+particle=2 travel_time=59980 mesh_index=29
+particle=3 travel_time=59970 mesh_index=29
+particle=4 travel_time=59960 mesh_index=29
+Diagnostics sample travel time at t=70000:
+particle=0 travel_time=70000 mesh_index=34
+particle=1 travel_time=69990 mesh_index=34
+particle=2 travel_time=69980 mesh_index=34
+particle=3 travel_time=69970 mesh_index=34
+particle=4 travel_time=69960 mesh_index=34
+Diagnostics sample travel time at t=80000:
+particle=0 travel_time=80000 mesh_index=39
+particle=1 travel_time=79990 mesh_index=39
+particle=2 travel_time=79980 mesh_index=39
+particle=3 travel_time=79970 mesh_index=39
+particle=4 travel_time=79960 mesh_index=39
+Diagnostics sample travel time at t=90000:
+particle=0 travel_time=90000 mesh_index=44
+particle=1 travel_time=89990 mesh_index=44
+particle=2 travel_time=89980 mesh_index=44
+particle=3 travel_time=89970 mesh_index=44
+particle=4 travel_time=89960 mesh_index=44
+Diagnostics sample travel time at t=100000:
+particle=0 travel_time=100000 mesh_index=49
+particle=1 travel_time=99990 mesh_index=49
+particle=2 travel_time=99980 mesh_index=49
+particle=3 travel_time=99970 mesh_index=49
+particle=4 travel_time=99960 mesh_index=49
+Timing: results output = 0.0471409 s
+CPU Time = 0
+
+
+[stderr]
